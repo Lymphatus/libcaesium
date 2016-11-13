@@ -9,6 +9,7 @@ compiler:
 
 before_install:
   - sudo apt-get install libtool autoconf git nasm
+  - chmod +x install.sh
   - ./install.sh
 
 before_script:
