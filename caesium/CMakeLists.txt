@@ -1,3 +1,5 @@
+use_c99()
+
 find_library(zoflipng zopflipng /usr/local/lib)
 find_library(jpeg jpeg /opt/mozjpeg/lib)
 find_library(turbojpeg turbojpeg /opt/mozjpeg/lib)

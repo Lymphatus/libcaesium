@@ -5,7 +5,7 @@ git clone https://github.com/mozilla/mozjpeg
 cd mozjpeg/
 autoreconf -fiv
 mkdir build && cd build
-../configure CFLAGS='-Wall -Wextra -std=c99'
+../configure
 make && sudo make install
 
 #zopflipng
