@@ -1,7 +1,8 @@
-#ifndef CS_CCLTYPES
-#define CS_CCLTYPES
+#ifndef LIBCAESIUM_CSTYPES_H
+#define LIBCAESIUM_CSTYPES_H
 
 #include <stdbool.h>
+#include <turbojpeg.h>
 
 typedef struct cs_jpeg_pars
 {
@@ -9,8 +10,9 @@ typedef struct cs_jpeg_pars
 	int color_space;
 	int dct_method;
 	bool exif_copy;
-	bool lossless;
-	//TODO uncomment when linking turbojpeg enum TJSAMP subsample;
+	enum TJSAMP subsample;
+	int width;
+	int height;
 } cs_jpeg_pars;
 
 typedef struct cs_png_pars
@@ -27,17 +29,19 @@ typedef struct cs_image_pars
 {
 	cs_jpeg_pars jpeg;
 	cs_png_pars png;
-
-	int width;
-	int height;
-	char **filepath;
 } cs_image_pars;
 
-enum image_type
+typedef enum image_type
 {
 	JPEG,
 	PNG,
 	UNKN,
-};
+} image_type;
+
+typedef enum error_level
+{
+	ERROR = 0,
+	WARNING = 1
+} error_level;
 
 #endif

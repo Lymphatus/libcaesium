@@ -5,16 +5,18 @@
 #include "error.h"
 #include "utils.h"
 #include "caesium.h"
+#include "png.h"
+#include "jpeg.h"
 
-bool cs_compress(const char *input, const char *output, cs_image_pars *options)
+bool cs_compress(const char *inputPath, const char *outputPath, cs_image_pars *options)
 {
 	FILE *pInputFile;
-	enum image_type type;
+	image_type type;
 	bool result = false;
 
 	//Inline... Should I split into 2 lines?
-	if ((pInputFile = fopen(input, "rb")) == NULL) {
-		display_error(0, 4);
+	if ((pInputFile = fopen(inputPath, "rb")) == NULL) {
+		display_error(ERROR, 4);
 		return result;
 	}
 
@@ -23,13 +25,18 @@ bool cs_compress(const char *input, const char *output, cs_image_pars *options)
 	fclose(pInputFile);
 
 	if (type == UNKN) {
-		display_error(1, 3);
+		display_error(WARNING, 3);
 	} else if (type == JPEG) {
 		//TODO result Compress JPEG
-		printf("Called JPEG compression\n");
+		if (options->jpeg.quality != 0) {
+			printf("Called JPEG lossy compression\n");
+			cs_jpeg_compress(outputPath, cs_jpeg_decompress(inputPath, &options->jpeg), &options->jpeg);
+		}
+		printf("Called JPEG lossless compression\n");
+		cs_jpeg_optimize(inputPath, outputPath, options->jpeg.exif_copy, inputPath);
 	} else if (type == PNG) {
-		//TODO result Compress PNG
 		printf("Called PNG compression\n");
+		result = cs_png_optimize(inputPath, outputPath, &options->png);
 	}
 
 	return result;

@@ -1,5 +1,5 @@
-#ifndef CAESIUM_H
-#define CAESIUM_H
+#ifndef LIBCAESIUM_CAESIUM_H
+#define LIBCAESIUM_CAESIUM_H
 
 #include <stdbool.h>
 

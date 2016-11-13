@@ -1,10 +1,10 @@
-#ifndef CCLT_UTILS
-#define CCLT_UTILS
+#ifndef LIBCAESIUM_UTILS_H
+#define LIBCAESIUM_UTILS_H
 
 #include <stdio.h>
 
 #include "cstypes.h"
 
-enum image_type detect_image_type(FILE *pFile);
+image_type detect_image_type(FILE *pFile);
 
 #endif
