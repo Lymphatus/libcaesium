@@ -1,9 +1,15 @@
+#include <stdio.h>
 #include "caesium.h"
 #include "helper.h"
 
-int main()
+int main(int argc, char *argv[])
 {
+	if (argc != 3) {
+		fprintf(stderr, "Wrong arguments.\nExiting.\n");
+		return -1;
+	}
 	cs_image_pars options = initialize_parameters();
-	cs_compress("test.jpg", "test1.jpg", &options);
+	cs_compress(argv[1], argv[2], &options);
+
 	return 0;
 }

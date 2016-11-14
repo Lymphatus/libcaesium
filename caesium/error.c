@@ -24,6 +24,18 @@ const char *get_error_message(int code)
 		case 4:
 			return "Could not open input file.";
 
+			//JPEG related errors
+		case 100:
+			return "Failed to open JPEG file while trying to get markers";
+		case 101:
+			return "Failed to open input JPEG file while optimizing";
+		case 102:
+			return "Failed to open output JPEG file while optimizing";
+		case 103:
+			return "Failed to open JPEG file while compressing";
+		case 104:
+			return "Failed to open JPEG file while decompressing";
+
 			//PNG related errors
 		case 200:
 			return "Failed to load PNG file.";

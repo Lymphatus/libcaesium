@@ -4,8 +4,7 @@
 #include <turbojpeg.h>
 
 #include "jpeg.h"
-
-//TODO Error handling
+#include "error.h"
 
 struct jpeg_decompress_struct cs_get_markers(const char *input)
 {
@@ -16,13 +15,9 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 
 	jpeg_create_decompress(&einfo);
 
-	//Open the input file
-	fp = fopen(input, "r");
-
 	//Check for errors
-	//TODO Use UNIX error messages
-	if (fp == NULL) {
-		//trigger_error(13, true, input);
+	if ((fp = fopen(input, "r")) == NULL) {
+		display_error(ERROR, 100);
 	}
 
 	//Create the IO instance for the input file
@@ -42,8 +37,6 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 
 int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif, const char *exif_src)
 {
-	//TODO Bug on normal compress: the input file is a bogus long string
-	// Happened with a (bugged) server connection
 	//File pointer for both input and output
 	FILE *fp;
 
@@ -64,17 +57,12 @@ int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif,
 	dstinfo.err = jpeg_std_error(&jdsterr);
 	jpeg_create_compress(&dstinfo);
 
-
-	//Open the input file
-	fp = fopen(input_file, "r");
-
 	//Check for errors
-	//TODO Use UNIX error messages
-	if (fp == NULL) {
-		//trigger_error(105, true, input_file);
+	if ((fp = fopen(input_file, "r")) == NULL) {
+		display_error(ERROR, 101);
 	}
 
-	//Create the IO istance for the input file
+	//Create the IO instance for the input file
 	jpeg_stdio_src(&srcinfo, fp);
 
 	//Save EXIF info
@@ -90,7 +78,6 @@ int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif,
 
 	//Read input coefficents
 	src_coef_arrays = jpeg_read_coefficients(&srcinfo);
-	//jcopy_markers_setup(&srcinfo, copyoption);
 
 	//Copy parameters
 	jpeg_copy_critical_parameters(&srcinfo, &dstinfo);
@@ -101,12 +88,9 @@ int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif,
 	//We don't need the input file anymore
 	fclose(fp);
 
-	//Open the output one instead
-	fp = fopen(output_file, "w+");
 	//Check for errors
-	//TODO Use UNIX error messages
-	if (fp == NULL) {
-		//trigger_error(106, true, output_file);
+	if ((fp = fopen(output_file, "wb")) == NULL) {
+		display_error(ERROR, 102);
 	}
 
 	//CRITICAL - This is the optimization step
@@ -117,7 +101,7 @@ int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif,
 	//Set the output file parameters
 	jpeg_stdio_dest(&dstinfo, fp);
 
-	//Actually write the coefficents
+	//Actually write the coefficients
 	jpeg_write_coefficients(&dstinfo, dst_coef_arrays);
 
 	//Write EXIF
@@ -151,12 +135,10 @@ void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_j
 	unsigned char *output_buffer;
 	unsigned long output_size = 0;
 
-	fp = fopen(output_file, "wb");
 
 	//Check for errors
-	//TODO Use UNIX error messages
-	if (fp == NULL) {
-		//trigger_error(106, true, output_file);
+	if ((fp = fopen(output_file, "wb")) == NULL) {
+		display_error(ERROR, 103);
 	}
 
 	output_buffer = NULL;
@@ -185,47 +167,43 @@ void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_j
 
 unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 {
-
-	//TODO I/O Error handling
-
-	FILE *file = NULL;
-	int res = 0;
-	long int sourceJpegBufferSize = 0;
+	//TODO This has a lot of non checked errors that may occur
+	FILE *fp;
+	long sourceJpegBufferSize = 0;
 	unsigned char *sourceJpegBuffer = NULL;
 	tjhandle tjDecompressHandle;
 	int fileWidth = 0, fileHeight = 0, jpegSubsamp = 0, colorSpace = 0;
 
-	//TODO No error checks here
-	file = fopen(fileName, "rb");
-	res = fseek(file, 0, SEEK_END);
-	sourceJpegBufferSize = ftell(file);
+	if ((fp = fopen(fileName, "rb")) == NULL) {
+		display_error(ERROR, 104);
+	}
+	fseek(fp, 0, SEEK_END);
+	sourceJpegBufferSize = ftell(fp);
 	sourceJpegBuffer = tjAlloc(sourceJpegBufferSize);
 
-	res = fseek(file, 0, SEEK_SET);
-	res = fread(sourceJpegBuffer, (long) sourceJpegBufferSize, 1, file);
+	fseek(fp, 0, SEEK_SET);
+	fread(sourceJpegBuffer, (size_t) sourceJpegBufferSize, 1, fp);
 	tjDecompressHandle = tjInitDecompress();
-	res = tjDecompressHeader3(tjDecompressHandle, sourceJpegBuffer, sourceJpegBufferSize, &fileWidth, &fileHeight,
-							  &jpegSubsamp, &colorSpace);
+	tjDecompressHeader3(tjDecompressHandle, sourceJpegBuffer, sourceJpegBufferSize, &fileWidth, &fileHeight,
+						&jpegSubsamp, &colorSpace);
 
 	options->width = fileWidth;
 	options->height = fileHeight;
 
-	options->subsample = jpegSubsamp;
+	options->subsample = (enum TJSAMP) jpegSubsamp;
 	options->color_space = colorSpace;
 
 	unsigned char *temp = tjAlloc(options->width * options->height * tjPixelSize[options->color_space]);
 
-	res = tjDecompress2(tjDecompressHandle,
-						sourceJpegBuffer,
-						sourceJpegBufferSize,
-						temp,
-						options->width,
-						0,
-						options->height,
-						options->color_space,
-						options->dct_method);
-
-	//fwrite(temp, pars->width * pars->height * tjPixelSize[pars->color_space], 1, fopen("/Users/lymphatus/Desktop/tmp/compresse/ccc", "w"));
+	tjDecompress2(tjDecompressHandle,
+				  sourceJpegBuffer,
+				  sourceJpegBufferSize,
+				  temp,
+				  options->width,
+				  0,
+				  options->height,
+				  options->color_space,
+				  options->dct_method);
 
 	tjDestroy(tjDecompressHandle);
 
@@ -236,11 +214,6 @@ void jcopy_markers_execute(j_decompress_ptr srcinfo, j_compress_ptr dstinfo)
 {
 	jpeg_saved_marker_ptr marker;
 
-	/* In the current implementation, we don't actually need to examine the
-	* option flag here; we just copy everything that got saved.
-	* But to avoid confusion, we do not output JFIF and Adobe APP14 markers
-	* if the encoder library already wrote one.
-	*/
 	for (marker = srcinfo->marker_list; marker != NULL; marker = marker->next) {
 		if (dstinfo->write_JFIF_header &&
 			marker->marker == JPEG_APP0 &&

@@ -27,15 +27,12 @@ bool cs_compress(const char *inputPath, const char *outputPath, cs_image_pars *o
 	if (type == UNKN) {
 		display_error(WARNING, 3);
 	} else if (type == JPEG) {
-		//TODO result Compress JPEG
 		if (options->jpeg.quality != 0) {
-			printf("Called JPEG lossy compression\n");
 			cs_jpeg_compress(outputPath, cs_jpeg_decompress(inputPath, &options->jpeg), &options->jpeg);
+			inputPath = outputPath;
 		}
-		printf("Called JPEG lossless compression\n");
 		cs_jpeg_optimize(inputPath, outputPath, options->jpeg.exif_copy, inputPath);
 	} else if (type == PNG) {
-		printf("Called PNG compression\n");
 		result = cs_png_optimize(inputPath, outputPath, &options->png);
 	}
 
