@@ -4,11 +4,10 @@ project(libcaesium)
 
 set(CMAKE_MACOSX_RPATH 1)
 set(MOZJPEG_INCLUDE /opt/mozjpeg/include)
-set(MOZJPEG_LIB32 /opt/mozjpeg/lib)
-set(MOZJPEG_LIB64 /opt/mozjpeg/lib64)
+set(MOZJPEG_LIB /opt/mozjpeg/lib)
 
 include_directories(${MOZJPEG_INCLUDE})
-link_directories(${MOZJPEG_LIB32} ${MOZJPEG_LIB64})
+link_directories(${MOZJPEG_LIB})
 
 add_subdirectory(caesium)
 add_subdirectory(demo)
