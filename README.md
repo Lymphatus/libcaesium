@@ -73,10 +73,10 @@ Those are the zopflipng compression parameters.
 - **transparent**: remove colors behind alpha channel 0. Default: true.
 - **auto_filter_strategy**: legacy.
 
-# Compilation
+## Compilation
 TODO
 
-# Installation
+## Installation
 TODO
 
 ## Compression vs Optimization
