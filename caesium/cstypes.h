@@ -7,9 +7,13 @@
 typedef struct cs_jpeg_pars
 {
 	int quality;
-	int color_space;
-	int dct_method;
 	bool exif_copy;
+	int dct_method;
+	/*
+	 * Parameters you have no reason to set as they will be
+	 * overwritten during the process
+	 */
+	int color_space;
 	enum TJSAMP subsample;
 	int width;
 	int height;
