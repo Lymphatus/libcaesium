@@ -82,6 +82,6 @@ TODO
 ## Compression vs Optimization
 JPEG is a lossy format: that means you will always lose some information after each compression. So, compressing a file with
 100 quality for 10 times will result in a always different image, even though you can't really see the difference.
-Libcaesium also supports optimization, by setting the _quality_ to 0. This performs a lossy process, resulting in the same image,
+Libcaesium also supports optimization, by setting the _quality_ to 0. This performs a lossless process, resulting in the same image,
 but with a smaller size (10-15% usually).  
 PNG is lossless, so libcaesium will always perform optimization rather than compression.
