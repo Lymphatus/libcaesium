@@ -4,6 +4,7 @@
 git clone https://github.com/mozilla/mozjpeg
 cd mozjpeg/
 autoreconf -fiv
+autoreconf -fiv
 mkdir build && cd build
 ../configure
 make && sudo make install
