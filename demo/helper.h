@@ -1,7 +1,7 @@
 #ifndef LIBCAESIUM_HELPER_H
 #define LIBCAESIUM_HELPER_H
 
-#include "cstypes.h"
+#include "caesium.h"
 
 void initialize_jpeg_parameters(cs_image_pars *options);
 

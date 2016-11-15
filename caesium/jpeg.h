@@ -3,7 +3,7 @@
 
 #include <jpeglib.h>
 
-#include "cstypes.h"
+#include "caesium.h"
 
 int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif, const char *exif_src);
 

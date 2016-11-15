@@ -14,3 +14,8 @@ target_link_libraries(caesium zopflipng jpeg turbojpeg)
 # Make sure the compiler can find include files for our Caesium library
 # when other libraries or executables link to Caesium
 target_include_directories(caesium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+install(FILES caesium.h DESTINATION include)
+install(TARGETS caesium caesium_static
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)

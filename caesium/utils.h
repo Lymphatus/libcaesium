@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "cstypes.h"
+#include "caesium.h"
 
 image_type detect_image_type(FILE *pFile);
 

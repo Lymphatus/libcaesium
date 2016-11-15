@@ -1,10 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "cstypes.h"
 #include "error.h"
 #include "utils.h"
-#include "caesium.h"
 #include "png.h"
 #include "jpeg.h"
 

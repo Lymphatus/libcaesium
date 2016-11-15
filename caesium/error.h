@@ -1,7 +1,7 @@
 #ifndef LIBCAESIUM_ERROR_H
 #define LIBCAESIUM_ERROR_H
 
-#include "cstypes.h"
+#include "caesium.h"
 
 void display_error(error_level level, int code);
 
