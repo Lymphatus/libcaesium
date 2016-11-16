@@ -3,6 +3,8 @@
 
 Libcaesium is a simple library performing JPEG and PNG compression/optimization using [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli).
 
+## Download
+Binaries not available yet. Please refer to the compilation section below.
 
 ## Basic usage
 
@@ -73,11 +75,27 @@ Those are the zopflipng compression parameters.
 - **transparent**: remove colors behind alpha channel 0. Default: true.
 - **auto_filter_strategy**: legacy.
 
-## Compilation
-TODO
+## Compilation and Installation
+Libcaesium uses cmake to build and install the library. Before compiling, be sure to have all the requisites.
+Libcaesium requires [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli) installed as shared/static libraries.
+Please refer to their own documentation for detailed instructions.
+Step by step instructions for each platform will be provided.
 
-## Installation
-TODO
+### Linux and OS X
+Provided you have all the requirements, building and installing from git is as simple as typing
+```
+$ git clone https://github.com/Lymphatus/libcaesium.git
+$ cd libcaesium
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ sudo make install
+```
+This will compile both the shared and static caesium library, the required header and a small demo application named _caesiumd_.
+
+### Windows
+Platform not tested. Compilation not supported yet.
 
 ## Compression vs Optimization
 JPEG is a lossy format: that means you will always lose some information after each compression. So, compressing a file with
