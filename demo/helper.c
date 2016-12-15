@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <turbojpeg.h>
 
 #include "helper.h"
 

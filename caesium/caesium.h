@@ -2,7 +2,6 @@
 #define LIBCAESIUM_CAESIUM_H
 
 #include <stdbool.h>
-#include <turbojpeg.h>
 
 typedef struct cs_jpeg_pars
 {
@@ -14,7 +13,7 @@ typedef struct cs_jpeg_pars
 	 * overwritten during the process
 	 */
 	int color_space;
-	enum TJSAMP subsample;
+	int subsample;
 	int width;
 	int height;
 } cs_jpeg_pars;
