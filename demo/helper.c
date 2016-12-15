@@ -5,7 +5,7 @@
 
 void initialize_jpeg_parameters(cs_image_pars *options)
 {
-	options->jpeg.quality = 65;
+	options->jpeg.quality = 0;
 	options->jpeg.exif_copy = false;
 	options->jpeg.dct_method = TJFLAG_FASTDCT;
 	options->jpeg.width = 0;

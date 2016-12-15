@@ -51,7 +51,7 @@ typedef struct cs_jpeg_pars
 ```
 The first 3 parameters matters, in term of compression, while the others will be set by the compressor/decompressor
 during the compression progress and thus they will be overwritten.
-- **quality**: in a range from 0 to 100, the quality of the resulting image. **Note** that 0 means _optimization_ (see below). Default: 65.
+- **quality**: in a range from 0 to 100, the quality of the resulting image. **Note** that 0 means _optimization_ (see below). Default: 0.
 - **exif_copy**: set it to _true_ to copy EXIF tag info after compression. Default: false;
 - **dct_method**: one of the turbojpeg DCT flags. Default: TJFLAG_FASTDCT.
 
