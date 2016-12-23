@@ -17,8 +17,6 @@ const char *get_error_message(int code)
 		//Generic errors
 		case 1:
 			return "NULL file pointer while checking type.";
-		case 2:
-			return "Could not read enough file bytes for type checking.";
 		case 3:
 			return "File type not supported.";
 		case 4:

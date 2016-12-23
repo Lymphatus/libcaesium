@@ -47,7 +47,6 @@ typedef enum error_level
 	WARNING = 1
 } error_level;
 
-
-bool cs_compress(const char *input, const char *output, cs_image_pars *options);
+bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options);
 
 #endif

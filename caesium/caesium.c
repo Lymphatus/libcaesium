@@ -6,14 +6,13 @@
 #include "png.h"
 #include "jpeg.h"
 
-bool cs_compress(const char *inputPath, const char *outputPath, cs_image_pars *options)
+bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options)
 {
 	FILE *pInputFile;
 	image_type type;
 	bool result = false;
 
-	//Inline... Should I split into 2 lines?
-	if ((pInputFile = fopen(inputPath, "rb")) == NULL) {
+	if ((pInputFile = fopen(input_path, "rb")) == NULL) {
 		display_error(ERROR, 4);
 		return result;
 	}
@@ -26,13 +25,14 @@ bool cs_compress(const char *inputPath, const char *outputPath, cs_image_pars *o
 		display_error(WARNING, 3);
 	} else if (type == JPEG) {
 		if (options->jpeg.quality != 0) {
-			cs_jpeg_compress(outputPath, cs_jpeg_decompress(inputPath, &options->jpeg), &options->jpeg);
+			cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
 			//The output is now the new input for optimization
-			inputPath = outputPath;
+			result = cs_jpeg_optimize(output_path, output_path, options->jpeg.exif_copy, input_path);
+		} else {
+			result = cs_jpeg_optimize(input_path, output_path, options->jpeg.exif_copy, input_path);
 		}
-		cs_jpeg_optimize(inputPath, outputPath, options->jpeg.exif_copy, inputPath);
 	} else if (type == PNG) {
-		result = cs_png_optimize(inputPath, outputPath, &options->png);
+		result = cs_png_optimize(input_path, output_path, &options->png);
 	}
 
 	return result;

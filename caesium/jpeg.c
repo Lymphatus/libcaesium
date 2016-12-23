@@ -35,7 +35,7 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 	return einfo;
 }
 
-int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif, const char *exif_src)
+bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif, const char *exif_src)
 {
 	//File pointer for both input and output
 	FILE *fp;
@@ -125,7 +125,7 @@ int cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif,
 	//Close the output file
 	fclose(fp);
 
-	return 0;
+	return true;
 }
 
 void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options)

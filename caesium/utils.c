@@ -14,7 +14,6 @@ image_type detect_image_type(FILE *pFile)
 	}
 
 	if (fread(buffer, 1, 2, pFile) < 2) {
-		display_error(ERROR, 2);
 		return UNKN;
 	}
 
