@@ -162,7 +162,7 @@ void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_j
 	fclose(fp);
 	tjDestroy(tjCompressHandle);
 	tjFree(output_buffer);
-
+	tjFree(image_buffer);
 }
 
 unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
@@ -206,6 +206,7 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 				  options->dct_method);
 
 	tjDestroy(tjDecompressHandle);
+	tjFree(sourceJpegBuffer);
 
 	return temp;
 }
