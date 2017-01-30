@@ -1,6 +1,10 @@
 #ifndef LIBCAESIUM_CAESIUM_H
 #define LIBCAESIUM_CAESIUM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 
 typedef struct cs_jpeg_pars
@@ -48,5 +52,9 @@ typedef enum error_level
 } error_level;
 
 bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
