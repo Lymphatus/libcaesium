@@ -52,6 +52,7 @@ typedef enum error_level
 } error_level;
 
 bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options);
+cs_image_pars initialize_parameters();
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "caesium.h"
-#include "helper.h"
 
 int main(int argc, char *argv[])
 {

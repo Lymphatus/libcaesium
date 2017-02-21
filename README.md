@@ -8,7 +8,7 @@ Binaries not available yet. Please refer to the compilation section below.
 
 ## Basic usage
 
-Libcaesium exposes one single function, auto-detecting the input file type:
+Libcaesium exposes one single function to compress, auto-detecting the input file type:
 ```C
 bool cs_compress(const char *input,
                  const char *output,
@@ -24,6 +24,8 @@ bool cs_compress(const char *input,
 
 ## Compression options
 Libcaesium supports a few compression parameters for each JPEG and PNG.
+You need to initialize the default values before compressing by calling `initialize_parameters()`.  
+
 They are defined into a top level struct containing each supported file parameters, as follows:
 ```C
 typedef struct cs_image_pars
@@ -39,14 +41,6 @@ typedef struct cs_jpeg_pars
 	int quality;
 	bool exif_copy;
 	int dct_method;
-	/*
-	 * Parameters you have no reason to set as they will be
-	 * overwritten during the process
-	 */
-	int color_space;
-	enum TJSAMP subsample;
-	int width;
-	int height;
 } cs_jpeg_pars;
 ```
 The first 3 parameters matters, in term of compression, while the others will be set by the compressor/decompressor
