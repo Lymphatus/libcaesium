@@ -9,7 +9,7 @@ image_type detect_image_type(FILE *pFile)
 	unsigned char buffer[2];
 
 	if (pFile == NULL) {
-		display_error(ERROR, 1);
+		display_error(WARNING, 101);
 		return UNKN;
 	}
 

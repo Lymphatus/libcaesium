@@ -17,7 +17,7 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 
 	//Check for errors
 	if ((fp = fopen(input, "r")) == NULL) {
-		display_error(ERROR, 100);
+		display_error(ERROR, 200);
 	}
 
 	//Create the IO instance for the input file
@@ -59,7 +59,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 
 	//Check for errors
 	if ((fp = fopen(input_file, "r")) == NULL) {
-		display_error(ERROR, 101);
+		display_error(ERROR, 201);
 	}
 
 	//Create the IO instance for the input file
@@ -90,7 +90,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 
 	//Check for errors
 	if ((fp = fopen(output_file, "wb")) == NULL) {
-		display_error(ERROR, 102);
+		display_error(ERROR, 202);
 	}
 
 	//CRITICAL - This is the optimization step
@@ -138,7 +138,7 @@ void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_j
 
 	//Check for errors
 	if ((fp = fopen(output_file, "wb")) == NULL) {
-		display_error(ERROR, 103);
+		display_error(ERROR, 203);
 	}
 
 	output_buffer = NULL;
@@ -175,7 +175,7 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 	int fileWidth = 0, fileHeight = 0, jpegSubsamp = 0, colorSpace = 0;
 
 	if ((fp = fopen(fileName, "rb")) == NULL) {
-		display_error(ERROR, 104);
+		display_error(ERROR, 204);
 	}
 	fseek(fp, 0, SEEK_END);
 	sourceJpegBufferSize = ftell(fp);

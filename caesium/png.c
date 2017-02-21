@@ -32,7 +32,7 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 	png_options.auto_filter_strategy = options->auto_filter_strategy;
 
 	if (lodepng_load_file(&orig_buffer, &orig_buffer_size, input) != 0) {
-		display_error(ERROR, 200);
+		display_error(ERROR, 300);
 		goto cleanup;
 	}
 
@@ -42,12 +42,12 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 						   0,
 						   &resultpng,
 						   &resultpng_size) != 0) {
-		display_error(ERROR, 201);
+		display_error(ERROR, 301);
 		goto cleanup;
 	}
 
 	if (lodepng_save_file(resultpng, resultpng_size, output) != 0) {
-		display_error(ERROR, 202);
+		display_error(ERROR, 302);
 		goto cleanup;
 	}
 

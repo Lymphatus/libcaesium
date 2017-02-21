@@ -13,7 +13,7 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 	bool result = false;
 
 	if ((pInputFile = fopen(input_path, "rb")) == NULL) {
-		display_error(ERROR, 4);
+		display_error(ERROR, 104);
 		return result;
 	}
 
@@ -22,7 +22,7 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 	fclose(pInputFile);
 
 	if (type == UNKN) {
-		display_error(WARNING, 3);
+		display_error(WARNING, 103);
 	} else if (type == JPEG) {
 		if (options->jpeg.quality != 0) {
 			cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
