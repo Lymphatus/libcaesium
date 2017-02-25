@@ -32,16 +32,23 @@ typedef struct cs_png_pars
 	int auto_filter_strategy;
 } cs_png_pars;
 
+typedef struct cs_tiff_pars
+{
+	int compression;
+} cs_tiff_pars;
+
 typedef struct cs_image_pars
 {
 	cs_jpeg_pars jpeg;
 	cs_png_pars png;
+	cs_tiff_pars tiff;
 } cs_image_pars;
 
 typedef enum image_type
 {
-	JPEG,
-	PNG,
+	CS_JPEG,
+	CS_PNG,
+	CS_TIFF,
 	UNKN,
 } image_type;
 
