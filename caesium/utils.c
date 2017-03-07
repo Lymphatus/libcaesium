@@ -17,7 +17,7 @@ image_type detect_image_type(FILE *pFile)
 		return UNKN;
 	}
 
-	if (buffer[0] == 0xFF && buffer[1] == 0xFF) {
+	if (buffer[0] == 0xFF && buffer[1] == 0xD8) {
 		return CS_JPEG;
 	} else if (buffer[0] == 0x89 && buffer[1] == 0x50) {
 		return CS_PNG;
