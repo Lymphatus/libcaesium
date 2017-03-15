@@ -1,4 +1,4 @@
-set(CMAKE_C_FLAGS "--std=gnu99 -fPIC")
+set(CMAKE_C_FLAGS "--std=gnu99 -fPIC ${CMAKE_C_FLAGS}")
 
 find_library(zoflipng zopflipng /usr/local/lib)
 find_library(jpeg /opt/mozjpeg/lib)
