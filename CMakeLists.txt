@@ -16,18 +16,9 @@ configure_file(
 )
 
 include_directories("${PROJECT_BINARY_DIR}")
+include_directories(/opt/mozjpeg/include)
 
-set(MOZJPEG_INCLUDE /opt/mozjpeg/include)
-set(MOZJPEG_LIB32 /opt/mozjpeg/lib)
-set(MOZJPEG_LIB64 /opt/mozjpeg/lib64)
-
-include_directories(${MOZJPEG_INCLUDE})
-
-if(EXISTS ${MOZJPEG_LIB64})
-    link_directories(${MOZJPEG_LIB64})
-else()
-    link_directories(${MOZJPEG_LIB32})
-endif()
+link_directories(/opt/mozjpeg/lib)
 
 add_subdirectory(caesium)
 add_subdirectory(demo)
