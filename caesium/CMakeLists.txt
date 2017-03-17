@@ -16,20 +16,17 @@ target_link_libraries(caesium zopflipng jpeg turbojpeg tiff)
 target_include_directories(caesium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # OSX installs in local
-if(APPLE)
+if (APPLE)
     install(FILES caesium.h DESTINATION /usr/local/include)
     install(TARGETS LIBRARY DESTINATION /usr/local/lib)
     install(TARGETS ARCHIVE DESTINATION /usr/local/lib)
-endif()
-
-if(UNIX AND NOT APPLE)
+elseif (UNIX AND NOT APPLE)
     install(FILES caesium.h DESTINATION /usr/include)
     install(TARGETS LIBRARY DESTINATION /usr/lib)
     install(TARGETS ARCHIVE DESTINATION /usr/lib)
-endif()
-
-# Fallback
-install(FILES caesium.h DESTINATION include)
-install(TARGETS caesium caesium_static
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+else ()
+    install(FILES caesium.h DESTINATION include)
+    install(TARGETS caesium caesium_static
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
+endif ()
