@@ -18,7 +18,12 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories(/opt/mozjpeg/include)
 
-link_directories(/opt/mozjpeg/lib)
+if(EXISTS /opt/mozjpeg/lib64)
+    link_directories(/opt/mozjpeg/lib64)
+else()
+    link_directories(/opt/mozjpeg/lib)
+endif()
+
 
 add_subdirectory(caesium)
 add_subdirectory(demo)

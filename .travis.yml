@@ -8,7 +8,7 @@ compiler:
   - clang
 
 before_install:
-  - sudo apt-get install libtool autoconf git nasm
+  - sudo apt-get install libtool autoconf git nasm pkg-config cmake libtiff-dev
   - chmod +x install.sh
   - ./install.sh
 
