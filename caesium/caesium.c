@@ -5,7 +5,6 @@
 #include "utils.h"
 #include "png.h"
 #include "jpeg.h"
-#include "tiff.h"
 
 bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options)
 {
@@ -34,8 +33,6 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 		}
 	} else if (type == CS_PNG) {
 		result = cs_png_optimize(input_path, output_path, &options->png);
-	} else if (type == CS_TIFF) {
-		result = cs_tiff_optimize(input_path, output_path, &options->tiff);
 	}
 
 	return result;
@@ -58,18 +55,12 @@ void initialize_png_parameters(cs_image_pars *par)
 	par->png.auto_filter_strategy = 1;
 }
 
-void initialize_tiff_parameters(cs_image_pars *par)
-{
-	par->tiff.compression = 0;
-}
-
 cs_image_pars initialize_parameters()
 {
 	cs_image_pars options;
 
 	initialize_jpeg_parameters(&options);
 	initialize_png_parameters(&options);
-	initialize_tiff_parameters(&options);
 
 	return options;
 }
