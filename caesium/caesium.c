@@ -23,7 +23,7 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 
 	if (type == UNKN) {
 		display_error(WARNING, 103);
-	} else if (type == JPEG) {
+	} else if (type == CS_JPEG) {
 		if (options->jpeg.quality != 0) {
 			cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
 			//The output is now the new input for optimization
@@ -31,7 +31,7 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 		} else {
 			result = cs_jpeg_optimize(input_path, output_path, options->jpeg.exif_copy, input_path);
 		}
-	} else if (type == PNG) {
+	} else if (type == CS_PNG) {
 		result = cs_png_optimize(input_path, output_path, &options->png);
 	}
 

@@ -5,17 +5,25 @@ project(libcaesium)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-set(MOZJPEG_INCLUDE /opt/mozjpeg/include)
-set(MOZJPEG_LIB32 /opt/mozjpeg/lib)
-set(MOZJPEG_LIB64 /opt/mozjpeg/lib64)
+# The version number.
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 3)
+set(VERSION_PATCH 1)
 
-include_directories(${MOZJPEG_INCLUDE})
+configure_file(
+        "caesium/config.h.in"
+        "${PROJECT_BINARY_DIR}/config.h"
+)
 
-if(EXISTS ${MOZJPEG_LIB64})
-    link_directories(${MOZJPEG_LIB64})
+include_directories("${PROJECT_BINARY_DIR}")
+include_directories(/opt/mozjpeg/include)
+
+if(EXISTS /opt/mozjpeg/lib64)
+    link_directories(/opt/mozjpeg/lib64)
 else()
-    link_directories(${MOZJPEG_LIB32})
+    link_directories(/opt/mozjpeg/lib)
 endif()
+
 
 add_subdirectory(caesium)
 add_subdirectory(demo)

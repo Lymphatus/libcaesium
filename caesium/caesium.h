@@ -40,8 +40,8 @@ typedef struct cs_image_pars
 
 typedef enum image_type
 {
-	JPEG,
-	PNG,
+	CS_JPEG,
+	CS_PNG,
 	UNKN,
 } image_type;
 
