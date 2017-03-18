@@ -17,13 +17,15 @@ target_include_directories(caesium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # OSX installs in local
 if (APPLE)
-    install(FILES caesium.h DESTINATION /usr/local/include)
-    install(TARGETS LIBRARY DESTINATION /usr/local/lib)
-    install(TARGETS ARCHIVE DESTINATION /usr/local/lib)
-elseif (UNIX)
     install(FILES caesium.h DESTINATION /usr/include)
-    install(TARGETS LIBRARY DESTINATION /usr/lib)
-    install(TARGETS ARCHIVE DESTINATION /usr/lib)
+    install(TARGETS caesium caesium_static
+            LIBRARY DESTINATION /usr/local/lib
+            ARCHIVE DESTINATION /usr/local/lib)
+elseif (UNIX OR LINUX)
+    install(FILES caesium.h DESTINATION /usr/include)
+    install(TARGETS caesium caesium_static
+            LIBRARY DESTINATION /usr/lib
+            ARCHIVE DESTINATION /usr/lib)
 else ()
     install(FILES caesium.h DESTINATION include)
     install(TARGETS caesium caesium_static

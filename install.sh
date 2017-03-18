@@ -9,6 +9,8 @@ mkdir build && cd build
 ../configure
 make && sudo make install
 
+cd
+
 #zopflipng
 git clone https://github.com/google/zopfli.git
 cd zopfli
