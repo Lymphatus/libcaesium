@@ -17,7 +17,7 @@ target_include_directories(caesium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # OSX installs in local
 if (APPLE)
-    install(FILES caesium.h DESTINATION /usr/include)
+    install(FILES caesium.h DESTINATION /usr/local/include)
     install(TARGETS caesium caesium_static
             LIBRARY DESTINATION /usr/local/lib
             ARCHIVE DESTINATION /usr/local/lib)
