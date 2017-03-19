@@ -16,7 +16,7 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 	jpeg_create_decompress(&einfo);
 
 	//Check for errors
-	if ((fp = fopen(input, "r")) == NULL) {
+	if ((fp = fopen(input, "rb")) == NULL) {
 		display_error(ERROR, 200);
 	}
 
@@ -58,7 +58,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 	jpeg_create_compress(&dstinfo);
 
 	//Check for errors
-	if ((fp = fopen(input_file, "r")) == NULL) {
+	if ((fp = fopen(input_file, "rb")) == NULL) {
 		display_error(ERROR, 201);
 	}
 
