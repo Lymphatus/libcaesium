@@ -16,12 +16,17 @@ configure_file(
 )
 
 include_directories("${PROJECT_BINARY_DIR}")
-include_directories(/opt/mozjpeg/include)
+if (NOT WIN32)
+    include_directories(/opt/mozjpeg/include)
 
-if(EXISTS /opt/mozjpeg/lib64)
-    link_directories(/opt/mozjpeg/lib64)
-else()
-    link_directories(/opt/mozjpeg/lib)
+    if(EXISTS /opt/mozjpeg/lib64)
+        link_directories(/opt/mozjpeg/lib64)
+    else()
+        link_directories(/opt/mozjpeg/lib)
+    endif()
+else ()
+    include_directories(C:\\mozjpeg\\include)
+    include_directories(C:\\zopfli\\src)
 endif()
 
 
