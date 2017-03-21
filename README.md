@@ -73,11 +73,31 @@ Those are the zopflipng compression parameters.
 Libcaesium uses cmake to build and install the library. Before compiling, be sure to have all the requisites.
 Libcaesium requires [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli) installed as shared/static libraries.
 Please refer to their own documentation for detailed instructions.
-Step by step instructions for each platform will be provided.
 
-### Linux and OS X
+### OS X
+##### Requirements
+You can install mozjpeg and zopfli with homebrew
+`$ brew install mozjpeg zopfli`
+
+##### Compile
 Provided you have all the requirements, building and installing from git is as simple as typing
+```bash
+$ git clone https://github.com/Lymphatus/libcaesium.git
+$ cd libcaesium
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ sudo make install
 ```
+This will compile both the shared and static caesium library, the required header and a small demo application named _caesiumd_.
+
+### Linux
+##### Requirements
+Run `install.sh` to get the latest mozjpeg and zopfli.
+##### Compile
+Provided you have all the requirements, building and installing from git is as simple as typing
+```bash
 $ git clone https://github.com/Lymphatus/libcaesium.git
 $ cd libcaesium
 $ mkdir build
@@ -89,7 +109,7 @@ $ sudo make install
 This will compile both the shared and static caesium library, the required header and a small demo application named _caesiumd_.
 
 ### Windows
-Platform not tested. Compilation not supported yet.
+Compiling on Windows is somehow tricky. You can achieve it with MinGW (tested) or Cygwin (not tested), but it's better to stick with the binaries provided.
 
 ## Compression vs Optimization
 JPEG is a lossy format: that means you will always lose some information after each compression. So, compressing a file with
