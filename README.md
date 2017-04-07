@@ -94,7 +94,11 @@ This will compile both the shared and static caesium library, the required heade
 
 ### Linux
 ##### Requirements
-Run `install.sh` to get the latest mozjpeg and zopfli.
+You need basic developer utilities. On Ubuntu you can install them with
+```bash
+sudo apt-get install libtool autoconf git nasm pkg-config cmake
+```
+Then run `install.sh` to get the latest mozjpeg and zopfli.
 ##### Compile
 Provided you have all the requirements, building and installing from git is as simple as typing
 ```bash
