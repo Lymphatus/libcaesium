@@ -96,11 +96,6 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_p
 
 	//CRITICAL - This is the optimization step
 	dstinfo.optimize_coding = true;
-	//TODO
-	//Progressive
-	if (options->progressive) {
-		jpeg_simple_progression(&dstinfo);
-	}
 
 	//Set the output file parameters
 	jpeg_stdio_dest(&dstinfo, fp);

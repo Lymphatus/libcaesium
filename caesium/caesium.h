@@ -13,7 +13,6 @@ typedef struct cs_jpeg_pars
 	int quality;
 	bool exif_copy;
 	int dct_method;
-	bool progressive;
 	/*
 	 * Parameters you have no reason to set as they will be
 	 * overwritten during the process
@@ -53,7 +52,7 @@ typedef enum error_level
 	WARNING = 1
 } error_level;
 
-bool cs_compress(const char *input_path, char *output_path, cs_image_pars *options);
+bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options);
 cs_image_pars initialize_parameters();
 
 #ifdef __cplusplus

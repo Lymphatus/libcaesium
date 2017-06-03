@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 	}
 
 	cs_image_pars options = initialize_parameters();
-	cs_compress(argv[1], argv[2], &options);
+	bool result = cs_compress(argv[1], argv[2], &options);
 
-	exit(EXIT_SUCCESS);
+	exit(result);
 }
