@@ -13,6 +13,7 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 {
 	bool result = false;
 	CZopfliPNGOptions png_options;
+	int error_code = 0;
 
 	CZopfliPNGSetDefaults(&png_options);
 
@@ -32,7 +33,7 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 	png_options.auto_filter_strategy = options->auto_filter_strategy;
 
 	if (lodepng_load_file(&orig_buffer, &orig_buffer_size, input) != 0) {
-		display_error(ERROR, 300);
+		error_code = 300;
 		goto cleanup;
 	}
 
@@ -42,12 +43,12 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 						   0,
 						   &resultpng,
 						   &resultpng_size) != 0) {
-		display_error(ERROR, 301);
+		error_code = 301;
 		goto cleanup;
 	}
 
 	if (lodepng_save_file(resultpng, resultpng_size, output) != 0) {
-		display_error(ERROR, 302);
+		error_code = 302;
 		goto cleanup;
 	}
 
@@ -56,5 +57,8 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 	cleanup:
 	free(orig_buffer);
 	free(resultpng);
+	if (error_code != 0) {
+		display_error(ERROR, error_code);
+	}
 	return result;
 }

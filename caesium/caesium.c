@@ -6,7 +6,7 @@
 #include "png.h"
 #include "jpeg.h"
 
-bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options)
+bool cs_compress(const char *input_path, char *output_path, cs_image_pars *options)
 {
 	FILE *pInputFile;
 	image_type type;
@@ -21,15 +21,23 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 
 	fclose(pInputFile);
 
+	//Same input and output, we need to use a temporary file
+	if (strcmp(input_path, output_path) == 0) {
+		output_path = realloc(output_path, (strlen(output_path) + 4) * sizeof(char));
+		snprintf(output_path, strlen(output_path) + 4, "%s.cs", output_path);
+	}
+
 	if (type == UNKN) {
 		display_error(WARNING, 103);
 	} else if (type == CS_JPEG) {
 		if (options->jpeg.quality != 0) {
-			cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
+			result = cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
 			//The output is now the new input for optimization
-			result = cs_jpeg_optimize(output_path, output_path, options->jpeg.exif_copy, input_path);
+			if (result) {
+				result = cs_jpeg_optimize(output_path, output_path, &options->jpeg, input_path);
+			}
 		} else {
-			result = cs_jpeg_optimize(input_path, output_path, options->jpeg.exif_copy, input_path);
+			result = cs_jpeg_optimize(input_path, output_path, &options->jpeg, input_path);
 		}
 	} else if (type == CS_PNG) {
 		result = cs_png_optimize(input_path, output_path, &options->png);
@@ -43,6 +51,7 @@ void initialize_jpeg_parameters(cs_image_pars *options)
 	options->jpeg.quality = 0;
 	options->jpeg.exif_copy = false;
 	options->jpeg.dct_method = 2048;
+	options->jpeg.progressive = false;
 }
 
 void initialize_png_parameters(cs_image_pars *par)

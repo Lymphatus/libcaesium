@@ -33,6 +33,14 @@ const char *get_error_message(int code)
 			return "Failed to open JPEG file while compressing";
 		case 204:
 			return "Failed to open JPEG file while decompressing";
+		case 205:
+			return "Failed to retrieve input JPEG file size";
+		case 206:
+			return "Input JPEG file is too big";
+		case 207:
+			return "Compressor failed";
+		case 208:
+			return "Compressor failed";
 
 			//PNG related errors
 		case 300:

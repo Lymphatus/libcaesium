@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-	fprintf(stdout, "libcaesium demo application v%d.%d.%d\n\n",
+	fprintf(stdout, "libcaesium demo application v%d.%d.%d\n",
 		   VERSION_MAJOR,
 		   VERSION_MINOR,
 		   VERSION_PATCH);

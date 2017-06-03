@@ -11,7 +11,7 @@ mkdir build && cd build
 ../configure
 make && sudo make install
 
-cd $SOURCE
+cd ${SOURCE}
 
 #zopflipng
 git clone https://github.com/google/zopfli.git
@@ -23,4 +23,4 @@ sudo ln -s libzopflipng.so.1.0.0 /usr/lib/libzopflipng.so.1
 sudo mkdir /usr/include/zopflipng
 sudo cp src/zopflipng/zopflipng_lib.h /usr/include/zopflipng
 
-cd $SOURCE
+cd ${SOURCE}
