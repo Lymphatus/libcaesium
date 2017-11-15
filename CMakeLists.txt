@@ -15,9 +15,12 @@ configure_file(
         "${PROJECT_BINARY_DIR}/config.h"
 )
 
+link_directories(/usr/local/lib)
+
 include_directories("${PROJECT_BINARY_DIR}")
 if (NOT WIN32)
     include_directories(/opt/mozjpeg/include)
+    include_directories(/usr/local/include)
 
     if(EXISTS /opt/mozjpeg/lib64)
         link_directories(/opt/mozjpeg/lib64)

@@ -4,7 +4,9 @@ else()
     set(CMAKE_C_FLAGS "--std=gnu99 ${CMAKE_C_FLAGS}")
 endif()
 
-find_library(zoflipng zopflipng /usr/local/lib)
+link_directories(/usr/local/lib)
+
+find_library(zopflipng zopflipng /usr/local/lib)
 find_library(jpeg jpeg /opt/mozjpeg/lib)
 find_library(turbojpeg turbojpeg /opt/mozjpeg/lib)
 
