@@ -5,11 +5,11 @@
 
 #include "caesium.h"
 
-bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif, const char *exif_src);
+bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_pars *options, const char *exif_src);
 
 struct jpeg_decompress_struct cs_get_markers(const char *input);
 
-void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options);
+bool cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options);
 
 unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options);
 

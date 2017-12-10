@@ -2,6 +2,7 @@
 #include <jpeglib.h>
 #include <string.h>
 #include <turbojpeg.h>
+#include <limits.h>
 
 #include "jpeg.h"
 #include "error.h"
@@ -28,14 +29,14 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 		jpeg_save_markers(&einfo, JPEG_APP0 + m, 0xFFFF);
 	}
 
-	jpeg_read_header(&einfo, TRUE);
+	jpeg_read_header(&einfo, true);
 
 	fclose(fp);
 
 	return einfo;
 }
 
-bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif, const char *exif_src)
+bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_pars *options, const char *exif_src)
 {
 	//File pointer for both input and output
 	FILE *fp;
@@ -66,14 +67,14 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 	jpeg_stdio_src(&srcinfo, fp);
 
 	//Save EXIF info
-	if (exif) {
+	if (options->exif_copy) {
 		for (int m = 0; m < 16; m++) {
 			jpeg_save_markers(&srcinfo, JPEG_APP0 + m, 0xFFFF);
 		}
 	}
 
 	//Read the input headers
-	(void) jpeg_read_header(&srcinfo, TRUE);
+	(void) jpeg_read_header(&srcinfo, true);
 
 
 	//Read input coefficents
@@ -94,9 +95,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 	}
 
 	//CRITICAL - This is the optimization step
-	dstinfo.optimize_coding = TRUE;
-	//Progressive
-	jpeg_simple_progression(&dstinfo);
+	dstinfo.optimize_coding = true;
 
 	//Set the output file parameters
 	jpeg_stdio_dest(&dstinfo, fp);
@@ -105,7 +104,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 	jpeg_write_coefficients(&dstinfo, dst_coef_arrays);
 
 	//Write EXIF
-	if (exif) {
+	if (options->exif_copy) {
 		if (strcmp(input_file, exif_src) == 0) {
 			jcopy_markers_execute(&srcinfo, &dstinfo);
 		} else {
@@ -128,24 +127,23 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, bool exif
 	return true;
 }
 
-void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options)
+bool cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options)
 {
 	FILE *fp;
 	tjhandle tjCompressHandle;
 	unsigned char *output_buffer;
 	unsigned long output_size = 0;
-
+	output_buffer = NULL;
+	int result = 0;
 
 	//Check for errors
 	if ((fp = fopen(output_file, "wb")) == NULL) {
 		display_error(ERROR, 203);
 	}
 
-	output_buffer = NULL;
 	tjCompressHandle = tjInitCompress();
 
-	//TODO Error checks
-	tjCompress2(tjCompressHandle,
+	result = tjCompress2(tjCompressHandle,
 				image_buffer,
 				options->width,
 				0,
@@ -156,35 +154,45 @@ void cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_j
 				options->subsample,
 				options->quality,
 				options->dct_method);
-
-	fwrite(output_buffer, output_size, 1, fp);
+	if (result == -1) {
+		display_error(ERROR, 207);
+	} else {
+		fwrite(output_buffer, output_size, 1, fp);
+	}
 
 	fclose(fp);
 	tjDestroy(tjCompressHandle);
 	tjFree(output_buffer);
 	tjFree(image_buffer);
+
+	return true;
 }
 
 unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 {
-	//TODO This has a lot of non checked errors that may occur
 	FILE *fp;
 	long sourceJpegBufferSize = 0;
 	unsigned char *sourceJpegBuffer = NULL;
 	tjhandle tjDecompressHandle;
-	int fileWidth = 0, fileHeight = 0, jpegSubsamp = 0, colorSpace = 0;
+	int fileWidth = 0, fileHeight = 0, jpegSubsamp = 0, colorSpace = 0, result = 0;
 
 	if ((fp = fopen(fileName, "rb")) == NULL) {
 		display_error(ERROR, 204);
 	}
 	fseek(fp, 0, SEEK_END);
 	sourceJpegBufferSize = ftell(fp);
-	sourceJpegBuffer = tjAlloc(sourceJpegBufferSize);
+	if (sourceJpegBufferSize == -1) {
+		display_error(ERROR, 205);
+	}
+	if (sourceJpegBufferSize > INT_MAX) {
+		display_error(ERROR, 206);
+	}
+	sourceJpegBuffer = tjAlloc((int) sourceJpegBufferSize);
 
 	fseek(fp, 0, SEEK_SET);
 	fread(sourceJpegBuffer, (size_t) sourceJpegBufferSize, 1, fp);
 	tjDecompressHandle = tjInitDecompress();
-	tjDecompressHeader3(tjDecompressHandle, sourceJpegBuffer, sourceJpegBufferSize, &fileWidth, &fileHeight,
+	tjDecompressHeader3(tjDecompressHandle, sourceJpegBuffer, (unsigned long) sourceJpegBufferSize, &fileWidth, &fileHeight,
 						&jpegSubsamp, &colorSpace);
 
 	options->width = fileWidth;
@@ -195,15 +203,18 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 
 	unsigned char *temp = tjAlloc(options->width * options->height * tjPixelSize[options->color_space]);
 
-	tjDecompress2(tjDecompressHandle,
+	result = tjDecompress2(tjDecompressHandle,
 				  sourceJpegBuffer,
-				  sourceJpegBufferSize,
+				  (unsigned long) sourceJpegBufferSize,
 				  temp,
 				  options->width,
 				  0,
 				  options->height,
 				  options->color_space,
 				  options->dct_method);
+	if (result == -1) {
+		display_error(ERROR, 208);
+	}
 
 	tjDestroy(tjDecompressHandle);
 	tjFree(sourceJpegBuffer);

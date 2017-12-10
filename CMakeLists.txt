@@ -7,17 +7,20 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # The version number.
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 2)
-set(VERSION_PATCH 2)
+set(VERSION_MINOR 3)
+set(VERSION_PATCH 0)
 
 configure_file(
         "caesium/config.h.in"
         "${PROJECT_BINARY_DIR}/config.h"
 )
 
+link_directories(/usr/local/lib)
+
 include_directories("${PROJECT_BINARY_DIR}")
 if (NOT WIN32)
     include_directories(/opt/mozjpeg/include)
+    include_directories(/usr/local/include)
 
     if(EXISTS /opt/mozjpeg/lib64)
         link_directories(/opt/mozjpeg/lib64)

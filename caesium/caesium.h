@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct cs_jpeg_pars
 {

@@ -25,11 +25,13 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 		display_error(WARNING, 103);
 	} else if (type == CS_JPEG) {
 		if (options->jpeg.quality != 0) {
-			cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
+			result = cs_jpeg_compress(output_path, cs_jpeg_decompress(input_path, &options->jpeg), &options->jpeg);
 			//The output is now the new input for optimization
-			result = cs_jpeg_optimize(output_path, output_path, options->jpeg.exif_copy, input_path);
+			if (result) {
+				result = cs_jpeg_optimize(output_path, output_path, &options->jpeg, input_path);
+			}
 		} else {
-			result = cs_jpeg_optimize(input_path, output_path, options->jpeg.exif_copy, input_path);
+			result = cs_jpeg_optimize(input_path, output_path, &options->jpeg, input_path);
 		}
 	} else if (type == CS_PNG) {
 		result = cs_png_optimize(input_path, output_path, &options->png);
@@ -47,12 +49,12 @@ void initialize_jpeg_parameters(cs_image_pars *options)
 
 void initialize_png_parameters(cs_image_pars *par)
 {
-	par->png.iterations = 10;
-	par->png.iterations_large = 5;
-	par->png.block_split_strategy = 4;
+	par->png.iterations = 2;
+	par->png.iterations_large = 1;
+	par->png.block_split_strategy = 0;
 	par->png.lossy_8 = true;
 	par->png.transparent = true;
-	par->png.auto_filter_strategy = 1;
+	par->png.auto_filter_strategy = true;
 }
 
 cs_image_pars initialize_parameters()
