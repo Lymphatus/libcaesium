@@ -50,11 +50,11 @@ void initialize_jpeg_parameters(cs_image_pars *options)
 void initialize_png_parameters(cs_image_pars *par)
 {
 	par->png.iterations = 2;
-	par->png.iterations_large = 2;
-	par->png.block_split_strategy = 4;
+	par->png.iterations_large = 1;
+	par->png.block_split_strategy = 0;
 	par->png.lossy_8 = true;
 	par->png.transparent = true;
-	par->png.auto_filter_strategy = 1;
+	par->png.auto_filter_strategy = true;
 }
 
 cs_image_pars initialize_parameters()
