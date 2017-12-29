@@ -41,13 +41,15 @@ typedef struct cs_jpeg_pars
 	int quality;
 	bool exif_copy;
 	int dct_method;
+	double scale_factor;
 } cs_jpeg_pars;
 ```
-The first 3 parameters matters, in term of compression, while the others will be set by the compressor/decompressor
+The first 4 parameters matters, in term of compression, while the others will be set by the compressor/decompressor
 during the compression progress and thus they will be overwritten.
 - **quality**: in a range from 0 to 100, the quality of the resulting image. **Note** that 0 means _optimization_ (see below). Default: 0.
 - **exif_copy**: set it to _true_ to copy EXIF tag info after compression. Default: false.
 - **dct_method**: one of the turbojpeg DCT flags. Default: TJFLAG_FASTDCT.
+- **scale_factor**: the image scaling factor, expressed as double precision number. Default: 1.0.
 
 ### PNG
 ```C
@@ -59,15 +61,18 @@ typedef struct cs_png_pars
 	bool lossy_8;
 	bool transparent;
 	int auto_filter_strategy;
+	double scale_factor;
 } cs_png_pars;
 ```
-Those are the zopflipng compression parameters.
+Those are the zopflipng compression parameters, except for the last one.
 - **iterations**: number of iterations (more means more compression). Default: 10.
 - **iteration_large**: number of iterations for large files. Default: 5.
 - **block_split_strategy**: filter strategy. Default: 4;
 - **lossy_8**: convert 16-bit per channel image to 8-bit per channel. Default: true.
 - **transparent**: remove colors behind alpha channel 0. Default: true.
 - **auto_filter_strategy**: legacy.
+- **scale_factor**: the image scaling factor, expressed as double precision number. Note that PNG cannot be upscaled. Default: 1.0.
+
 
 ## Compilation and Installation
 Libcaesium uses cmake to build and install the library. Before compiling, be sure to have all the requisites.
@@ -121,3 +126,7 @@ JPEG is a lossy format: that means you will always lose some information after e
 Libcaesium also supports optimization, by setting the _quality_ to 0. This performs a lossless process, resulting in the same image,
 but with a smaller size (10-15% usually).  
 PNG is lossless, so libcaesium will always perform optimization rather than compression.
+
+## Resizing
+Resizing is partially supported. It is handy but it's almost completely out of the scope of this library.
+If you really feel the need to do it within libcaesium you can do so, but I advise you should opt for a different toolset for the best results.

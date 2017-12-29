@@ -13,6 +13,7 @@ typedef struct cs_jpeg_pars
 	int quality;
 	bool exif_copy;
 	int dct_method;
+	double scale_factor;
 	/*
 	 * Parameters you have no reason to set as they will be
 	 * overwritten during the process
@@ -31,6 +32,7 @@ typedef struct cs_png_pars
 	bool lossy_8;
 	bool transparent;
 	int auto_filter_strategy;
+	double scale_factor;
 } cs_png_pars;
 
 typedef struct cs_image_pars

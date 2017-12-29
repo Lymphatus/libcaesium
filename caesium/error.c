@@ -40,7 +40,9 @@ const char *get_error_message(int code)
 		case 207:
 			return "Compressor failed";
 		case 208:
-			return "Compressor failed";
+			return "Decompressor failed";
+		case 209:
+			return "CMYK images are not fully supported and can only be optimized.";
 
 			//PNG related errors
 		case 300:
@@ -49,6 +51,10 @@ const char *get_error_message(int code)
 			return "Error while optimizing PNG.";
 		case 303:
 			return "Error while writing output PNG file.";
+		case 304:
+			return "Error while resizing PNG file.";
+		case 305:
+			return "PNG scaling factor must be a number greater than 0 and equal or minor to 1.";
 
 		default:
 			return "Unrecognized error.";

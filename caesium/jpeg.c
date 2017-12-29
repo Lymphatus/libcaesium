@@ -3,6 +3,7 @@
 #include <string.h>
 #include <turbojpeg.h>
 #include <limits.h>
+#include <math.h>
 
 #include "jpeg.h"
 #include "error.h"
@@ -127,8 +128,11 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_p
 	return true;
 }
 
-bool cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options)
+int cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jpeg_pars *options)
 {
+	if (image_buffer == 0) {
+		return 2;
+	}
 	FILE *fp;
 	tjhandle tjCompressHandle;
 	unsigned char *output_buffer;
@@ -165,7 +169,7 @@ bool cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_j
 	tjFree(output_buffer);
 	tjFree(image_buffer);
 
-	return true;
+	return 1;
 }
 
 unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
@@ -195,13 +199,18 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 	tjDecompressHeader3(tjDecompressHandle, sourceJpegBuffer, (unsigned long) sourceJpegBufferSize, &fileWidth, &fileHeight,
 						&jpegSubsamp, &colorSpace);
 
-	options->width = fileWidth;
-	options->height = fileHeight;
+	if (colorSpace == 4) { //CMYK
+		display_error(WARNING, 209);
+		return 0;
+	}
+
+	options->width = (int) round(fileWidth * options->scale_factor);
+	options->height = (int) round(fileHeight * options->scale_factor);
 
 	options->subsample = (enum TJSAMP) jpegSubsamp;
 	options->color_space = colorSpace;
 
-	unsigned char *temp = tjAlloc(options->width * options->height * tjPixelSize[options->color_space]);
+	unsigned char *temp = tjAlloc(options->width * options->height * tjPixelSize[colorSpace]);
 
 	result = tjDecompress2(tjDecompressHandle,
 				  sourceJpegBuffer,
@@ -210,7 +219,7 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 				  options->width,
 				  0,
 				  options->height,
-				  options->color_space,
+				  colorSpace,
 				  options->dct_method);
 	if (result == -1) {
 		display_error(ERROR, 208);
