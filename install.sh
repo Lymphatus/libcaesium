@@ -17,9 +17,9 @@ cd ${SOURCE}
 git clone https://github.com/google/zopfli.git
 cd zopfli
 make libzopflipng
-sudo cp libzopflipng.so.1.0.0 /usr/lib
-sudo ln -s libzopflipng.so.1.0.0 /usr/lib/libzopflipng.so
-sudo ln -s libzopflipng.so.1.0.0 /usr/lib/libzopflipng.so.1
+sudo cp libzopflipng.so.1.0.2 /usr/local/lib
+sudo ln -s libzopflipng.so.1.0.2 /usr/local/lib/libzopflipng.so
+sudo ln -s libzopflipng.so.1.0.2 /usr/local/lib/libzopflipng.so.1
 sudo mkdir /usr/include/zopflipng
 sudo cp src/zopflipng/zopflipng_lib.h /usr/include/zopflipng
 
