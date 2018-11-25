@@ -45,7 +45,7 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 void initialize_jpeg_parameters(cs_image_pars *options)
 {
 	options->jpeg.quality = 0;
-	options->jpeg.exif_copy = false;
+	options->jpeg.exif_copy = true;
 	options->jpeg.dct_method = 2048;
 	options->jpeg.scale_factor = 1.0;
 }

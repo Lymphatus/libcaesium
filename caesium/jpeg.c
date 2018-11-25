@@ -26,6 +26,7 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 	jpeg_stdio_src(&einfo, fp);
 
 	//Save EXIF info
+	jpeg_save_markers(&einfo, JPEG_COM, 0xFFFF);
 	for (int m = 0; m < 16; m++) {
 		jpeg_save_markers(&einfo, JPEG_APP0 + m, 0xFFFF);
 	}
@@ -69,6 +70,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_p
 
 	//Save EXIF info
 	if (options->exif_copy) {
+		jpeg_save_markers(&srcinfo, JPEG_COM, 0xFFFF);
 		for (int m = 0; m < 16; m++) {
 			jpeg_save_markers(&srcinfo, JPEG_APP0 + m, 0xFFFF);
 		}
