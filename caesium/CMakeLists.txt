@@ -1,21 +1,25 @@
 if (NOT WIN32)
     set(CMAKE_C_FLAGS "--std=gnu99 -fPIC ${CMAKE_C_FLAGS}")
-else()
+else ()
     set(CMAKE_C_FLAGS "--std=gnu99 ${CMAKE_C_FLAGS}")
-endif()
+endif ()
 
-link_directories(/usr/local/lib)
-
-find_library(zopflipng zopflipng /usr/local/lib)
-find_library(jpeg jpeg /opt/mozjpeg/lib)
-find_library(turbojpeg turbojpeg /opt/mozjpeg/lib)
+if (APPLE)
+    find_library(zopflipng zopflipng /usr/local/Cellar/zopfli/1.0.2/lib)
+    find_library(jpeg jpeg /usr/local/Cellar/mozjpeg/3.3.1/lib)
+    find_library(turbojpeg turbojpeg /usr/local/Cellar/mozjpeg/3.3.1/lib)
+else ()
+    find_library(zopflipng zopflipng /usr/local/lib)
+    find_library(jpeg jpeg /opt/mozjpeg/lib)
+    find_library(turbojpeg turbojpeg /opt/mozjpeg/lib)
+endif ()
 
 add_library(caesium SHARED caesium.c error.c utils.c png.c vendor/lodepng.c jpeg.c)
 add_library(caesium_static STATIC caesium.c error.c utils.c png.c vendor/lodepng.c jpeg.c)
 
 set_target_properties(caesium_static PROPERTIES OUTPUT_NAME caesium)
 
-target_link_libraries(caesium zopflipng jpeg turbojpeg)
+target_link_libraries(caesium jpeg turbojpeg zopflipng)
 
 # Make sure the compiler can find include files for our Caesium library
 # when other libraries or executables link to Caesium

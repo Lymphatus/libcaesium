@@ -5,7 +5,7 @@
 #define STBIW_ASSERT(x)
 
 #include <stdlib.h>
-#include <zopflipng/zopflipng_lib.h>
+#include <zopflipng_lib.h>
 
 #include "vendor/stb_image.h"
 #include "vendor/stb_image_write.h"
