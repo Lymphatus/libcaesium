@@ -5,10 +5,8 @@ SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #mozjpeg
 git clone https://github.com/mozilla/mozjpeg
 cd mozjpeg/
-autoreconf -fiv
-autoreconf -fiv #It's not a typo, trust me
 mkdir build && cd build
-../configure
+cmake -G"Unix Makefiles" ..
 make && sudo make install
 
 cd ${SOURCE}
