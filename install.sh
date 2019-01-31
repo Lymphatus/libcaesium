@@ -17,10 +17,18 @@ cd ${SOURCE}
 git clone https://github.com/google/zopfli.git
 cd zopfli
 make libzopflipng
-sudo cp libzopflipng.so.1.0.2 /usr/local/lib
-sudo ln -s libzopflipng.so.1.0.2 /usr/local/lib/libzopflipng.so
-sudo ln -s libzopflipng.so.1.0.2 /usr/local/lib/libzopflipng.so.1
-sudo mkdir /usr/include/zopflipng
-sudo cp src/zopflipng/zopflipng_lib.h /usr/include/zopflipng
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sudo cp libzopflipng.so.1.0.2 /usr/local/lib
+    sudo ln -s libzopflipng.so.1.0.2 /usr/local/lib/libzopflipng.so
+    sudo ln -s libzopflipng.so.1.0.2 /usr/local/lib/libzopflipng.so.1
+    sudo mkdir /usr/local/include/zopflipng
+    sudo cp src/zopflipng/zopflipng_lib.h /usr/local/include/zopflipng
+else
+    sudo cp libzopflipng.so.1.0.2 /usr/lib
+    sudo ln -s libzopflipng.so.1.0.2 /usr/lib/libzopflipng.so
+    sudo ln -s libzopflipng.so.1.0.2 /usr/lib/libzopflipng.so.1
+    sudo mkdir /usr/include/zopflipng
+    sudo cp src/zopflipng/zopflipng_lib.h /usr/include/zopflipng
+fi
 
 cd ${SOURCE}

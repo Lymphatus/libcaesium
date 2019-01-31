@@ -16,9 +16,17 @@ configure_file(
 )
 
 link_directories(/usr/local/lib)
-
 include_directories("${PROJECT_BINARY_DIR}")
-if (NOT WIN32)
+
+if (APPLE)
+    link_directories(/usr/local/opt/mozjpeg)
+
+    include_directories(/usr/local/opt/mozjpeg/include)
+    include_directories(/usr/local/include)
+elseif(WIN32)
+    include_directories(C:\\mozjpeg\\include)
+    include_directories(C:\\zopfli\\src)
+else()
     include_directories(/opt/mozjpeg/include)
     include_directories(/usr/local/include)
 
@@ -27,11 +35,7 @@ if (NOT WIN32)
     else()
         link_directories(/opt/mozjpeg/lib)
     endif()
-else ()
-    include_directories(C:\\mozjpeg\\include)
-    include_directories(C:\\zopfli\\src)
 endif()
-
 
 add_subdirectory(caesium)
 add_subdirectory(demo)
