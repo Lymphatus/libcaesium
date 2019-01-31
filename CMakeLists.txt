@@ -28,7 +28,7 @@ elseif(WIN32)
     include_directories(C:\\zopfli\\src)
 else()
     include_directories(/opt/mozjpeg/include)
-    include_directories(/usr/local/include)
+    include_directories(/usr/include/zopflipng)
 
     if(EXISTS /opt/mozjpeg/lib64)
         link_directories(/opt/mozjpeg/lib64)
