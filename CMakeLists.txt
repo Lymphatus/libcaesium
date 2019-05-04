@@ -15,14 +15,13 @@ configure_file(
         "${PROJECT_BINARY_DIR}/config.h"
 )
 
-link_directories(/usr/local/lib)
 include_directories("${PROJECT_BINARY_DIR}")
 
 if (APPLE)
-    link_directories(/usr/local/opt/mozjpeg)
+    link_directories(/usr/local/opt/mozjpeg/lib)
 
     include_directories(/usr/local/opt/mozjpeg/include)
-    include_directories(/usr/local/include)
+    include_directories(/usr/local/include/zopflipng)
 elseif(WIN32)
     include_directories(C:\\mozjpeg\\include)
     include_directories(C:\\zopfli\\src)
@@ -36,6 +35,8 @@ else()
         link_directories(/opt/mozjpeg/lib)
     endif()
 endif()
+
+link_directories(/usr/local/lib)
 
 add_subdirectory(caesium)
 add_subdirectory(demo)
