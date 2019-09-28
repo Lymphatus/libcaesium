@@ -101,7 +101,7 @@ This will compile both the shared and static caesium library, the required heade
 ##### Requirements
 You need basic developer utilities. On Ubuntu you can install them with
 ```bash
-sudo apt-get install libtool autoconf git nasm pkg-config cmake
+sudo apt-get install libtool autoconf git nasm pkg-config cmake libpng-dev
 ```
 Then run `install.sh` to get the latest mozjpeg and zopfli.
 ##### Compile

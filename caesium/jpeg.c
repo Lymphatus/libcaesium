@@ -227,6 +227,7 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 		display_error(ERROR, 208);
 	}
 
+	fclose(fp);
 	tjDestroy(tjDecompressHandle);
 	tjFree(sourceJpegBuffer);
 
