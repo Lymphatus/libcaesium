@@ -15,9 +15,6 @@ ELSE()
 ENDIF()
 
 add_library(caesium SHARED caesium.c error.c utils.c png.c vendor/lodepng.c jpeg.c)
-add_library(caesium_static STATIC caesium.c error.c utils.c png.c vendor/lodepng.c jpeg.c)
-
-set_target_properties(caesium_static PROPERTIES OUTPUT_NAME caesium)
 
 target_link_libraries(caesium jpeg turbojpeg zopflipng)
 
@@ -28,17 +25,14 @@ target_include_directories(caesium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # OSX installs in local
 if (APPLE)
     install(FILES caesium.h DESTINATION /usr/local/include)
-    install(TARGETS caesium caesium_static
-            LIBRARY DESTINATION /usr/local/lib
-            ARCHIVE DESTINATION /usr/local/lib)
+    install(TARGETS caesium
+            LIBRARY DESTINATION /usr/local/lib)
 elseif (UNIX OR LINUX)
     install(FILES caesium.h DESTINATION /usr/include)
-    install(TARGETS caesium caesium_static
-            LIBRARY DESTINATION /usr/lib
-            ARCHIVE DESTINATION /usr/lib)
+    install(TARGETS caesium
+            LIBRARY DESTINATION /usr/lib)
 else ()
     install(FILES caesium.h DESTINATION include)
-    install(TARGETS caesium caesium_static
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib)
+    install(TARGETS caesium
+            LIBRARY DESTINATION lib)
 endif ()
