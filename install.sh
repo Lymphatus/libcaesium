@@ -3,8 +3,9 @@
 SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #mozjpeg
-git clone --branch 'v3.3.1' --depth 1 https://github.com/mozilla/mozjpeg.git
+git clone https://github.com/mozilla/mozjpeg.git
 cd mozjpeg/ || exit
+git checkout 426de82d0c081c996c23b75fed05833b6627b590
 mkdir build && cd build || exit
 cmake -G"Unix Makefiles" ..
 make && sudo make install
