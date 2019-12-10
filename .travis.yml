@@ -6,6 +6,7 @@ os:
 
 dist: bionic
 sudo: required
+osx_image: xcode11.2
 
 compiler:
   - gcc
