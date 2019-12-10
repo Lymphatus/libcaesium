@@ -18,10 +18,10 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 if (APPLE)
-    link_directories(/usr/local/opt/mozjpeg/lib)
+    link_directories(/opt/mozjpeg/lib)
 
-    include_directories(/usr/local/opt/mozjpeg/include)
-    include_directories(/usr/local/include/zopflipng)
+    include_directories(/opt/mozjpeg/include)
+    include_directories(/usr/local/include)
 elseif(WIN32)
     include_directories(C:\\mozjpeg\\include)
     include_directories(C:\\zopfli\\src)
