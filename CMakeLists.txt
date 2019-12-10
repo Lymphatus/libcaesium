@@ -8,7 +8,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # The version number.
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 4)
-set(VERSION_PATCH 3)
+set(VERSION_PATCH 4)
 
 configure_file(
         "caesium/config.h.in"

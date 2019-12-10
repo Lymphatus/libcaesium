@@ -79,43 +79,35 @@ Libcaesium uses cmake to build and install the library. Before compiling, be sur
 Libcaesium requires [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli) installed as shared/static libraries.
 Please refer to their own documentation for detailed instructions.
 
-### OS X
+### OS X/Linux
 ##### Requirements
-You can install mozjpeg and zopfli with homebrew
-`$ brew install mozjpeg zopfli`
+Be sure you have the build tools
+###### Linux
+`$ sudo apt-get install libtool autoconf git nasm pkg-config cmake libpng-dev`
+
+###### OSX
+`$ brew install nasm cmake`
+
+Get the code with
+`$ git clone https://github.com/Lymphatus/libcaesium.git`
+
+If you don't have `mozjpeg` and `zopfli` you should run
+```bash
+$ cd libcaesium
+$ ./install.sh
+```
+which will install the requirements.
 
 ##### Compile
 Provided you have all the requirements, building and installing from git is as simple as typing
 ```bash
-$ git clone https://github.com/Lymphatus/libcaesium.git
-$ cd libcaesium
 $ mkdir build
 $ cd build
 $ cmake ..
 $ make
 $ sudo make install
 ```
-This will compile both the shared and static caesium library, the required header and a small demo application named _caesiumd_.
-
-### Linux
-##### Requirements
-You need basic developer utilities. On Ubuntu you can install them with
-```bash
-sudo apt-get install libtool autoconf git nasm pkg-config cmake libpng-dev
-```
-Then run `install.sh` to get the latest mozjpeg and zopfli.
-##### Compile
-Provided you have all the requirements, building and installing from git is as simple as typing
-```bash
-$ git clone https://github.com/Lymphatus/libcaesium.git
-$ cd libcaesium
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-$ sudo make install
-```
-This will compile both the shared and static caesium library, the required header and a small demo application named _caesiumd_.
+This will compile the Caesium library, the required header and a small demo application named _caesiumd_.
 
 ### Windows
 Compiling on Windows is somehow tricky. You can achieve it with MinGW (tested) or Cygwin (not tested), but it's better to stick with the binaries provided.
