@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stdio.h>
 
 #include "error.h"
@@ -6,7 +5,7 @@
 #include "png.h"
 #include "jpeg.h"
 
-bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options)
+bool cs_compress(const char *input_path, const char *output_path, cs_image_pars *options, int* err_n)
 {
 	FILE *pInputFile;
 	image_type type;
@@ -15,6 +14,7 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 
 	if ((pInputFile = fopen(input_path, "rb")) == NULL) {
 		display_error(ERROR, 104);
+        *err_n = error_code;
 		return result;
 	}
 
@@ -38,6 +38,8 @@ bool cs_compress(const char *input_path, const char *output_path, cs_image_pars 
 	} else if (type == CS_PNG) {
 		result = cs_png_optimize(input_path, output_path, &options->png);
 	}
+
+    *err_n = error_code;
 
 	return result;
 }

@@ -7,8 +7,14 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # The version number.
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 4)
-set(VERSION_PATCH 4)
+set(VERSION_MINOR 5)
+set(VERSION_PATCH 0)
+
+if (DEFINED VERBOSE)
+    set(VERBOSE ${VERBOSE})
+else ()
+    set(VERBOSE 0)
+endif ()
 
 configure_file(
         "caesium/config.h.in"
@@ -22,19 +28,19 @@ if (APPLE)
 
     include_directories(/opt/mozjpeg/include)
     include_directories(/usr/local/include)
-elseif(WIN32)
+elseif (WIN32)
     include_directories(C:\\mozjpeg\\include)
     include_directories(C:\\zopfli\\src)
-else()
+else ()
     include_directories(/opt/mozjpeg/include)
     include_directories(/usr/include/zopflipng)
 
-    if(EXISTS /opt/mozjpeg/lib64)
+    if (EXISTS /opt/mozjpeg/lib64)
         link_directories(/opt/mozjpeg/lib64)
-    else()
+    else ()
         link_directories(/opt/mozjpeg/lib)
-    endif()
-endif()
+    endif ()
+endif ()
 
 link_directories(/usr/local/lib)
 
