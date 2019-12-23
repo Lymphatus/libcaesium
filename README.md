@@ -11,16 +11,19 @@ Binaries not available yet. Please refer to the compilation section below.
 Libcaesium exposes one single function to compress, auto-detecting the input file type:
 ```C
 bool cs_compress(const char *input,
-                 char *output,
-                 cs_image_pars *options);
+                 const char *output,
+                 cs_image_pars *options,
+                 int* err_n);
 ```
 #### Parameters
 **input** - input file path  
 **output** - output file path  
 **options** - pointer to the options struct, containing compression parameters (see below)  
+**err_n** - pointer to an integer that will contain the error code if something went wrong during compression 
 
 #### Return value
-**true** if the compression has successfully ended, or **false** if any error occurs.
+**true** if the compression has successfully ended, or **false** if any error occurs. If any error occurred, the **err_n**
+variable will contain the error code. See `error.h` for further info.
 
 ## Compression options
 Libcaesium supports a few compression parameters for each JPEG and PNG.
@@ -78,6 +81,7 @@ Those are the zopflipng compression parameters, except for the last one.
 Libcaesium uses cmake to build and install the library. Before compiling, be sure to have all the requisites.
 Libcaesium requires [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli) installed as shared/static libraries.
 Please refer to their own documentation for detailed instructions.
+You can also enable the verbose output, which will print on stderr if anything goes wrong, by using the `-DVERBOSE=1` flag during compilation.
 
 ### OS X/Linux
 ##### Requirements

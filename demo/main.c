@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "caesium.h"
+#include "../caesium/caesium.h"
 #include "config.h"
 
 int main(int argc, char *argv[])
@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
 	}
 
 	cs_image_pars options = initialize_parameters();
-	bool result = cs_compress(argv[1], argv[2], &options);
+	int error_code = 0;
+	cs_compress(argv[1], argv[2], &options, &error_code);
 
-	exit(!result);
+	exit(error_code);
 }
