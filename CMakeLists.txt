@@ -24,25 +24,34 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 if (APPLE)
-    link_directories(/opt/mozjpeg/lib)
-
-    include_directories(/opt/mozjpeg/include)
-    include_directories(/usr/local/include)
+    set(MOZJPEG_DEFAULT_PATH /opt/mozjpeg)
+    set(ZOPFLI_DEFAULT_PATH /usr/local)
 elseif (WIN32)
-    include_directories(C:\\mozjpeg\\include)
-    include_directories(C:\\zopfli\\src)
+    set(MOZJPEG_DEFAULT_PATH C:\\mozjpeg)
+    set(ZOPFLI_DEFAULT_PATH C:\\zopfli)
 else ()
-    include_directories(/opt/mozjpeg/include)
-    include_directories(/usr/include/zopflipng)
-
-    if (EXISTS /opt/mozjpeg/lib64)
-        link_directories(/opt/mozjpeg/lib64)
-    else ()
-        link_directories(/opt/mozjpeg/lib)
-    endif ()
+    set(MOZJPEG_DEFAULT_PATH /opt/mozjpeg)
+    set(ZOPFLI_DEFAULT_PATH /usr)
 endif ()
 
-link_directories(/usr/local/lib)
+
+if (NOT DEFINED MOZJPEG_PATH)
+    set(MOZJPEG_PATH ${MOZJPEG_DEFAULT_PATH})
+endif()
+
+if (NOT DEFINED ZOPFLI_PATH)
+    set(ZOPFLI_PATH ${ZOPFLI_DEFAULT_PATH})
+endif()
+
+include_directories(${MOZJPEG_PATH}/include)
+include_directories(${ZOPFLI_PATH}/include)
+
+if (EXISTS ${MOZJPEG_PATH}/lib64)
+    link_directories(${MOZJPEG_PATH}/lib64)
+else ()
+    link_directories(${MOZJPEG_PATH}/lib)
+endif ()
+link_directories(${ZOPFLI_PATH}/lib)
 
 add_subdirectory(caesium)
 add_subdirectory(demo)
