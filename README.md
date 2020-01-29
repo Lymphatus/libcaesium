@@ -100,7 +100,7 @@ If you don't have `mozjpeg` and `zopfli` you should run
 $ cd libcaesium
 $ ./install.sh
 ```
-which will install the requirements.
+which will install the requirements (Ubuntu only).
 
 ##### Compile
 Provided you have all the requirements, building and installing from git is as simple as typing

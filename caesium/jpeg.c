@@ -7,6 +7,10 @@
 
 #include "jpeg.h"
 #include "error.h"
+#include "config.h"
+
+METHODDEF(void)
+do_not_emit_message () {}
 
 struct jpeg_decompress_struct cs_get_markers(const char *input)
 {
@@ -59,6 +63,11 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_p
 	jpeg_create_decompress(&srcinfo);
 	dstinfo.err = jpeg_std_error(&jdsterr);
 	jpeg_create_compress(&dstinfo);
+
+    if (!VERBOSE) {
+	    srcinfo.err->emit_message = do_not_emit_message;
+	    dstinfo.err->emit_message = do_not_emit_message;
+    }
 
 	//Check for errors
 	if ((fp = fopen(input_file, "rb")) == NULL) {
