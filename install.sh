@@ -19,7 +19,7 @@ cd "${SOURCE}" || exit
 git clone --branch 'zopfli-1.0.3' --depth 1 https://github.com/google/zopfli.git
 cd zopfli || exit
 mkdir build && cd build || exit
-cmake -DZOPFLI_BUILD_SHARED=ON ..
+cmake -D"ZOPFLI_BUILD_SHARED=ON" -D"CMAKE_INSTALL_LIBDIR=/usr/local/lib" ..
 make libzopflipng && sudo make install
 
 cd "${SOURCE}" || exit
