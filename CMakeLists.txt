@@ -31,7 +31,7 @@ elseif (WIN32)
     set(ZOPFLI_DEFAULT_PATH C:\\zopfli)
 else ()
     set(MOZJPEG_DEFAULT_PATH /opt/mozjpeg)
-    set(ZOPFLI_DEFAULT_PATH /usr/local)
+    set(ZOPFLI_DEFAULT_PATH /usr)
 endif ()
 
 
