@@ -27,3 +27,5 @@ before_script:
 
 script: make
 
+after_success:
+  - demo/caesiumd -v

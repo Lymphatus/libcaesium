@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../caesium/caesium.h"
 #include "config.h"
 
 int main(int argc, char *argv[])
 {
-	fprintf(stdout, "libcaesium demo application v%d.%d.%d\n",
-		   VERSION_MAJOR,
-		   VERSION_MINOR,
-		   VERSION_PATCH);
+	if (argc == 2 && strcmp(argv[1], "-v") == 0) {
+		fprintf(stdout, "%d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+		exit(EXIT_SUCCESS);
+	}
 
 	if (argc != 3) {
 		fprintf(stderr, "Wrong arguments.\nExiting.\n");

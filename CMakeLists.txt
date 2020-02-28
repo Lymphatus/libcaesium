@@ -8,7 +8,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # The version number.
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 5)
-set(VERSION_PATCH 1)
+set(VERSION_PATCH 2)
 
 if (DEFINED VERBOSE)
     set(VERBOSE ${VERBOSE})
@@ -31,7 +31,7 @@ elseif (WIN32)
     set(ZOPFLI_DEFAULT_PATH C:\\zopfli)
 else ()
     set(MOZJPEG_DEFAULT_PATH /opt/mozjpeg)
-    set(ZOPFLI_DEFAULT_PATH /usr)
+    set(ZOPFLI_DEFAULT_PATH /usr/local)
 endif ()
 
 
