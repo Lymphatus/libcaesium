@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SOURCE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 rm -rf ./mozjpeg
 rm -rf ./zopfli
@@ -19,7 +19,11 @@ cd "${SOURCE}" || exit
 git clone --branch 'zopfli-1.0.3' --depth 1 https://github.com/google/zopfli.git
 cd zopfli || exit
 mkdir build && cd build || exit
-cmake -D"ZOPFLI_BUILD_SHARED=ON" -D"CMAKE_INSTALL_LIBDIR=/usr/local/lib" ..
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  cmake -D"ZOPFLI_BUILD_SHARED=ON" -D"CMAKE_INSTALL_BINDIR=/usr/bin" -D"CMAKE_INSTALL_LIBDIR=/usr/lib" -D"CMAKE_INSTALL_INCLUDEDIR=/usr/include" ..
+else
+  cmake -D"ZOPFLI_BUILD_SHARED=ON" ..
+fi
 make libzopflipng && sudo make install
 
 cd "${SOURCE}" || exit
