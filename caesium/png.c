@@ -23,11 +23,11 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 	if (options->scale_factor > 0.0 && options->scale_factor < 1.0) {
 		result = cs_png_resize(input, output, options->scale_factor);
 		if (!result) {
-			display_error(ERROR, 304);
+			libcaesium_display_error(ERROR, 304);
 			return result;
 		}
 	} else if (options->scale_factor != 1.0) {
-		display_error(ERROR, 305);
+		libcaesium_display_error(ERROR, 305);
 		return false;
 	}
 
@@ -76,7 +76,7 @@ bool cs_png_optimize(const char *input, const char *output, cs_png_pars *options
 	free(orig_buffer);
 	free(resultpng);
 	if (error_code != 0) {
-		display_error(ERROR, error_code);
+		libcaesium_display_error(ERROR, error_code);
 	}
 	return result;
 }

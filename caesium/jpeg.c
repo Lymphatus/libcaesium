@@ -23,7 +23,7 @@ struct jpeg_decompress_struct cs_get_markers(const char *input)
 
 	//Check for errors
 	if ((fp = fopen(input, "rb")) == NULL) {
-		display_error(ERROR, 200);
+		libcaesium_display_error(ERROR, 200);
 	}
 
 	//Create the IO instance for the input file
@@ -71,7 +71,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_p
 
 	//Check for errors
 	if ((fp = fopen(input_file, "rb")) == NULL) {
-		display_error(ERROR, 201);
+		libcaesium_display_error(ERROR, 201);
 	}
 
 	//Create the IO instance for the input file
@@ -103,7 +103,7 @@ bool cs_jpeg_optimize(const char *input_file, const char *output_file, cs_jpeg_p
 
 	//Check for errors
 	if ((fp = fopen(output_file, "wb")) == NULL) {
-		display_error(ERROR, 202);
+		libcaesium_display_error(ERROR, 202);
 	}
 
 	//CRITICAL - This is the optimization step
@@ -153,7 +153,7 @@ int cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jp
 
 	//Check for errors
 	if ((fp = fopen(output_file, "wb")) == NULL) {
-		display_error(ERROR, 203);
+		libcaesium_display_error(ERROR, 203);
 	}
 
 	tjCompressHandle = tjInitCompress();
@@ -170,7 +170,7 @@ int cs_jpeg_compress(const char *output_file, unsigned char *image_buffer, cs_jp
 				options->quality,
 				options->dct_method);
 	if (result == -1) {
-		display_error(ERROR, 207);
+		libcaesium_display_error(ERROR, 207);
 	} else {
 		fwrite(output_buffer, output_size, 1, fp);
 	}
@@ -192,15 +192,15 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 	int fileWidth = 0, fileHeight = 0, jpegSubsamp = 0, colorSpace = 0, result = 0;
 
 	if ((fp = fopen(fileName, "rb")) == NULL) {
-		display_error(ERROR, 204);
+		libcaesium_display_error(ERROR, 204);
 	}
 	fseek(fp, 0, SEEK_END);
 	sourceJpegBufferSize = ftell(fp);
 	if (sourceJpegBufferSize == -1) {
-		display_error(ERROR, 205);
+		libcaesium_display_error(ERROR, 205);
 	}
 	if (sourceJpegBufferSize > INT_MAX) {
-		display_error(ERROR, 206);
+		libcaesium_display_error(ERROR, 206);
 	}
 	sourceJpegBuffer = tjAlloc((int) sourceJpegBufferSize);
 
@@ -211,7 +211,7 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 						&jpegSubsamp, &colorSpace);
 
 	if (colorSpace == 4) { //CMYK
-		display_error(WARNING, 209);
+		libcaesium_display_error(WARNING, 209);
 		return 0;
 	}
 
@@ -233,7 +233,7 @@ unsigned char *cs_jpeg_decompress(const char *fileName, cs_jpeg_pars *options)
 				  colorSpace,
 				  options->dct_method);
 	if (result == -1) {
-		display_error(ERROR, 208);
+		libcaesium_display_error(ERROR, 208);
 	}
 
 	fclose(fp);

@@ -5,7 +5,7 @@
 
 int error_code = 0;
 
-void display_error(error_level level, int code) {
+void libcaesium_display_error(error_level level, int code) {
     error_code = code;
     if (VERBOSE) {
         char *error_level = ((level) ? "[WARNING]" : "[ERROR]");

@@ -5,7 +5,7 @@
 
 extern int error_code;
 
-void display_error(error_level level, int code);
+void libcaesium_display_error(error_level level, int code);
 
 const char *get_error_message(int code);
 
