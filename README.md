@@ -1,128 +1,131 @@
 # libcaesium
-[![Build Status](https://travis-ci.org/Lymphatus/libcaesium.svg?branch=master)](https://travis-ci.org/Lymphatus/libcaesium)  
 
-Libcaesium is a simple library performing JPEG and PNG compression/optimization using [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli).
+Libcaesium is a simple library performing JPEG, PNG, WebP and GIF (experimental) compression/optimization written in Rust, with a C interface.\
+**IMPORTANT**: starting from v0.6.0 the library is written in Rust and no longer in C. There's a C interface, but it's not backward compatible with the <0.6.0.
 
-## Download
-Binaries not available yet. Please refer to the compilation section below.
-
-## Basic usage
-
-Libcaesium exposes one single function to compress, auto-detecting the input file type:
-```C
-bool cs_compress(const char *input,
-                 const char *output,
-                 cs_image_pars *options,
-                 int* err_n);
+## Usage in Rust
+Libcaesium exposes one single function, auto-detecting the input file type:
+```Rust
+pub fn compress(
+    input_path: String,
+    output_path: String,
+    parameters: CSParameters
+) -> Result<(), Box<dyn Error>>
 ```
 #### Parameters
-**input** - input file path  
-**output** - output file path  
-**options** - pointer to the options struct, containing compression parameters (see below)  
-**err_n** - pointer to an integer that will contain the error code if something went wrong during compression 
+- `input_path` - input file path (full filename)
+- `output_path` - output file path (full filename)
+- `parameters` - options struct, containing compression parameters (see below)
 
-#### Return value
-**true** if the compression has successfully ended, or **false** if any error occurs. If any error occurred, the **err_n**
-variable will contain the error code. See `error.h` for further info.
-
-## Compression options
-Libcaesium supports a few compression parameters for each JPEG and PNG.
-You need to initialize the default values before compressing by calling `initialize_parameters()`.  
-
+### Compression options
+Libcaesium supports a few compression parameters for each file it supports.
 They are defined into a top level struct containing each supported file parameters, as follows:
-```C
-typedef struct cs_image_pars
-{
-	cs_jpeg_pars jpeg;
-	cs_png_pars png;
-} cs_image_pars;
+```Rust
+pub struct CSParameters {
+    pub jpeg: jpeg::Parameters,
+    pub png: png::Parameters,
+    pub gif: gif::Parameters,
+    pub webp: webp::Parameters,
+    pub keep_metadata: bool,
+    pub optimize: bool,
+}
 ```
-### JPEG
-```C
-typedef struct cs_jpeg_pars
-{
-	int quality;
-	bool exif_copy;
-	int dct_method;
-	double scale_factor;
-} cs_jpeg_pars;
-```
-The first 4 parameters matters, in term of compression, while the others will be set by the compressor/decompressor
-during the compression progress and thus they will be overwritten.
-- **quality**: in a range from 0 to 100, the quality of the resulting image. **Note** that 0 means _optimization_ (see below). Default: 0.
-- **exif_copy**: set it to _true_ to copy EXIF tag info after compression. Default: false.
-- **dct_method**: one of the turbojpeg DCT flags. Default: TJFLAG_FASTDCT.
-- **scale_factor**: the image scaling factor, expressed as double precision number. Default: 1.0.
+Each file type has its own options, but the last two are generic:
+- `keep_metadata`: will keep metadata information for any supported type. JPEG and PNG supported. Default `false`.
+- `optimize`: forces optimization, when available. With this option enabled the compression will be lossless. JPEG, PNG and WebP supported. Default `false`.
 
-### PNG
-```C
-typedef struct cs_png_pars
-{
-	int iterations;
-	int iterations_large;
-	int block_split_strategy;
-	bool lossy_8;
-	bool transparent;
-	int auto_filter_strategy;
-	double scale_factor;
-} cs_png_pars;
+#### jpeg
+```Rust
+pub struct Parameters {
+    pub quality: u32,
+}
 ```
-Those are the zopflipng compression parameters, except for the last one.
-- **iterations**: number of iterations (more means more compression). Default: 10.
-- **iteration_large**: number of iterations for large files. Default: 5.
-- **block_split_strategy**: filter strategy. Default: 4;
-- **lossy_8**: convert 16-bit per channel image to 8-bit per channel. Default: true.
-- **transparent**: remove colors behind alpha channel 0. Default: true.
-- **auto_filter_strategy**: legacy.
-- **scale_factor**: the image scaling factor, expressed as double precision number. Note that PNG cannot be upscaled. Default: 1.0.
+- `quality`: in a range from 1 to 100, the quality of the resulting image. Default `80`.
 
+#### png
+```Rust
+pub struct Parameters {
+    pub oxipng: oxipng::Options,
+    pub level: u32,
+    pub force_zopfli: bool
+}
+```
+- `oxipng`: oxipng options. Should be left as default unless you want to do something advanced. Refer to [oxipng](https://github.com/shssoichiro/oxipng) for documentation.
+- `level`: level of optimization, from 0 to 6. Increasing the level will result in a smaller file, at the cost of computation time. If the optimization flag is `true`, the level is set to `6`. Default: `3`.
+- `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image but it may take minutes to finish the process. Default `false`.
+
+#### gif
+GIF support is experimental, has many know issues and does not support optimization. Expect bugs (especially on Windows).
+```Rust
+pub struct Parameters {
+    pub quality: u32,
+}
+```
+- `quality`: in a range from 0 to 100, the quality of the resulting image. If the optimization flag is `true`, the level is set to `100`. Default: `80`.
+
+#### webp
+WebP compression is tricky. The format is already well optimized and using the `optimize` flag will probably result in a bigger image.
+```Rust
+pub struct Parameters {
+    pub quality: u32,
+}
+```
+- `quality`: in a range from 0 to 100, the quality of the resulting image. If the optimization flag is `true`, this option will be ignored. Default: `60`.
+
+## Usage in C
+Libcaesium exposes one single C function, auto-detecting the input file type:
+```Rust
+pub extern fn c_compress(
+    input_path: *const c_char,
+    output_path: *const c_char,
+    params: C_CSParameters
+) -> bool
+```
+#### Parameters
+- `input_path` - input file path (full filename)
+- `output_path` - output file path (full filename)
+- `parameters` - options struct, containing compression parameters (see below)
+- 
+#### Return
+`true` if all goes well, `false` otherwise.
+
+### Compression options
+The C options struct is slightly different from the Rust one:
+```Rust
+#[repr(C)]
+pub struct C_CSParameters {
+    pub keep_metadata: bool,
+    pub jpeg_quality: u32,
+    pub png_level: u32,
+    pub png_force_zopfli: bool,
+    pub gif_quality: u32,
+    pub webp_quality: u32,
+    pub optimize: bool,
+}
+```
+The option description is the same as the Rust counterpart.
+
+## Download
+Binaries not available. Please refer to the compilation section below.
 
 ## Compilation and Installation
-Libcaesium uses cmake to build and install the library. Before compiling, be sure to have all the requisites.
-Libcaesium requires [mozjpeg](https://github.com/mozilla/mozjpeg) and [zopfli](https://github.com/google/zopfli) installed as shared/static libraries.
-Please refer to their own documentation for detailed instructions.
-You can also enable the verbose output, which will print on stderr if anything goes wrong, by using the `-DVERBOSE=1` flag during compilation.
+Compilation is available for all supported platforms: Windows, MacOS and Linux.
 
-### OS X/Linux
-##### Requirements
-Be sure you have the build tools
-###### Linux
-`$ sudo apt-get install libtool autoconf git nasm pkg-config cmake libpng-dev`
-
-###### OSX
-`$ brew install nasm cmake`
-
-Get the code with
-`$ git clone https://github.com/Lymphatus/libcaesium.git`
-
-If you don't have `mozjpeg` and `zopfli` you should run
-```bash
-$ cd libcaesium
-$ ./install.sh
 ```
-which will install the requirements.
-
-##### Compile
-Provided you have all the requirements, building and installing from git is as simple as typing
-```bash
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-$ sudo make install
+cargo build --release
 ```
-This will compile the Caesium library, the required header and a small demo application named _caesiumd_.
+Note: if you don't use the `--release` flag, the PNG optimizations can take a very long time to complete, especially using the zopfli algorithm.
 
-### Windows
-Compiling on Windows is somehow tricky. You can achieve it with MinGW (tested) or Cygwin (not tested), but it's better to stick with the binaries provided.
+The result will be a dynamic library usable by external applications through its C interface.
 
 ## Compression vs Optimization
 JPEG is a lossy format: that means you will always lose some information after each compression. So, compressing a file with
-100 quality for 10 times will result in a always different image, even though you can't really see the difference.
+100 quality for 10 times will result in an always different image, even though you can't really see the difference.
 Libcaesium also supports optimization, by setting the _quality_ to 0. This performs a lossless process, resulting in the same image,
-but with a smaller size (10-15% usually).  
+but with a smaller size (10-12% usually).  
 PNG is lossless, so libcaesium will always perform optimization rather than compression.
+GIF optimization is possible, but currently not supported.
+WebP optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.
 
 ## Resizing
-Resizing is partially supported. It is handy but it's almost completely out of the scope of this library.
-If you really feel the need to do it within libcaesium you can do so, but I advise you should opt for a different toolset for the best results.
+Resizing is no longer supported since 0.6.0.

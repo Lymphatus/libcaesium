@@ -1,0 +1,48 @@
+[package]
+name = "libcaesium"
+version = "0.6.0"
+authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
+edition = "2018"
+categories = ["multimedia::images"]
+keywords = [
+    "compression",
+    "library",
+    "jpeg",
+    "png",
+    "gif",
+    "webp"
+]
+description = "A lossy/lossless image compression library."
+readme = "README.md"
+exclude = [
+    "tests/*",
+]
+homepage = "https://github.com/Lymphatus/libcaesium"
+repository = "https://github.com/Lymphatus/libcaesium"
+license = "Apache-2.0"
+
+[dependencies]
+mozjpeg = "0.9.1"
+mozjpeg-sys = "1.0.0"
+oxipng = "5.0"
+libc = "0.2.76"
+wasm-bindgen = "0.2"
+gifsicle = "1.92.5"
+webp = "0.2.0"
+infer = "0.5.0"
+
+[dev-dependencies]
+dssim = "2.11.2"
+load_image = { version = "2.12.1", features = ["static"] }
+imgref = "1.7.0"
+lodepng = "3.0.0"
+kamadak-exif = "0.5.0"
+
+[lib]
+name = "caesium"
+path = "src/lib.rs"
+crate-type = ["lib", "dylib"]
+test = true
+doctest = false
+bench = false
+doc = false
