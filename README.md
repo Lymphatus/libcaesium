@@ -17,6 +17,7 @@ pub fn compress(
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
 
+The output folder where the file is compressed **must** exist.
 ### Compression options
 Libcaesium supports a few compression parameters for each file it supports.
 They are defined into a top level struct containing each supported file parameters, as follows:
