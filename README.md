@@ -1,4 +1,4 @@
-# libcaesium
+# libcaesium [![Rust](https://github.com/Lymphatus/libcaesium/actions/workflows/rust.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/rust.yml)
 
 Libcaesium is a simple library performing JPEG, PNG, WebP and GIF (experimental) compression/optimization written in Rust, with a C interface.\
 **IMPORTANT**: starting from v0.6.0 the library is written in Rust and no longer in C. There's a C interface, but it's not backward compatible with the <0.6.0.
