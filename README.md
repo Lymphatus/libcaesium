@@ -86,7 +86,6 @@ pub extern fn c_compress(
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
-- 
 #### Return
 `true` if all goes well, `false` otherwise.
 
