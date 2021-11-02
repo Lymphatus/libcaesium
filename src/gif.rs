@@ -9,6 +9,36 @@ pub struct Parameters {
 
 pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
 {
+    return if parameters.optimize {
+        lossless(input_path, output_path)
+    } else {
+        lossy(input_path, output_path, parameters)
+    };
+}
+
+fn lossless(input_path: String, output_path: String) -> Result<(), io::Error>
+{
+    let args: Vec<CString> = vec![
+        CString::new(format!("{:?}", std::env::current_exe()))?,
+        CString::new(input_path)?,
+        CString::new(format!("--output={}", output_path))?,
+        CString::new("--optimize=3")?
+    ];
+
+    let argv: Vec<_> = args.iter().map(|a| a.as_ptr()).collect();
+
+    unsafe {
+        let result = gifsicle::gifsicle_main(argv.len() as _, argv.as_ptr());
+
+        match result {
+            0 => Ok(()),
+            _ => Err(io::Error::new(io::ErrorKind::Other, "GIF optimization failed!"))
+        }
+    }
+}
+
+pub fn lossy(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
+{
     unsafe {
         let input_file = libc::fopen(CString::new(input_path)?.as_ptr(), CString::new("r")?.as_ptr());
         let output_file = libc::fopen(CString::new(output_path)?.as_ptr(), CString::new("w+")?.as_ptr());
