@@ -64,7 +64,7 @@ pub extern fn c_compress(input_path: *const c_char, output_path: *const c_char, 
     unsafe {
         let mut parameters = initialize_parameters();
         parameters.jpeg.quality = params.jpeg_quality;
-        parameters.png.level = params.png_level - 1;
+        parameters.png.level = params.png_level;
         parameters.optimize = params.optimize;
         parameters.keep_metadata = params.keep_metadata;
         parameters.png.force_zopfli = params.png_force_zopfli;
@@ -86,7 +86,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
         return Err("Invalid JPEG quality value".into());
     }
 
-    if parameters.png.level > 6 {
+    if parameters.png.level == 0 || parameters.png.level > 7 {
         return Err("Invalid PNG quality value".into());
     }
 
