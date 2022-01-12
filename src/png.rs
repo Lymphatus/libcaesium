@@ -20,6 +20,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
     if parameters.optimize && parameters.png.force_zopfli {
         oxipng_options.deflate = oxipng::Deflaters::Zopfli;
     } else {
+        oxipng_options.deflate = oxipng::Deflaters::Libdeflater;
         let mut preset = parameters.png.level - 1;
         if parameters.optimize {
            preset = 6;
