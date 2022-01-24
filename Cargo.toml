@@ -41,7 +41,7 @@ kamadak-exif = "0.5.0"
 [lib]
 name = "libcaesium"
 path = "src/lib.rs"
-crate-type = ["lib", "dylib"]
+crate-type = ["lib", "cdylib"]
 test = true
 doctest = false
 bench = false

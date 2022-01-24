@@ -25,10 +25,10 @@ pub fn cleanup(file: &str) {
 fn compress_80_with_metadata() {
     let output = "tests/samples/output/compressed_80_metadata.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = libcaesium::initialize_parameters();
     pars.jpeg.quality = 80;
     pars.keep_metadata = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let model = get_model_metadata(Path::new(output));
     assert_eq!(model.display_value().to_string(), "\"Canon EOS 2000D\"");
@@ -39,10 +39,10 @@ fn compress_80_with_metadata() {
 fn optimize_with_metadata() {
     let output = "tests/samples/output/optimized_metadata.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = libcaesium::initialize_parameters();
     pars.optimize = true;
     pars.keep_metadata = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let model = get_model_metadata(Path::new(output));
     assert_eq!(model.display_value().to_string(), "\"Canon EOS 2000D\"");

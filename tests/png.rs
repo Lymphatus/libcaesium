@@ -1,4 +1,4 @@
-use caesium;
+use libcaesium;
 use std::sync::Once;
 use std::fs;
 
@@ -22,9 +22,9 @@ pub fn cleanup(file: &str) {
 fn standard_compress_png() {
     let output = "tests/samples/output/compressed.png";
     initialize(output);
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
+    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
                       String::from(output),
-                      caesium::initialize_parameters())
+                      libcaesium::initialize_parameters())
         .unwrap();
     assert!(std::path::Path::new(output).exists());
     cleanup(output)
@@ -34,9 +34,9 @@ fn standard_compress_png() {
 fn standard_compress_png_with_optimize_flag() {
     let output = "tests/samples/output/compressed_max.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = libcaesium::initialize_parameters();
     params.optimize = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
+    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
                       String::from(output),
                       params)
         .unwrap();
@@ -48,11 +48,11 @@ fn standard_compress_png_with_optimize_flag() {
 fn zopfli_compress_png() {
     let output = "tests/samples/output/optimized.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = libcaesium::initialize_parameters();
     params.png.level = 3;
     params.optimize = true;
     params.png.force_zopfli = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
+    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
                       String::from(output),
                       params)
         .unwrap();
