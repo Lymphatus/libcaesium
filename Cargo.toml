@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2018"
 categories = ["multimedia::images"]
@@ -22,9 +22,8 @@ repository = "https://github.com/Lymphatus/libcaesium"
 license = "Apache-2.0"
 
 [dependencies]
-mozjpeg = "0.9.1"
 mozjpeg-sys = "1.0.1"
-oxipng = "5.0"
+oxipng = { version = "5.0.1", optional = false }
 libc = "0.2.76"
 wasm-bindgen = "0.2"
 gifsicle = "1.92.5"
