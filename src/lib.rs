@@ -71,12 +71,9 @@ pub extern fn c_compress(input_path: *const c_char, output_path: *const c_char, 
         parameters.gif.quality = params.gif_quality;
         parameters.webp.quality = params.webp_quality;
 
-        match compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
+        compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
                  CStr::from_ptr(output_path).to_str().unwrap().to_string(),
-                 parameters) {
-            Ok(_) => true,
-            Err(_) => false
-        }
+                 parameters).is_ok()
     }
 }
 
