@@ -22,12 +22,13 @@ pub fn cleanup(file: &str) {
 //     let output = "tests/samples/output/compressed_20.gif";
 //     initialize(output);
 //     let mut params = libcaesium::initialize_parameters();
-//     params.gif.level = 20;
+//     params.gif.quality = 20;
 //     libcaesium::compress(String::from("tests/samples/uncompressed_은하.gif"),
 //                       String::from(output),
 //                       params)
 //         .unwrap();
 //     assert!(std::path::Path::new(output).exists());
+//     assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
 //     cleanup(output)
 // }
 //

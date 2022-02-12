@@ -9,11 +9,15 @@ pub struct Parameters {
 
 pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
 {
-    return if parameters.optimize {
+    if parameters.width > 0 || parameters.height > 0 {
+        return Err(io::Error::new(io::ErrorKind::Other, "GIF resizing is not supported"));
+    }
+
+    if parameters.optimize {
         lossless(input_path, output_path)
     } else {
         lossy(input_path, output_path, parameters)
-    };
+    }
 }
 
 fn lossless(input_path: String, output_path: String) -> Result<(), io::Error>
@@ -22,7 +26,7 @@ fn lossless(input_path: String, output_path: String) -> Result<(), io::Error>
         CString::new(format!("{:?}", std::env::current_exe()))?,
         CString::new(input_path)?,
         CString::new(format!("--output={}", output_path))?,
-        CString::new("--optimize=3")?
+        CString::new("--optimize=3")?,
     ];
 
     let argv: Vec<_> = args.iter().map(|a| a.as_ptr()).collect();
@@ -46,10 +50,7 @@ pub fn lossy(input_path: String, output_path: String, parameters: CSParameters) 
         libc::fclose(input_file);
 
         let padding: [*mut c_void; 7] = [std::ptr::null_mut(); 7];
-        let mut loss = 0;
-        if !parameters.optimize {
-            loss = (100 - parameters.gif.quality) as c_int
-        }
+        let loss = (100 - parameters.gif.quality) as c_int;
 
         let gc_info = gifsicle::Gif_CompressInfo {
             flags: 0,

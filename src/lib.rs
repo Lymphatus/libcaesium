@@ -3,6 +3,7 @@ mod jpeg;
 mod png;
 mod gif;
 mod webp;
+mod resize;
 
 use std::error::Error;
 use crate::utils::get_filetype;
@@ -10,7 +11,7 @@ use std::ffi::CStr;
 use std::os::raw::c_char;
 
 #[repr(C)]
-pub struct C_CSParameters {
+pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
     pub png_level: u32,
@@ -18,6 +19,8 @@ pub struct C_CSParameters {
     pub gif_quality: u32,
     pub webp_quality: u32,
     pub optimize: bool,
+    pub width: u32,
+    pub height: u32,
 }
 
 pub struct CSParameters {
@@ -27,6 +30,8 @@ pub struct CSParameters {
     pub webp: webp::Parameters,
     pub keep_metadata: bool,
     pub optimize: bool,
+    pub width: u32,
+    pub height: u32,
 }
 
 pub fn initialize_parameters() -> CSParameters
@@ -56,45 +61,34 @@ pub fn initialize_parameters() -> CSParameters
         webp,
         keep_metadata: false,
         optimize: false,
+        width: 0,
+        height: 0,
     }
 }
 
 #[no_mangle]
-pub extern fn c_compress(input_path: *const c_char, output_path: *const c_char, params: C_CSParameters) -> bool {
-    unsafe {
-        let mut parameters = initialize_parameters();
-        parameters.jpeg.quality = params.jpeg_quality;
-        parameters.png.level = params.png_level;
-        parameters.optimize = params.optimize;
-        parameters.keep_metadata = params.keep_metadata;
-        parameters.png.force_zopfli = params.png_force_zopfli;
-        parameters.gif.quality = params.gif_quality;
-        parameters.webp.quality = params.webp_quality;
+#[allow(clippy::missing_safety_doc)]
+pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c_char, params: CCSParameters) -> bool {
+    let mut parameters = initialize_parameters();
+    parameters.jpeg.quality = params.jpeg_quality;
+    parameters.png.level = params.png_level;
+    parameters.optimize = params.optimize;
+    parameters.keep_metadata = params.keep_metadata;
+    parameters.png.force_zopfli = params.png_force_zopfli;
+    parameters.gif.quality = params.gif_quality;
+    parameters.webp.quality = params.webp_quality;
+    parameters.width = params.width;
+    parameters.height = params.height;
 
-        compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
-                 CStr::from_ptr(output_path).to_str().unwrap().to_string(),
-                 parameters).is_ok()
-    }
+    let x = compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
+                     CStr::from_ptr(output_path).to_str().unwrap().to_string(),
+                     parameters).is_ok();
+    x
 }
 
 pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), Box<dyn Error>> {
+    validate_parameters(&parameters)?;
     let file_type = get_filetype(&input_path);
-    if parameters.jpeg.quality == 0 || parameters.jpeg.quality > 100 {
-        return Err("Invalid JPEG quality value".into());
-    }
-
-    if parameters.png.level == 0 || parameters.png.level > 7 {
-        return Err("Invalid PNG quality value".into());
-    }
-
-    if parameters.gif.quality > 100 {
-        return Err("Invalid GIF quality value".into());
-    }
-
-    if parameters.webp.quality > 100 {
-        return Err("Invalid WebP quality value".into());
-    }
-
 
     match file_type {
         utils::SupportedFileTypes::Jpeg => {
@@ -110,6 +104,26 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
             webp::compress(input_path, output_path, parameters)?;
         }
         _ => return Err("Unknown file type".into())
+    }
+
+    Ok(())
+}
+
+fn validate_parameters(parameters: &CSParameters) -> Result<(), Box<dyn Error>> {
+    if parameters.jpeg.quality == 0 || parameters.jpeg.quality > 100 {
+        return Err("Invalid JPEG quality value".into());
+    }
+
+    if parameters.png.level == 0 || parameters.png.level > 7 {
+        return Err("Invalid PNG quality value".into());
+    }
+
+    if parameters.gif.quality > 100 {
+        return Err("Invalid GIF quality value".into());
+    }
+
+    if parameters.webp.quality > 100 {
+        return Err("Invalid WebP quality value".into());
     }
 
     Ok(())

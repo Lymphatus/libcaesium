@@ -29,6 +29,7 @@ fn compress_20() {
                       params)
         .unwrap();
     assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     cleanup(output)
 }
 
@@ -43,6 +44,7 @@ fn compress_50() {
                       params)
         .unwrap();
     assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     cleanup(output)
 }
 
@@ -57,6 +59,7 @@ fn compress_80() {
                       params)
         .unwrap();
     assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     cleanup(output)
 }
 
@@ -71,6 +74,7 @@ fn compress_100() {
                       params)
         .unwrap();
     assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     cleanup(output)
 }
 
@@ -85,5 +89,42 @@ fn optimize() {
                       params)
         .unwrap();
     assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
+    cleanup(output)
+}
+
+#[test]
+fn downscale_compress_80() {
+    let output = "tests/samples/output/downscale_compressed_80.webp";
+    initialize(output);
+    let mut params = libcaesium::initialize_parameters();
+    params.webp.quality = 80;
+    params.width = 150;
+    params.height = 100;
+    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+                         String::from(output),
+                         params)
+        .unwrap();
+    assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
+    assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
+    cleanup(output)
+}
+
+#[test]
+fn downscale_optimize() {
+    let output = "tests/samples/output/downscale_optimized.webp";
+    initialize(output);
+    let mut params = libcaesium::initialize_parameters();
+    params.optimize = true;
+    params.width = 150;
+    params.height = 100;
+    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+                         String::from(output),
+                         params)
+        .unwrap();
+    assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
+    assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
     cleanup(output)
 }

@@ -1,9 +1,12 @@
 use std::fs::File;
-use std::io::Write;
 use std::{io, mem};
 use mozjpeg_sys::*;
 use crate::CSParameters;
 use std::fs;
+use std::io::Write;
+use image::ImageOutputFormat::Jpeg;
+use img_parts::{DynImage, ImageEXIF, ImageICC};
+use crate::resize::resize;
 
 pub struct Parameters {
     pub quality: u32,
@@ -11,16 +14,32 @@ pub struct Parameters {
 
 pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
 {
-    unsafe {
-        if parameters.optimize {
-            lossless(input_path, output_path, parameters)
+    let mut in_file = fs::read(input_path)?;
+
+    if parameters.width > 0 || parameters.height > 0 {
+        if parameters.keep_metadata {
+            let metadata = extract_metadata(in_file.clone());
+            in_file = resize(in_file, parameters.width, parameters.height, Jpeg(80))?;
+            in_file = save_metadata(in_file, metadata.0, metadata.1);
         } else {
-            lossy(input_path, output_path, parameters)
+            in_file = resize(in_file, parameters.width, parameters.height, Jpeg(80))?;
         }
     }
+
+    unsafe {
+        let compression_buffer: (*mut u8, u64);
+        if parameters.optimize {
+            compression_buffer = lossless(in_file, parameters)?;
+        } else {
+            compression_buffer = lossy(in_file, parameters)?;
+        }
+        let mut output_file_buffer = File::create(output_path)?;
+        output_file_buffer.write_all(std::slice::from_raw_parts(compression_buffer.0, compression_buffer.1 as usize))?;
+    }
+    Ok(())
 }
 
-unsafe fn lossless(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error> {
+unsafe fn lossless(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, u64), io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
     let mut src_err = mem::zeroed();
@@ -33,7 +52,6 @@ unsafe fn lossless(input_path: String, output_path: String, parameters: CSParame
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
 
-    let in_file = fs::read(input_path)?;
     jpeg_mem_src(&mut src_info, in_file.as_ptr(), in_file.len() as _);
 
     if parameters.keep_metadata {
@@ -68,17 +86,14 @@ unsafe fn lossless(input_path: String, output_path: String, parameters: CSParame
     jpeg_finish_decompress(&mut src_info);
     jpeg_destroy_decompress(&mut src_info);
 
-    let mut output_file_buffer = File::create(output_path)?;
-    output_file_buffer.write_all(std::slice::from_raw_parts(buf, buf_size as usize))?;
-    Ok(())
+    Ok((buf, buf_size))
 }
 
-unsafe fn lossy(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error> {
+unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, u64), io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
     let mut src_err = mem::zeroed();
     let mut dst_info: jpeg_compress_struct = mem::zeroed();
     let mut dst_err = mem::zeroed();
-
 
     src_info.common.err = jpeg_std_error(&mut src_err);
     dst_info.common.err = jpeg_std_error(&mut dst_err);
@@ -86,7 +101,6 @@ unsafe fn lossy(input_path: String, output_path: String, parameters: CSParameter
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
 
-    let in_file = fs::read(input_path)?;
     jpeg_mem_src(&mut src_info, in_file.as_ptr(), in_file.len() as _);
 
     if parameters.keep_metadata {
@@ -128,7 +142,6 @@ unsafe fn lossy(input_path: String, output_path: String, parameters: CSParameter
     dst_info.optimize_coding = i32::from(true);
     jpeg_set_quality(&mut dst_info, parameters.jpeg.quality as i32, false as boolean);
 
-
     jpeg_start_compress(&mut dst_info, true as boolean);
 
     if parameters.keep_metadata {
@@ -151,7 +164,39 @@ unsafe fn lossy(input_path: String, output_path: String, parameters: CSParameter
     jpeg_finish_decompress(&mut src_info);
     jpeg_destroy_decompress(&mut src_info);
 
-    let mut output_file_buffer = File::create(output_path)?;
-    output_file_buffer.write_all(std::slice::from_raw_parts(buf, buf_size as usize))?;
-    Ok(())
+    // let mut output_file_buffer = File::create(output_path)?;
+    // output_file_buffer.write_all(std::slice::from_raw_parts(buf, buf_size as usize))?;
+    Ok((buf, buf_size))
+}
+
+fn extract_metadata(image: Vec<u8>) -> (Option<img_parts::Bytes>, Option<img_parts::Bytes>) {
+    let (iccp, exif) = DynImage::from_bytes(image.into())
+        .expect("image loaded")
+        .map_or((None, None), |dyn_image| (dyn_image.icc_profile(), dyn_image.exif()));
+
+    (iccp, exif)
+}
+
+//TODO if image is resized, change "PixelXDimension" and "PixelYDimension"
+fn save_metadata(image_buffer: Vec<u8>, iccp: Option<img_parts::Bytes>, exif: Option<img_parts::Bytes>) -> Vec<u8> {
+    if iccp.is_some() || exif.is_some() {
+        let mut dyn_image = match DynImage::from_bytes(img_parts::Bytes::from(image_buffer.clone())) {
+            Ok(o) => match o {
+                None => return image_buffer,
+                Some(d) => d
+            }
+            Err(_) => return image_buffer
+        };
+
+        dyn_image.set_icc_profile(iccp);
+        dyn_image.set_exif(exif);
+
+        let mut image_with_metadata: Vec<u8> = vec![];
+        match dyn_image.encoder().write_to(&mut image_with_metadata) {
+            Ok(_) => image_with_metadata,
+            Err(_) => image_buffer
+        }
+    } else {
+        image_buffer
+    }
 }

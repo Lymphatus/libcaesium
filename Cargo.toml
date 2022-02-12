@@ -23,12 +23,14 @@ license = "Apache-2.0"
 
 [dependencies]
 mozjpeg-sys = "1.0.1"
-oxipng = { version = "5.0.1", optional = false }
+oxipng = "5.0.1"
 libc = "0.2.76"
-wasm-bindgen = "0.2"
 gifsicle = "1.92.5"
 webp = "0.2.0"
-infer = "0.5.0"
+infer = "0.6.0"
+image = { version = "0.24", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
+img-parts = "0.2.3"
+bytes = "1.1.0"
 
 [dev-dependencies]
 dssim = "2.11.2"

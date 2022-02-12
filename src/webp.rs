@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io;
 use std::io::{Read, Write};
 use std::ops::Deref;
-use webp;
 use crate::CSParameters;
+use crate::resize::resize_image;
 
 pub struct Parameters {
     pub quality: u32,
@@ -11,6 +11,7 @@ pub struct Parameters {
 
 pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
 {
+    let must_resize = parameters.width > 0 || parameters.height > 0;
     let mut input_file = File::open(input_path)?;
 
     let mut input_data = Vec::new();
@@ -20,7 +21,11 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
         Some(img) => img,
         None => return Err(io::Error::new(io::ErrorKind::Other, "WebP decode failed!"))
     };
-    let input_image = input_webp.to_image();
+    let mut input_image = input_webp.to_image();
+
+    if must_resize {
+        input_image = resize_image(input_image, parameters.width, parameters.height)?;
+    }
 
     let encoder = match webp::Encoder::from_image(&input_image) {
         Ok(encoder) => encoder,
@@ -29,7 +34,12 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
 
     let mut output_file = File::create(output_path)?;
     if parameters.optimize {
-        output_file.write_all(encoder.encode_lossless().deref())?;
+        if must_resize {
+            output_file.write_all(encoder.encode(100.0).deref())?;
+        } else {
+            //TODO With resize can throw an error
+            output_file.write_all(encoder.encode_lossless().deref())?;
+        }
     } else {
         output_file.write_all(encoder.encode(parameters.webp.quality as f32).deref())?;
     }

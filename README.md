@@ -29,11 +29,15 @@ pub struct CSParameters {
     pub webp: webp::Parameters,
     pub keep_metadata: bool,
     pub optimize: bool,
+    pub width: u32,
+    pub height: u32,
 }
 ```
 Each file type has its own options, but the last two are generic:
 - `keep_metadata`: will keep metadata information for any supported type. JPEG and PNG supported. Default `false`.
 - `optimize`: forces optimization, when available. With this option enabled the compression will be lossless. JPEG, PNG and WebP supported. Default `false`.
+- `width`: Resizes the image to the given width. If this value is `0` and the height value is also `0`, no resizing will be done. If this is `0` and height is `> 0`, the image will be scaled based on height keeping the aspect ratio. Default `0`.
+- `height`: Resizes the image to the given height. If this value is `0` and the width value is also `0`, no resizing will be done. If this is `0` and width is `> 0`, the image will be scaled based on width keeping the aspect ratio. Default `0`.
 
 #### jpeg
 ```Rust
@@ -79,7 +83,7 @@ Libcaesium exposes one single C function, auto-detecting the input file type:
 pub extern fn c_compress(
     input_path: *const c_char,
     output_path: *const c_char,
-    params: C_CSParameters
+    params: CCSParameters
 ) -> bool
 ```
 #### Parameters
@@ -93,7 +97,7 @@ pub extern fn c_compress(
 The C options struct is slightly different from the Rust one:
 ```Rust
 #[repr(C)]
-pub struct C_CSParameters {
+pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
     pub png_level: u32,
@@ -101,6 +105,8 @@ pub struct C_CSParameters {
     pub gif_quality: u32,
     pub webp_quality: u32,
     pub optimize: bool,
+    pub width: u32,
+    pub height: u32,
 }
 ```
 The option description is the same as the Rust counterpart.
