@@ -26,7 +26,7 @@ mozjpeg-sys = "1.0.1"
 oxipng = "5.0.1"
 libc = "0.2.76"
 gifsicle = "1.92.5"
-webp = "0.2.0"
+webp = "0.2.1"
 infer = "0.6.0"
 image = { version = "0.24", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
 img-parts = "0.2.3"

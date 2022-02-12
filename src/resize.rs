@@ -1,6 +1,6 @@
 use std::io;
 use std::io::{Cursor};
-use image::{DynamicImage, GenericImageView};
+use image::DynamicImage;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
 
@@ -10,11 +10,11 @@ pub fn resize(image_buffer: Vec<u8>, width: u32, height: u32, format: image::Ima
         Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e.to_string()))
     };
 
-    let dimensions = compute_dimensions(image.width(), image.height(),width, height);
+    let dimensions = compute_dimensions(image.width(), image.height(), width, height);
     image = image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3);
 
     let mut resized_file: Vec<u8> = vec![];
-    match image.write_to(&mut resized_file, format) {
+    match image.write_to(&mut Cursor::new(&mut resized_file), format) {
         Ok(_) => {}
         Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e.to_string()))
     }
@@ -23,7 +23,7 @@ pub fn resize(image_buffer: Vec<u8>, width: u32, height: u32, format: image::Ima
 }
 
 pub fn resize_image(image: DynamicImage, width: u32, height: u32) -> Result<DynamicImage, io::Error> {
-    let dimensions = compute_dimensions(image.width(), image.height(),width, height);
+    let dimensions = compute_dimensions(image.width(), image.height(), width, height);
     let resized_image = image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3);
 
     Ok(resized_image)
