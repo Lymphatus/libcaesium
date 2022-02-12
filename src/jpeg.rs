@@ -86,7 +86,7 @@ unsafe fn lossless(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u
     jpeg_finish_decompress(&mut src_info);
     jpeg_destroy_decompress(&mut src_info);
 
-    Ok((buf, buf_size))
+    Ok((buf, buf_size as u64))
 }
 
 unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, u64), io::Error> {
@@ -166,7 +166,7 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
 
     // let mut output_file_buffer = File::create(output_path)?;
     // output_file_buffer.write_all(std::slice::from_raw_parts(buf, buf_size as usize))?;
-    Ok((buf, buf_size))
+    Ok((buf, buf_size as u64))
 }
 
 fn extract_metadata(image: Vec<u8>) -> (Option<img_parts::Bytes>, Option<img_parts::Bytes>) {
