@@ -1,7 +1,4 @@
-use imgref::{Img, ImgVec};
-use std::path::Path;
-use dssim::{RGBAPLU, ToRGBAPLU, Val};
-use load_image::ImageData;
+use dssim::Val;
 use std::sync::Once;
 use std::fs;
 
@@ -21,24 +18,10 @@ pub fn cleanup(file: &str) {
     }
 }
 
-fn load<P: AsRef<Path>>(path: P) -> Result<ImgVec<RGBAPLU>, lodepng::Error> {
-    let img = load_image::load_image(path.as_ref(), false)?;
-    match img.bitmap {
-        ImageData::RGB8(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::RGB16(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::RGBA8(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::RGBA16(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::GRAY8(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::GRAY16(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::GRAYA8(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-        ImageData::GRAYA16(ref bitmap) => Ok(Img::new(bitmap.to_rgbaplu(), img.width, img.height)),
-    }
-}
-
 fn diff(compressed: &str) -> Val {
     let attr = dssim::Dssim::new();
-    let orig = attr.create_image(&load("tests/samples/uncompressed_드림캐쳐.jpg").unwrap()).unwrap();
-    let comp = attr.create_image(&load(compressed).unwrap()).unwrap();
+    let orig = dssim::load_image(&attr, "tests/samples/uncompressed_드림캐쳐.jpg").unwrap();
+    let comp = dssim::load_image(&attr, compressed).unwrap();
     let (diff, _) = attr.compare(&orig, comp);
     diff
 }
