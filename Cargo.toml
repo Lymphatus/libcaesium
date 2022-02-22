@@ -38,7 +38,7 @@ kamadak-exif = "0.5.0"
 lodepng = "=3.5.2"
 
 [lib]
-name = "libcaesium"
+name = "caesium"
 path = "src/lib.rs"
 crate-type = ["lib", "cdylib"]
 test = true
