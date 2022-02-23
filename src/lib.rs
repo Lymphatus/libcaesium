@@ -92,21 +92,43 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
 
     match file_type {
         utils::SupportedFileTypes::Jpeg => {
-            jpeg::compress(input_path, output_path, parameters)?;
+            return match jpeg::compress(input_path, output_path, parameters) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    eprintln!("JPEG compression error: {}", e.to_string());
+                    Err(e.into())
+                }
+            };
         }
         utils::SupportedFileTypes::Png => {
-            png::compress(input_path, output_path, parameters)?;
+            return match png::compress(input_path, output_path, parameters) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    eprintln!("PNG compression error: {}", e.to_string());
+                    Err(e.into())
+                }
+            };
         }
         utils::SupportedFileTypes::Gif => {
-            gif::compress(input_path, output_path, parameters)?;
+            return match gif::compress(input_path, output_path, parameters) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    eprintln!("GIF compression error: {}", e.to_string());
+                    Err(e.into())
+                }
+            };
         }
         utils::SupportedFileTypes::WebP => {
-            webp::compress(input_path, output_path, parameters)?;
+            return match webp::compress(input_path, output_path, parameters) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    eprintln!("WebP compression error: {}", e.to_string());
+                    Err(e.into())
+                }
+            };
         }
         _ => return Err("Unknown file type".into())
     }
-
-    Ok(())
 }
 
 fn validate_parameters(parameters: &CSParameters) -> Result<(), Box<dyn Error>> {

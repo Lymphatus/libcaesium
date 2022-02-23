@@ -30,9 +30,9 @@ fn diff(compressed: &str) -> Val {
 fn compress_100() {
     let output = "tests/samples/output/compressed_100.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 100;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -44,9 +44,9 @@ fn compress_100() {
 fn compress_80() {
     let output = "tests/samples/output/compressed_80.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 80;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -58,9 +58,9 @@ fn compress_80() {
 fn compress_50() {
     let output = "tests/samples/output/compressed_50.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 50;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -72,9 +72,9 @@ fn compress_50() {
 fn compress_10() {
     let output = "tests/samples/output/compressed_10_드림캐쳐.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 10;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -86,9 +86,9 @@ fn compress_10() {
 fn optimize_jpeg() {
     let output = "tests/samples/output/compressed_optimized_드림캐쳐.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.optimize = true;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -104,11 +104,11 @@ fn optimize_jpeg() {
 fn downscale_exact() {
     let output = "tests/samples/output/downscale_800_600.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 80;
     pars.width = 800;
     pars.height = 600;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -120,11 +120,11 @@ fn downscale_exact() {
 fn downscale_exact_optimize() {
     let output = "tests/samples/output/downscale_optimize_800_600.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.optimize = true;
     pars.width = 800;
     pars.height = 600;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");

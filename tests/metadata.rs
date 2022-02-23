@@ -23,10 +23,10 @@ pub fn cleanup(file: &str) {
 fn compress_80_with_metadata() {
     let output = "tests/samples/output/compressed_80_metadata.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 80;
     pars.keep_metadata = true;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     assert!(metadata_is_equal(Path::new("tests/samples/uncompressed_드림캐쳐.jpg"), Path::new(output)));
     cleanup(output)
@@ -36,10 +36,10 @@ fn compress_80_with_metadata() {
 fn optimize_with_metadata() {
     let output = "tests/samples/output/optimized_metadata.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.optimize = true;
     pars.keep_metadata = true;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     assert!(metadata_is_equal(Path::new("tests/samples/uncompressed_드림캐쳐.jpg"), Path::new(output)));
     cleanup(output)
@@ -49,12 +49,12 @@ fn optimize_with_metadata() {
 fn resize_optimize_with_metadata() {
     let output = "tests/samples/output/resized_optimized_metadata.jpg";
     initialize(output);
-    let mut pars = libcaesium::initialize_parameters();
+    let mut pars = caesium::initialize_parameters();
     pars.optimize = true;
     pars.keep_metadata = true;
     pars.width = 200;
     pars.height = 200;
-    libcaesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
     assert!(std::path::Path::new(output).exists());
     assert!(metadata_is_equal(Path::new("tests/samples/uncompressed_드림캐쳐.jpg"), Path::new(output)));
     cleanup(output)

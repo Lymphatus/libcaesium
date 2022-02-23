@@ -1,4 +1,4 @@
-use libcaesium;
+use caesium;
 use std::sync::Once;
 use std::fs;
 
@@ -22,9 +22,9 @@ pub fn cleanup(file: &str) {
 fn compress_20() {
     let output = "tests/samples/output/compressed_20.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.webp.quality = 20;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                       String::from(output),
                       params)
         .unwrap();
@@ -37,9 +37,9 @@ fn compress_20() {
 fn compress_50() {
     let output = "tests/samples/output/compressed_50.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.webp.quality = 50;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                       String::from(output),
                       params)
         .unwrap();
@@ -52,9 +52,9 @@ fn compress_50() {
 fn compress_80() {
     let output = "tests/samples/output/compressed_80.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.webp.quality = 80;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                       String::from(output),
                       params)
         .unwrap();
@@ -67,9 +67,9 @@ fn compress_80() {
 fn compress_100() {
     let output = "tests/samples/output/compressed_100.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.webp.quality = 100;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                       String::from(output),
                       params)
         .unwrap();
@@ -82,9 +82,9 @@ fn compress_100() {
 fn optimize() {
     let output = "tests/samples/output/optimized.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.optimize = true;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                       String::from(output),
                       params)
         .unwrap();
@@ -97,11 +97,11 @@ fn optimize() {
 fn downscale_compress_80() {
     let output = "tests/samples/output/downscale_compressed_80.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.webp.quality = 80;
     params.width = 150;
     params.height = 100;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                          String::from(output),
                          params)
         .unwrap();
@@ -115,11 +115,11 @@ fn downscale_compress_80() {
 fn downscale_optimize() {
     let output = "tests/samples/output/downscale_optimized.webp";
     initialize(output);
-    let mut params = libcaesium::initialize_parameters();
+    let mut params = caesium::initialize_parameters();
     params.optimize = true;
     params.width = 150;
     params.height = 100;
-    libcaesium::compress(String::from("tests/samples/uncompressed_家.webp"),
+    caesium::compress(String::from("tests/samples/uncompressed_家.webp"),
                          String::from(output),
                          params)
         .unwrap();

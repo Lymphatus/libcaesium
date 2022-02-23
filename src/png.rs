@@ -19,6 +19,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
     }
 
     let mut oxipng_options = parameters.png.oxipng;
+    oxipng_options.deflate = oxipng::Deflaters::Libdeflater;
 
     if !parameters.keep_metadata {
         oxipng_options.strip = oxipng::Headers::Safe;
@@ -27,7 +28,6 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
     if parameters.optimize && parameters.png.force_zopfli {
         oxipng_options.deflate = oxipng::Deflaters::Zopfli;
     } else {
-        oxipng_options.deflate = oxipng::Deflaters::Libdeflater;
         let mut preset = parameters.png.level - 1;
         if parameters.optimize {
             preset = 6;
