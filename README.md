@@ -131,7 +131,4 @@ Libcaesium also supports optimization, by setting the _quality_ to 0. This perfo
 but with a smaller size (10-12% usually).  
 PNG is lossless, so libcaesium will always perform optimization rather than compression.
 GIF optimization is possible, but currently not supported.
-WebP optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.
-
-## Resizing
-Resizing is no longer supported since 0.6.0.
+WebP optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.s
