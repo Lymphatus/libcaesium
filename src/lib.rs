@@ -7,7 +7,7 @@ mod resize;
 
 use std::error::Error;
 use crate::utils::get_filetype;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
 #[repr(C)]
@@ -21,6 +21,12 @@ pub struct CCSParameters {
     pub optimize: bool,
     pub width: u32,
     pub height: u32,
+}
+
+#[repr(C)]
+pub struct CCSResult {
+    pub success: bool,
+    pub error_message: *const c_char,
 }
 
 pub struct CSParameters {
@@ -68,8 +74,9 @@ pub fn initialize_parameters() -> CSParameters
 
 #[no_mangle]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c_char, params: CCSParameters) -> bool {
+pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c_char, params: CCSParameters) -> CCSResult {
     let mut parameters = initialize_parameters();
+
     parameters.jpeg.quality = params.jpeg_quality;
     parameters.png.level = params.png_level;
     parameters.optimize = params.optimize;
@@ -80,10 +87,29 @@ pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c
     parameters.width = params.width;
     parameters.height = params.height;
 
-    let x = compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
-                     CStr::from_ptr(output_path).to_str().unwrap().to_string(),
-                     parameters).is_ok();
-    x
+    let mut error_message = CString::new("").unwrap();
+
+    match compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
+                   CStr::from_ptr(output_path).to_str().unwrap().to_string(),
+                   parameters) {
+        Ok(_) => {
+            let em_pointer = error_message.as_ptr();
+            std::mem::forget(error_message);
+            CCSResult {
+                success: true,
+                error_message: em_pointer
+            }
+        }
+        Err(e) => {
+            error_message = CString::new(e.to_string()).unwrap();
+            let em_pointer = error_message.as_ptr();
+            std::mem::forget(error_message);
+            CCSResult {
+                success: false,
+                error_message: em_pointer
+            }
+        }
+    }
 }
 
 pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), Box<dyn Error>> {
@@ -92,43 +118,21 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
 
     match file_type {
         utils::SupportedFileTypes::Jpeg => {
-            return match jpeg::compress(input_path, output_path, parameters) {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    eprintln!("JPEG compression error: {}", e.to_string());
-                    Err(e.into())
-                }
-            };
+            jpeg::compress(input_path, output_path, parameters)?;
         }
         utils::SupportedFileTypes::Png => {
-            return match png::compress(input_path, output_path, parameters) {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    eprintln!("PNG compression error: {}", e.to_string());
-                    Err(e.into())
-                }
-            };
+            png::compress(input_path, output_path, parameters)?;
         }
         utils::SupportedFileTypes::Gif => {
-            return match gif::compress(input_path, output_path, parameters) {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    eprintln!("GIF compression error: {}", e.to_string());
-                    Err(e.into())
-                }
-            };
+            gif::compress(input_path, output_path, parameters)?;
         }
         utils::SupportedFileTypes::WebP => {
-            return match webp::compress(input_path, output_path, parameters) {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    eprintln!("WebP compression error: {}", e.to_string());
-                    Err(e.into())
-                }
-            };
+            webp::compress(input_path, output_path, parameters)?;
         }
         _ => return Err("Unknown file type".into())
     }
+
+    Ok(())
 }
 
 fn validate_parameters(parameters: &CSParameters) -> Result<(), Box<dyn Error>> {

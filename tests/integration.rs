@@ -1,5 +1,3 @@
-use caesium;
-
 #[test]
 fn unknown_file_type() {
     let output = "tests/samples/output/should_not_be_there";

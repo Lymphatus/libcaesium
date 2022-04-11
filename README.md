@@ -17,7 +17,7 @@ pub fn compress(
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
 
-The output folder where the file is compressed **must** exist.
+NOTE: The output folder where the file is compressed **must** exist.
 ### Compression options
 Libcaesium supports a few compression parameters for each file it supports.
 They are defined into a top level struct containing each supported file parameters, as follows:
@@ -57,7 +57,7 @@ pub struct Parameters {
 ```
 - `oxipng`: oxipng options. Should be left as default unless you want to do something advanced. Refer to [oxipng](https://github.com/shssoichiro/oxipng) for documentation.
 - `level`: level of optimization, from 1 to 7. Increasing the level will result in a smaller file, at the cost of computation time. If the optimization flag is `true`, the level is set to `6`. Default: `3`.
-- `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image but it may take minutes to finish the process. Default `false`.
+- `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image, but it may take minutes to finish the process. Default `false`.
 
 #### gif
 GIF support is experimental, has many know issues and does not support optimization. Expect bugs (especially on Windows).
@@ -69,7 +69,7 @@ pub struct Parameters {
 - `quality`: in a range from 0 to 100, the quality of the resulting image. If the optimization flag is `true`, the level is set to `100`. Default: `80`.
 
 #### webp
-WebP compression is tricky. The format is already well optimized and using the `optimize` flag will probably result in a bigger image.
+WebP's compression is tricky. The format is already well optimized and using the `optimize` flag will probably result in a bigger image.
 ```Rust
 pub struct Parameters {
     pub quality: u32,
@@ -84,14 +84,23 @@ pub extern fn c_compress(
     input_path: *const c_char,
     output_path: *const c_char,
     params: CCSParameters
-) -> bool
+) -> CCSResult
 ```
 #### Parameters
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
 #### Return
-`true` if all goes well, `false` otherwise.
+A `CCSResult` struct
+```Rust
+#[repr(C)]
+pub struct CCSResult {
+    pub success: bool,
+    pub error_message: *const c_char,
+}
+```
+If `success` is `true` the compression process ended successfully and `error_message` will be empty.  
+On failure, the `error_message` will be filled with a string containing a brief explanation of the error.
 
 ### Compression options
 The C options struct is slightly different from the Rust one:
@@ -131,4 +140,4 @@ Libcaesium also supports optimization, by setting the _quality_ to 0. This perfo
 but with a smaller size (10-12% usually).  
 PNG is lossless, so libcaesium will always perform optimization rather than compression.
 GIF optimization is possible, but currently not supported.
-WebP optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.s
+WebP's optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.s

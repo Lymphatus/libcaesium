@@ -16,6 +16,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
 {
     let mut in_file = fs::read(input_path)?;
 
+
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
             let metadata = extract_metadata(in_file.clone());
@@ -27,12 +28,11 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
     }
 
     unsafe {
-        let compression_buffer: (*mut u8, u64);
-        if parameters.optimize {
-            compression_buffer = lossless(in_file, parameters)?;
+        let compression_buffer: (*mut u8, u64) = if parameters.optimize {
+            lossless(in_file, parameters)?
         } else {
-            compression_buffer = lossy(in_file, parameters)?;
-        }
+            lossy(in_file, parameters)?
+        };
         let mut output_file_buffer = File::create(output_path)?;
         output_file_buffer.write_all(std::slice::from_raw_parts(compression_buffer.0, compression_buffer.1 as usize))?;
     }
