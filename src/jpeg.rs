@@ -134,7 +134,7 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
     dst_info.image_width = width;
     dst_info.image_height = height;
     dst_info.in_color_space = color_space;
-    dst_info.input_components = 3;
+    dst_info.input_components = if color_space == J_COLOR_SPACE::JCS_GRAYSCALE { 1 } else { 3 };
     jpeg_set_defaults(&mut dst_info);
 
     let row_stride = dst_info.image_width as usize * dst_info.input_components as usize;
