@@ -22,12 +22,12 @@ repository = "https://github.com/Lymphatus/libcaesium"
 license = "Apache-2.0"
 
 [dependencies]
-mozjpeg-sys = "1.0.1"
+mozjpeg-sys = "1.0.2"
 oxipng = "5.0.1"
 libc = "0.2"
 gifsicle = "1.92.5"
 webp = "0.2"
-infer = "0.7"
+infer = "0.8"
 image = { version = "0.24", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
 img-parts = "0.2"
 bytes = "1.1"
