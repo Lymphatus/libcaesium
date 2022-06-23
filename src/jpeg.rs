@@ -1,11 +1,13 @@
-use std::fs::File;
 use std::{io, mem};
-use mozjpeg_sys::*;
-use crate::CSParameters;
 use std::fs;
+use std::fs::File;
 use std::io::Write;
+
 use image::ImageOutputFormat::Jpeg;
 use img_parts::{DynImage, ImageEXIF, ImageICC};
+use mozjpeg_sys::*;
+
+use crate::CSParameters;
 use crate::resize::resize;
 
 pub struct Parameters {
@@ -134,7 +136,15 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
     dst_info.image_width = width;
     dst_info.image_height = height;
     dst_info.in_color_space = color_space;
-    dst_info.input_components = if color_space == J_COLOR_SPACE::JCS_GRAYSCALE { 1 } else { 3 };
+    let input_components = match color_space {
+        J_COLOR_SPACE::JCS_GRAYSCALE => 1,
+        J_COLOR_SPACE::JCS_RGB => 3,
+        J_COLOR_SPACE::JCS_YCbCr => 3,
+        J_COLOR_SPACE::JCS_CMYK => 4,
+        J_COLOR_SPACE::JCS_YCCK => 4,
+        _ => 3
+    };
+    dst_info.input_components = input_components;
     jpeg_set_defaults(&mut dst_info);
 
     let row_stride = dst_info.image_width as usize * dst_info.input_components as usize;
