@@ -14,7 +14,7 @@ use std::os::raw::c_char;
 pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
-    pub png_level: u32,
+    pub png_quality: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
@@ -48,7 +48,7 @@ pub fn initialize_parameters() -> CSParameters
 
     let png = png::Parameters {
         oxipng: oxipng::Options::default(),
-        level: 3,
+        quality: 80,
         force_zopfli: false,
     };
 
@@ -78,7 +78,7 @@ pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c
     let mut parameters = initialize_parameters();
 
     parameters.jpeg.quality = params.jpeg_quality;
-    parameters.png.level = params.png_level;
+    parameters.png.quality = params.png_quality;
     parameters.optimize = params.optimize;
     parameters.keep_metadata = params.keep_metadata;
     parameters.png.force_zopfli = params.png_force_zopfli;
@@ -140,7 +140,7 @@ fn validate_parameters(parameters: &CSParameters) -> Result<(), Box<dyn Error>> 
         return Err("Invalid JPEG quality value".into());
     }
 
-    if parameters.png.level == 0 || parameters.png.level > 7 {
+    if parameters.png.quality > 100 {
         return Err("Invalid PNG quality value".into());
     }
 

@@ -51,12 +51,12 @@ pub struct Parameters {
 ```Rust
 pub struct Parameters {
     pub oxipng: oxipng::Options,
-    pub level: u32,
+    pub quality: u32,
     pub force_zopfli: bool
 }
 ```
 - `oxipng`: oxipng options. Should be left as default unless you want to do something advanced. Refer to [oxipng](https://github.com/shssoichiro/oxipng) for documentation.
-- `level`: level of optimization, from 1 to 7. Increasing the level will result in a smaller file, at the cost of computation time. If the optimization flag is `true`, the level is set to `6`. Default: `3`.
+- `quality`: in a range from 1 to 100, the quality of the resulting image. Default `80`.
 - `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image, but it may take minutes to finish the process. Default `false`.
 
 #### gif

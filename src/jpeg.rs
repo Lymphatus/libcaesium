@@ -18,7 +18,6 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
 {
     let mut in_file = fs::read(input_path)?;
 
-
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
             let metadata = extract_metadata(in_file.clone());

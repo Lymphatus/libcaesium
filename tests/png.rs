@@ -107,7 +107,7 @@ fn downscale_zopfli_compress_png() {
     let mut params = caesium::initialize_parameters();
     params.width = 150;
     params.height = 150;
-    params.png.level = 3;
+    params.png.quality = 80;
     params.optimize = true;
     params.png.force_zopfli = true;
     caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),

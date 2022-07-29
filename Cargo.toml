@@ -31,6 +31,7 @@ infer = "0.8"
 image = { version = "0.24", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
 img-parts = "0.2"
 bytes = "1.1"
+imagequant = "4.0.0"
 
 [dev-dependencies]
 dssim = "3.2.0"
