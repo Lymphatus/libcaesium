@@ -31,7 +31,44 @@ pub fn compress (input_path: String, output_path: String, parameters: CSParamete
 }
 
 pub fn lossy (in_file: Vec<u8>, parameters: CSParameters) -> Result<Vec<u8>, io::Error> {
-    lossless(in_file, parameters)
+    let rgba_bitmap = match lodepng::decode32(in_file) {
+        Ok(i) => i,
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    };
+
+    let mut liq = imagequant::new();
+    match liq.set_quality(0, parameters.png.quality as u8) {
+        Ok(()) => {},
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    }
+
+    let mut liq_image = match liq.new_image(rgba_bitmap.buffer.as_slice(), rgba_bitmap.width, rgba_bitmap.height, 0.0) {
+        Ok(i) => i,
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    };
+
+    let mut quantization = match liq.quantize(&mut liq_image) {
+        Ok(q) => q,
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    };
+
+    let (palette, pixels) = match quantization.remapped(&mut liq_image) {
+        Ok((pl, px)) => (pl, px),
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    };
+
+    let mut encoder = lodepng::Encoder::new();
+    match encoder.set_palette(palette.as_slice()) {
+        Ok(_) => {},
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    }
+    let png_vec = match encoder.encode(pixels.as_slice(), rgba_bitmap.width, rgba_bitmap.height) {
+        Ok(pv) => pv,
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+    };
+
+    Ok(png_vec)
+
 }
 
 pub fn lossless(in_file: Vec<u8>, parameters: CSParameters) -> Result<Vec<u8>, io::Error> {
