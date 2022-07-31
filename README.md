@@ -56,7 +56,7 @@ pub struct Parameters {
 }
 ```
 - `oxipng`: oxipng options. Should be left as default unless you want to do something advanced. Refer to [oxipng](https://github.com/shssoichiro/oxipng) for documentation.
-- `quality`: in a range from 1 to 100, the quality of the resulting image. Default `80`.
+- `quality`: in a range from 0 to 100, the quality of the resulting image. Default `80`.
 - `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image, but it may take minutes to finish the process. Default `false`.
 
 #### gif
@@ -109,7 +109,7 @@ The C options struct is slightly different from the Rust one:
 pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
-    pub png_level: u32,
+    pub png_quality: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
