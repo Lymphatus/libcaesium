@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.9.1"
+version = "0.9.2"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -32,7 +32,7 @@ image = { version = "0.24.3", default-features = false, features = ["jpeg", "png
 img-parts = "0.2"
 bytes = "1.1"
 lodepng = "3.7"
-imagequant = "4.0.0"
+imagequant = {git = "https://github.com/Lymphatus/libimagequant", rev = "67f1686"}
 
 [dev-dependencies]
 dssim = "3.2.0"
