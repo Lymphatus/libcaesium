@@ -3,15 +3,18 @@ use std::io;
 use std::io::{Read, Write};
 use std::ops::Deref;
 
-use crate::CSParameters;
 use crate::resize::resize_image;
+use crate::CSParameters;
 
 pub struct Parameters {
     pub quality: u32,
 }
 
-pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
-{
+pub fn compress(
+    input_path: String,
+    output_path: String,
+    parameters: CSParameters,
+) -> Result<(), io::Error> {
     let must_resize = parameters.width > 0 || parameters.height > 0;
     let mut input_file = File::open(input_path)?;
 
@@ -20,7 +23,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
     let decoder = webp::Decoder::new(&input_data);
     let input_webp = match decoder.decode() {
         Some(img) => img,
-        None => return Err(io::Error::new(io::ErrorKind::Other, "WebP decode failed!"))
+        None => return Err(io::Error::new(io::ErrorKind::Other, "WebP decode failed!")),
     };
     let mut input_image = input_webp.to_image();
 
@@ -30,7 +33,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
 
     let encoder = match webp::Encoder::from_image(&input_image) {
         Ok(encoder) => encoder,
-        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e))
+        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
     };
 
     let mut output_file = File::create(output_path)?;

@@ -1,5 +1,5 @@
-use std::sync::Once;
 use std::fs;
+use std::sync::Once;
 
 static INIT: Once = Once::new();
 

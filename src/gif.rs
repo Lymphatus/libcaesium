@@ -8,10 +8,16 @@ pub struct Parameters {
     pub quality: u32,
 }
 
-pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
-{
+pub fn compress(
+    input_path: String,
+    output_path: String,
+    parameters: CSParameters,
+) -> Result<(), io::Error> {
     if parameters.width > 0 || parameters.height > 0 {
-        return Err(io::Error::new(io::ErrorKind::Other, "GIF resizing is not supported"));
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            "GIF resizing is not supported",
+        ));
     }
 
     if parameters.optimize {
@@ -21,8 +27,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
     }
 }
 
-fn lossless(input_path: String, output_path: String) -> Result<(), io::Error>
-{
+fn lossless(input_path: String, output_path: String) -> Result<(), io::Error> {
     let args: Vec<CString> = vec![
         CString::new(format!("{:?}", std::env::current_exe()))?,
         CString::new(input_path)?,
@@ -37,16 +42,28 @@ fn lossless(input_path: String, output_path: String) -> Result<(), io::Error>
 
         match result {
             0 => Ok(()),
-            _ => Err(io::Error::new(io::ErrorKind::Other, "GIF optimization failed!"))
+            _ => Err(io::Error::new(
+                io::ErrorKind::Other,
+                "GIF optimization failed!",
+            )),
         }
     }
 }
 
-pub fn lossy(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
-{
+pub fn lossy(
+    input_path: String,
+    output_path: String,
+    parameters: CSParameters,
+) -> Result<(), io::Error> {
     unsafe {
-        let input_file = libc::fopen(CString::new(input_path)?.as_ptr(), CString::new("r")?.as_ptr());
-        let output_file = libc::fopen(CString::new(output_path)?.as_ptr(), CString::new("w+")?.as_ptr());
+        let input_file = libc::fopen(
+            CString::new(input_path)?.as_ptr(),
+            CString::new("r")?.as_ptr(),
+        );
+        let output_file = libc::fopen(
+            CString::new(output_path)?.as_ptr(),
+            CString::new("w+")?.as_ptr(),
+        );
         let input_stream = gifsicle::Gif_ReadFile(input_file);
         libc::fclose(input_file);
 
@@ -63,7 +80,10 @@ pub fn lossy(input_path: String, output_path: String, parameters: CSParameters) 
 
         match write_result {
             1 => Ok(()),
-            _ => Err(io::Error::new(io::ErrorKind::Other, "GIF compression failed!"))
+            _ => Err(io::Error::new(
+                io::ErrorKind::Other,
+                "GIF compression failed!",
+            )),
         }
     }
 }

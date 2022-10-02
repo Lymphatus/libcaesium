@@ -1,5 +1,5 @@
-use std::sync::Once;
 use std::fs;
+use std::sync::Once;
 
 static INIT: Once = Once::new();
 
@@ -21,12 +21,17 @@ pub fn cleanup(file: &str) {
 fn standard_compress_png() {
     let output = "tests/samples/output/compressed.png";
     initialize(output);
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                      String::from(output),
-                      caesium::initialize_parameters())
-        .unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        caesium::initialize_parameters(),
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
+    assert_eq!(
+        infer::get_from_path(output).unwrap().unwrap().mime_type(),
+        "image/png"
+    );
     assert_eq!(image::image_dimensions(output).unwrap(), (380, 287));
     cleanup(output)
 }
@@ -37,12 +42,17 @@ fn standard_compress_png_with_optimize_flag() {
     initialize(output);
     let mut params = caesium::initialize_parameters();
     params.optimize = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                      String::from(output),
-                      params)
-        .unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        params,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
+    assert_eq!(
+        infer::get_from_path(output).unwrap().unwrap().mime_type(),
+        "image/png"
+    );
     assert_eq!(image::image_dimensions(output).unwrap(), (380, 287));
     cleanup(output)
 }
@@ -72,12 +82,17 @@ fn downscale_standard_compress_png() {
     let mut params = caesium::initialize_parameters();
     params.width = 150;
     params.height = 150;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                         String::from(output),
-                         params)
-        .unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        params,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
+    assert_eq!(
+        infer::get_from_path(output).unwrap().unwrap().mime_type(),
+        "image/png"
+    );
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 150));
     cleanup(output)
 }
@@ -90,12 +105,17 @@ fn downscale_standard_compress_png_with_optimize_flag() {
     params.width = 150;
     params.height = 150;
     params.optimize = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                         String::from(output),
-                         params)
-        .unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        params,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
+    assert_eq!(
+        infer::get_from_path(output).unwrap().unwrap().mime_type(),
+        "image/png"
+    );
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 150));
     cleanup(output)
 }
@@ -110,12 +130,17 @@ fn downscale_zopfli_compress_png() {
     params.png.quality = 80;
     params.optimize = true;
     params.png.force_zopfli = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                         String::from(output),
-                         params)
-        .unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        params,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
+    assert_eq!(
+        infer::get_from_path(output).unwrap().unwrap().mime_type(),
+        "image/png"
+    );
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 150));
     cleanup(output)
 }

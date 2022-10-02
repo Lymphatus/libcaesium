@@ -4,12 +4,12 @@ use std::os::raw::c_char;
 
 use crate::utils::get_filetype;
 
-mod utils;
+mod gif;
 mod jpeg;
 mod png;
-mod gif;
-mod webp;
 mod resize;
+mod utils;
+mod webp;
 
 #[repr(C)]
 pub struct CCSParameters {
@@ -41,11 +41,8 @@ pub struct CSParameters {
     pub height: u32,
 }
 
-pub fn initialize_parameters() -> CSParameters
-{
-    let jpeg = jpeg::Parameters {
-        quality: 80
-    };
+pub fn initialize_parameters() -> CSParameters {
+    let jpeg = jpeg::Parameters { quality: 80 };
 
     let png = png::Parameters {
         oxipng: oxipng::Options::default(),
@@ -53,13 +50,9 @@ pub fn initialize_parameters() -> CSParameters
         force_zopfli: false,
     };
 
-    let gif = gif::Parameters {
-        quality: 80
-    };
+    let gif = gif::Parameters { quality: 80 };
 
-    let webp = webp::Parameters {
-        quality: 80
-    };
+    let webp = webp::Parameters { quality: 80 };
 
     CSParameters {
         jpeg,
@@ -75,7 +68,11 @@ pub fn initialize_parameters() -> CSParameters
 
 #[no_mangle]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c_char, params: CCSParameters) -> CCSResult {
+pub unsafe extern "C" fn c_compress(
+    input_path: *const c_char,
+    output_path: *const c_char,
+    params: CCSParameters,
+) -> CCSResult {
     let mut parameters = initialize_parameters();
 
     parameters.jpeg.quality = params.jpeg_quality;
@@ -90,15 +87,17 @@ pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c
 
     let mut error_message = CString::new("").unwrap();
 
-    match compress(CStr::from_ptr(input_path).to_str().unwrap().to_string(),
-                   CStr::from_ptr(output_path).to_str().unwrap().to_string(),
-                   parameters) {
+    match compress(
+        CStr::from_ptr(input_path).to_str().unwrap().to_string(),
+        CStr::from_ptr(output_path).to_str().unwrap().to_string(),
+        parameters,
+    ) {
         Ok(_) => {
             let em_pointer = error_message.as_ptr();
             std::mem::forget(error_message);
             CCSResult {
                 success: true,
-                error_message: em_pointer
+                error_message: em_pointer,
             }
         }
         Err(e) => {
@@ -107,13 +106,17 @@ pub unsafe extern fn c_compress(input_path: *const c_char, output_path: *const c
             std::mem::forget(error_message);
             CCSResult {
                 success: false,
-                error_message: em_pointer
+                error_message: em_pointer,
             }
         }
     }
 }
 
-pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), Box<dyn Error>> {
+pub fn compress(
+    input_path: String,
+    output_path: String,
+    parameters: CSParameters,
+) -> Result<(), Box<dyn Error>> {
     validate_parameters(&parameters)?;
     let file_type = get_filetype(&input_path);
 
@@ -130,7 +133,7 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
         utils::SupportedFileTypes::WebP => {
             webp::compress(input_path, output_path, parameters)?;
         }
-        _ => return Err("Unknown file type".into())
+        _ => return Err("Unknown file type".into()),
     }
 
     Ok(())

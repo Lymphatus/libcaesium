@@ -1,6 +1,6 @@
 use dssim::Val;
-use std::sync::Once;
 use std::fs;
+use std::sync::Once;
 
 static INIT: Once = Once::new();
 
@@ -32,7 +32,12 @@ fn compress_100() {
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 100;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -46,7 +51,12 @@ fn compress_80() {
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 80;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -60,7 +70,12 @@ fn compress_50() {
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 50;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -74,7 +89,12 @@ fn compress_10() {
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 10;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -88,7 +108,12 @@ fn optimize_jpeg() {
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     pars.optimize = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -108,7 +133,12 @@ fn downscale_exact() {
     pars.jpeg.quality = 80;
     pars.width = 800;
     pars.height = 600;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
@@ -124,7 +154,12 @@ fn downscale_exact_optimize() {
     pars.optimize = true;
     pars.width = 800;
     pars.height = 600;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");

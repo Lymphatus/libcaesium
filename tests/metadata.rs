@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use std::sync::Once;
 use std::fs;
 use std::path::Path;
+use std::sync::Once;
 
 static INIT: Once = Once::new();
 
@@ -26,9 +26,17 @@ fn compress_80_with_metadata() {
     let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 80;
     pars.keep_metadata = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
-    assert!(std::path::Path::new(output).exists());
-    assert!(metadata_is_equal(Path::new("tests/samples/uncompressed_드림캐쳐.jpg"), Path::new(output)));
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
+    assert!(Path::new(output).exists());
+    assert!(metadata_is_equal(
+        Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
+        Path::new(output)
+    ));
     cleanup(output)
 }
 
@@ -39,9 +47,17 @@ fn optimize_with_metadata() {
     let mut pars = caesium::initialize_parameters();
     pars.optimize = true;
     pars.keep_metadata = true;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
-    assert!(std::path::Path::new(output).exists());
-    assert!(metadata_is_equal(Path::new("tests/samples/uncompressed_드림캐쳐.jpg"), Path::new(output)));
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
+    assert!(Path::new(output).exists());
+    assert!(metadata_is_equal(
+        Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
+        Path::new(output)
+    ));
     cleanup(output)
 }
 
@@ -54,20 +70,31 @@ fn resize_optimize_with_metadata() {
     pars.keep_metadata = true;
     pars.width = 200;
     pars.height = 200;
-    caesium::compress(String::from("tests/samples/uncompressed_드림캐쳐.jpg"), String::from(output), pars).unwrap();
-    assert!(std::path::Path::new(output).exists());
-    assert!(metadata_is_equal(Path::new("tests/samples/uncompressed_드림캐쳐.jpg"), Path::new(output)));
+    caesium::compress(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        pars,
+    )
+    .unwrap();
+    assert!(Path::new(output).exists());
+    assert!(metadata_is_equal(
+        Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
+        Path::new(output)
+    ));
     cleanup(output)
 }
 
 fn extract_exif(path: &Path) -> HashMap<String, String> {
-    let file = std::fs::File::open(path).unwrap();
+    let file = fs::File::open(path).unwrap();
     let mut bufreader = std::io::BufReader::new(&file);
     let exif_reader = exif::Reader::new();
     let exif = exif_reader.read_from_container(&mut bufreader).unwrap();
     let mut exif_map = HashMap::new();
     for f in exif.fields() {
-        exif_map.insert(format!("{}", f.tag), f.display_value().to_string() as String);
+        exif_map.insert(
+            format!("{}", f.tag),
+            f.display_value().to_string() as String,
+        );
     }
 
     exif_map

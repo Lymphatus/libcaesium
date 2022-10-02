@@ -2,20 +2,23 @@ use image::ImageOutputFormat::Jpeg;
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 use mozjpeg_sys::*;
 
-use std::{io, mem};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
+use std::{io, mem};
 
-use crate::CSParameters;
 use crate::resize::resize;
+use crate::CSParameters;
 
 pub struct Parameters {
     pub quality: u32,
 }
 
-pub fn compress(input_path: String, output_path: String, parameters: CSParameters) -> Result<(), io::Error>
-{
+pub fn compress(
+    input_path: String,
+    output_path: String,
+    parameters: CSParameters,
+) -> Result<(), io::Error> {
     let mut in_file = fs::read(input_path)?;
 
     if parameters.width > 0 || parameters.height > 0 {
@@ -35,12 +38,18 @@ pub fn compress(input_path: String, output_path: String, parameters: CSParameter
             lossy(in_file, parameters)?
         };
         let mut output_file_buffer = File::create(output_path)?;
-        output_file_buffer.write_all(std::slice::from_raw_parts(compression_buffer.0, compression_buffer.1 as usize))?;
+        output_file_buffer.write_all(std::slice::from_raw_parts(
+            compression_buffer.0,
+            compression_buffer.1 as usize,
+        ))?;
     }
     Ok(())
 }
 
-unsafe fn lossless(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, u64), io::Error> {
+unsafe fn lossless(
+    in_file: Vec<u8>,
+    parameters: CSParameters,
+) -> Result<(*mut u8, u64), io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
     let mut src_err = mem::zeroed();
@@ -77,7 +86,12 @@ unsafe fn lossless(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u
         let mut marker = src_info.marker_list;
 
         while !marker.is_null() {
-            jpeg_write_marker(&mut dst_info, (*marker).marker as i32, (*marker).data, (*marker).data_length);
+            jpeg_write_marker(
+                &mut dst_info,
+                (*marker).marker as i32,
+                (*marker).data,
+                (*marker).data_length,
+            );
             marker = (*marker).next;
         }
     }
@@ -136,12 +150,12 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
     dst_info.image_height = height;
     dst_info.in_color_space = color_space;
     let input_components = match color_space {
-        J_COLOR_SPACE::JCS_GRAYSCALE => 1,
-        J_COLOR_SPACE::JCS_RGB => 3,
-        J_COLOR_SPACE::JCS_YCbCr => 3,
-        J_COLOR_SPACE::JCS_CMYK => 4,
-        J_COLOR_SPACE::JCS_YCCK => 4,
-        _ => 3
+        JCS_GRAYSCALE => 1,
+        JCS_RGB => 3,
+        JCS_YCbCr => 3,
+        JCS_CMYK => 4,
+        JCS_YCCK => 4,
+        _ => 3,
     };
     dst_info.input_components = input_components;
     jpeg_set_defaults(&mut dst_info);
@@ -149,7 +163,11 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
     let row_stride = dst_info.image_width as usize * dst_info.input_components as usize;
     dst_info.dct_method = J_DCT_METHOD::JDCT_ISLOW;
     dst_info.optimize_coding = i32::from(true);
-    jpeg_set_quality(&mut dst_info, parameters.jpeg.quality as i32, false as boolean);
+    jpeg_set_quality(
+        &mut dst_info,
+        parameters.jpeg.quality as i32,
+        false as boolean,
+    );
 
     jpeg_start_compress(&mut dst_info, true as boolean);
 
@@ -157,7 +175,12 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
         let mut marker = src_info.marker_list;
 
         while !marker.is_null() {
-            jpeg_write_marker(&mut dst_info, (*marker).marker as i32, (*marker).data, (*marker).data_length);
+            jpeg_write_marker(
+                &mut dst_info,
+                (*marker).marker as i32,
+                (*marker).data,
+                (*marker).data_length,
+            );
             marker = (*marker).next;
         }
     }
@@ -181,20 +204,27 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, 
 fn extract_metadata(image: Vec<u8>) -> (Option<img_parts::Bytes>, Option<img_parts::Bytes>) {
     let (iccp, exif) = DynImage::from_bytes(image.into())
         .expect("image loaded")
-        .map_or((None, None), |dyn_image| (dyn_image.icc_profile(), dyn_image.exif()));
+        .map_or((None, None), |dyn_image| {
+            (dyn_image.icc_profile(), dyn_image.exif())
+        });
 
     (iccp, exif)
 }
 
 //TODO if image is resized, change "PixelXDimension" and "PixelYDimension"
-fn save_metadata(image_buffer: Vec<u8>, iccp: Option<img_parts::Bytes>, exif: Option<img_parts::Bytes>) -> Vec<u8> {
+fn save_metadata(
+    image_buffer: Vec<u8>,
+    iccp: Option<img_parts::Bytes>,
+    exif: Option<img_parts::Bytes>,
+) -> Vec<u8> {
     if iccp.is_some() || exif.is_some() {
-        let mut dyn_image = match DynImage::from_bytes(img_parts::Bytes::from(image_buffer.clone())) {
+        let mut dyn_image = match DynImage::from_bytes(img_parts::Bytes::from(image_buffer.clone()))
+        {
             Ok(o) => match o {
                 None => return image_buffer,
-                Some(d) => d
-            }
-            Err(_) => return image_buffer
+                Some(d) => d,
+            },
+            Err(_) => return image_buffer,
         };
 
         dyn_image.set_icc_profile(iccp);
@@ -203,7 +233,7 @@ fn save_metadata(image_buffer: Vec<u8>, iccp: Option<img_parts::Bytes>, exif: Op
         let mut image_with_metadata: Vec<u8> = vec![];
         match dyn_image.encoder().write_to(&mut image_with_metadata) {
             Ok(_) => image_with_metadata,
-            Err(_) => image_buffer
+            Err(_) => image_buffer,
         }
     } else {
         image_buffer
