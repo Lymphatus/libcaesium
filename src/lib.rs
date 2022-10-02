@@ -1,14 +1,15 @@
+use std::error::Error;
+use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
+
+use crate::utils::get_filetype;
+
 mod utils;
 mod jpeg;
 mod png;
 mod gif;
 mod webp;
 mod resize;
-
-use std::error::Error;
-use crate::utils::get_filetype;
-use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
 
 #[repr(C)]
 pub struct CCSParameters {

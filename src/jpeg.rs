@@ -1,11 +1,11 @@
+use image::ImageOutputFormat::Jpeg;
+use img_parts::{DynImage, ImageEXIF, ImageICC};
+use mozjpeg_sys::*;
+
 use std::{io, mem};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-
-use image::ImageOutputFormat::Jpeg;
-use img_parts::{DynImage, ImageEXIF, ImageICC};
-use mozjpeg_sys::*;
 
 use crate::CSParameters;
 use crate::resize::resize;

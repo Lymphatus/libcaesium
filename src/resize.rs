@@ -1,8 +1,9 @@
-use std::io;
-use std::io::{Cursor};
 use image::DynamicImage;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
+
+use std::io;
+use std::io::Cursor;
 
 pub fn resize(image_buffer: Vec<u8>, width: u32, height: u32, format: image::ImageOutputFormat) -> Result<Vec<u8>, io::Error> {
     let mut image = match ImageReader::new(Cursor::new(image_buffer)).with_guessed_format()?.decode() {

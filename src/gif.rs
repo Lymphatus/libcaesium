@@ -1,6 +1,7 @@
 use std::ffi::CString;
 use std::io;
 use std::os::raw::{c_int, c_void};
+
 use crate::CSParameters;
 
 pub struct Parameters {

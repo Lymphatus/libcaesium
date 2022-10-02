@@ -1,8 +1,10 @@
+use image::io::Reader as ImageReader;
+
 use std::{fs, io};
 use std::fs::File;
 use std::io::Write;
-
-use image::io::Reader as ImageReader;
+use std::num::NonZeroU8;
+use oxipng::Deflaters::Zopfli;
 
 use crate::CSParameters;
 use crate::resize::resize_image;
@@ -88,7 +90,7 @@ fn lossless(input_path: String, parameters: CSParameters) -> Result<Vec<u8>, io:
     }
 
     if parameters.optimize && parameters.png.force_zopfli {
-        oxipng_options.deflate = oxipng::Deflaters::Zopfli;
+        oxipng_options.deflate = Zopfli { iterations: NonZeroU8::new(15).unwrap() };
     } else {
         oxipng_options = oxipng::Options::from_preset(6);
     }
