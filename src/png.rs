@@ -9,12 +9,6 @@ use std::{fs, io};
 use crate::resize::resize_image;
 use crate::CSParameters;
 
-pub struct Parameters {
-    pub oxipng: oxipng::Options,
-    pub quality: u32,
-    pub force_zopfli: bool,
-}
-
 pub fn compress(
     input_path: String,
     output_path: String,
@@ -93,7 +87,7 @@ fn lossy(input_path: String, parameters: CSParameters) -> Result<Vec<u8>, io::Er
 
 fn lossless(input_path: String, parameters: CSParameters) -> Result<Vec<u8>, io::Error> {
     let in_file = fs::read(input_path)?;
-    let mut oxipng_options = parameters.png.oxipng;
+    let mut oxipng_options = oxipng::Options::default();
     if !parameters.keep_metadata {
         oxipng_options.strip = oxipng::Headers::Safe;
     }

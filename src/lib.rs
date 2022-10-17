@@ -4,11 +4,15 @@ use std::os::raw::c_char;
 
 use crate::utils::get_filetype;
 
+#[cfg(feature = "gif")]
 mod gif;
+#[cfg(feature = "jpg")]
 mod jpeg;
+#[cfg(feature = "png")]
 mod png;
 mod resize;
 mod utils;
+#[cfg(feature = "webp")]
 mod webp;
 
 #[repr(C)]
@@ -30,29 +34,46 @@ pub struct CCSResult {
     pub error_message: *const c_char,
 }
 
+pub struct JpegParameters {
+    pub quality: u32,
+}
+
+pub struct PngParameters {
+    pub quality: u32,
+    pub force_zopfli: bool,
+}
+
+pub struct GifParameters {
+    pub quality: u32,
+}
+
+pub struct WebPParameters {
+    pub quality: u32,
+}
+
 pub struct CSParameters {
-    pub jpeg: jpeg::Parameters,
-    pub png: png::Parameters,
-    pub gif: gif::Parameters,
-    pub webp: webp::Parameters,
+    pub jpeg: JpegParameters,
+    pub png: PngParameters,
+    pub gif: GifParameters,
+    pub webp: WebPParameters,
     pub keep_metadata: bool,
     pub optimize: bool,
     pub width: u32,
     pub height: u32,
 }
 
-pub fn initialize_parameters() -> CSParameters {
-    let jpeg = jpeg::Parameters { quality: 80 };
 
-    let png = png::Parameters {
-        oxipng: oxipng::Options::default(),
+pub fn initialize_parameters() -> CSParameters {
+    let jpeg = JpegParameters { quality: 80 };
+
+    let png = PngParameters {
         quality: 80,
         force_zopfli: false,
     };
 
-    let gif = gif::Parameters { quality: 80 };
+    let gif = GifParameters { quality: 80 };
 
-    let webp = webp::Parameters { quality: 80 };
+    let webp = WebPParameters { quality: 80 };
 
     CSParameters {
         jpeg,
@@ -121,15 +142,19 @@ pub fn compress(
     let file_type = get_filetype(&input_path);
 
     match file_type {
+        #[cfg(feature = "jpg")]
         utils::SupportedFileTypes::Jpeg => {
             jpeg::compress(input_path, output_path, parameters)?;
         }
+        #[cfg(feature = "png")]
         utils::SupportedFileTypes::Png => {
             png::compress(input_path, output_path, parameters)?;
         }
+        #[cfg(feature = "gif")]
         utils::SupportedFileTypes::Gif => {
             gif::compress(input_path, output_path, parameters)?;
         }
+        #[cfg(feature = "webp")]
         utils::SupportedFileTypes::WebP => {
             webp::compress(input_path, output_path, parameters)?;
         }

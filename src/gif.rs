@@ -4,10 +4,6 @@ use std::os::raw::{c_int, c_void};
 
 use crate::CSParameters;
 
-pub struct Parameters {
-    pub quality: u32,
-}
-
 pub fn compress(
     input_path: String,
     output_path: String,

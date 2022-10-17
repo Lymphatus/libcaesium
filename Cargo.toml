@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.9.3"
+version = "0.10.0"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -22,17 +22,24 @@ repository = "https://github.com/Lymphatus/libcaesium"
 license = "Apache-2.0"
 
 [dependencies]
-mozjpeg-sys = "1.0.2"
-oxipng = "6.0.1"
+mozjpeg-sys = { version = "1.0.2", optional = true }
+oxipng = { version = "6.0.1", optional = true }
 libc = "0.2"
-gifsicle = "1.92.5"
-webp = "0.2"
+gifsicle = { version = "1.92.5", optional = true }
+webp = { version = "0.2", optional = true }
 infer = "0.9"
 image = { version = "0.24.3", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
 img-parts = "0.3"
 bytes = "1.1"
-lodepng = "3.7"
-imagequant = {git = "https://github.com/Lymphatus/libimagequant", rev = "67f1686"}
+lodepng = { version = "3.7", optional = true }
+imagequant = {git = "https://github.com/Lymphatus/libimagequant", rev = "67f1686", optional = true}
+
+[features]
+default = ["jpg", "png", "webp", "gif"]
+jpg = ["dep:mozjpeg-sys"]
+png = ["dep:oxipng", "dep:lodepng", "dep:imagequant"]
+webp = ["dep:webp"]
+gif = ["dep:gifsicle"]
 
 [dev-dependencies]
 dssim = "3.2.0"

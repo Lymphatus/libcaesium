@@ -5,6 +5,7 @@ use image::DynamicImage;
 use std::io;
 use std::io::Cursor;
 
+#[allow(dead_code)]
 pub fn resize(
     image_buffer: Vec<u8>,
     width: u32,
@@ -31,6 +32,7 @@ pub fn resize(
     Ok(resized_file)
 }
 
+#[allow(dead_code)]
 pub fn resize_image(
     image: DynamicImage,
     width: u32,
@@ -42,6 +44,7 @@ pub fn resize_image(
     Ok(resized_image)
 }
 
+#[allow(dead_code)]
 fn compute_dimensions(
     original_width: u32,
     original_height: u32,

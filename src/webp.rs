@@ -6,10 +6,6 @@ use std::ops::Deref;
 use crate::resize::resize_image;
 use crate::CSParameters;
 
-pub struct Parameters {
-    pub quality: u32,
-}
-
 pub fn compress(
     input_path: String,
     output_path: String,
