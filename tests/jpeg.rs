@@ -35,7 +35,7 @@ fn compress_100() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -54,7 +54,7 @@ fn compress_80() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -73,7 +73,7 @@ fn compress_50() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -92,7 +92,7 @@ fn compress_10() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -111,7 +111,7 @@ fn optimize_jpeg() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -136,7 +136,7 @@ fn downscale_exact() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -157,7 +157,7 @@ fn downscale_exact_optimize() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());

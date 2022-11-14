@@ -7,7 +7,7 @@ use crate::CSParameters;
 pub fn compress(
     input_path: String,
     output_path: String,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(), io::Error> {
     if parameters.width > 0 || parameters.height > 0 {
         return Err(io::Error::new(
@@ -49,7 +49,7 @@ fn lossless(input_path: String, output_path: String) -> Result<(), io::Error> {
 pub fn lossy(
     input_path: String,
     output_path: String,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(), io::Error> {
     unsafe {
         let input_file = libc::fopen(

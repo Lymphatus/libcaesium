@@ -8,5 +8,5 @@ fn main() {
     let output = args[2].clone();
 
     let parameters = initialize_parameters();
-    compress(input, output, parameters).unwrap();
+    compress(input, output, &parameters).unwrap();
 }

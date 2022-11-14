@@ -9,7 +9,7 @@ use crate::CSParameters;
 pub fn compress(
     input_path: String,
     output_path: String,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(), io::Error> {
     let must_resize = parameters.width > 0 || parameters.height > 0;
     let mut input_file = File::open(input_path)?;

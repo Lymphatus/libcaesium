@@ -24,7 +24,7 @@ fn standard_compress_png() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
-        caesium::initialize_parameters(),
+        &caesium::initialize_parameters(),
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -45,7 +45,7 @@ fn standard_compress_png_with_optimize_flag() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -85,7 +85,7 @@ fn downscale_standard_compress_png() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -108,7 +108,7 @@ fn downscale_standard_compress_png_with_optimize_flag() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -133,7 +133,7 @@ fn downscale_zopfli_compress_png() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());

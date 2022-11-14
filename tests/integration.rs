@@ -5,7 +5,7 @@ fn unknown_file_type() {
     let result = caesium::compress(
         String::from("tests/samples/output/.gitkeep"),
         String::from(output),
-        params,
+        &params,
     );
     assert!(result.is_err())
 }

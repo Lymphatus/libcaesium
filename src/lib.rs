@@ -34,23 +34,28 @@ pub struct CCSResult {
     pub error_message: *const c_char,
 }
 
+#[derive(Copy, Clone)]
 pub struct JpegParameters {
     pub quality: u32,
 }
 
+#[derive(Copy, Clone)]
 pub struct PngParameters {
     pub quality: u32,
     pub force_zopfli: bool,
 }
 
+#[derive(Copy, Clone)]
 pub struct GifParameters {
     pub quality: u32,
 }
 
+#[derive(Copy, Clone)]
 pub struct WebPParameters {
     pub quality: u32,
 }
 
+#[derive(Copy, Clone)]
 pub struct CSParameters {
     pub jpeg: JpegParameters,
     pub png: PngParameters,
@@ -111,7 +116,7 @@ pub unsafe extern "C" fn c_compress(
     match compress(
         CStr::from_ptr(input_path).to_str().unwrap().to_string(),
         CStr::from_ptr(output_path).to_str().unwrap().to_string(),
-        parameters,
+        &parameters,
     ) {
         Ok(_) => {
             let em_pointer = error_message.as_ptr();
@@ -136,7 +141,7 @@ pub unsafe extern "C" fn c_compress(
 pub fn compress(
     input_path: String,
     output_path: String,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(), Box<dyn Error>> {
     validate_parameters(&parameters)?;
     let file_type = get_filetype(&input_path);

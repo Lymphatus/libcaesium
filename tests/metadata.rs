@@ -29,7 +29,7 @@ fn compress_80_with_metadata() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(Path::new(output).exists());
@@ -50,7 +50,7 @@ fn optimize_with_metadata() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(Path::new(output).exists());
@@ -73,7 +73,7 @@ fn resize_optimize_with_metadata() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        pars,
+        &pars,
     )
     .unwrap();
     assert!(Path::new(output).exists());

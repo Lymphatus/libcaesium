@@ -12,7 +12,7 @@ use crate::CSParameters;
 pub fn compress(
     input_path: String,
     output_path: String,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(), io::Error> {
     let mut original_path = input_path;
     if parameters.width > 0 || parameters.height > 0 {
@@ -40,7 +40,7 @@ pub fn compress(
     Ok(())
 }
 
-fn lossy(input_path: String, parameters: CSParameters) -> Result<Vec<u8>, io::Error> {
+fn lossy(input_path: String, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
     let rgba_bitmap = match lodepng::decode32_file(input_path) {
         Ok(i) => i,
         Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
@@ -85,7 +85,7 @@ fn lossy(input_path: String, parameters: CSParameters) -> Result<Vec<u8>, io::Er
     Ok(png_vec)
 }
 
-fn lossless(input_path: String, parameters: CSParameters) -> Result<Vec<u8>, io::Error> {
+fn lossless(input_path: String, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
     let in_file = fs::read(input_path)?;
     let mut oxipng_options = oxipng::Options::default();
     if !parameters.keep_metadata {

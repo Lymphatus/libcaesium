@@ -13,7 +13,7 @@ use crate::CSParameters;
 pub fn compress(
     input_path: String,
     output_path: String,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(), io::Error> {
     let mut in_file = fs::read(input_path)?;
 
@@ -44,7 +44,7 @@ pub fn compress(
 
 unsafe fn lossless(
     in_file: Vec<u8>,
-    parameters: CSParameters,
+    parameters: &CSParameters,
 ) -> Result<(*mut u8, u64), io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
@@ -100,7 +100,7 @@ unsafe fn lossless(
     Ok((buf, buf_size as u64))
 }
 
-unsafe fn lossy(in_file: Vec<u8>, parameters: CSParameters) -> Result<(*mut u8, u64), io::Error> {
+unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<(*mut u8, u64), io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
     let mut src_err = mem::zeroed();
     let mut dst_info: jpeg_compress_struct = mem::zeroed();

@@ -9,7 +9,7 @@ Libcaesium exposes one single function, auto-detecting the input file type:
 pub fn compress(
     input_path: String,
     output_path: String,
-    parameters: CSParameters
+    parameters: &CSParameters
 ) -> Result<(), Box<dyn Error>>
 ```
 #### Parameters

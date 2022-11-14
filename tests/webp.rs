@@ -26,7 +26,7 @@ fn compress_20() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -46,7 +46,7 @@ fn compress_50() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -66,7 +66,7 @@ fn compress_80() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -86,7 +86,7 @@ fn compress_100() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -106,7 +106,7 @@ fn optimize() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -128,7 +128,7 @@ fn downscale_compress_80() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -151,7 +151,7 @@ fn downscale_optimize() {
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        params,
+        &params,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
