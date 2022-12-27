@@ -136,6 +136,5 @@ JPEG is a lossy format: that means you will always lose some information after e
 100 quality for 10 times will result in an always different image, even though you can't really see the difference.
 Libcaesium also supports optimization, by setting the _quality_ to 0. This performs a lossless process, resulting in the same image,
 but with a smaller size (10-12% usually).  
-PNG is lossless, so libcaesium will always perform optimization rather than compression.
 GIF optimization is possible, but currently not supported.
-WebP's optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.s
+WebP's optimization is also possible, but it will probably result in a bigger output file as it's well suited to losslessly convert from PNG or JPEG.
