@@ -143,7 +143,7 @@ pub fn compress(
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), Box<dyn Error>> {
-    validate_parameters(&parameters)?;
+    validate_parameters(parameters)?;
     let file_type = get_filetype(&input_path);
 
     match file_type {
