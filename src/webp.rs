@@ -11,18 +11,26 @@ pub fn compress(
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), io::Error> {
-    let must_resize = parameters.width > 0 || parameters.height > 0;
     let mut input_file = File::open(input_path)?;
 
     let mut input_data = Vec::new();
     input_file.read_to_end(&mut input_data)?;
-    let decoder = webp::Decoder::new(&input_data);
+
+    let mut output_file = File::create(output_path)?;
+    let compressed_image = compress_to_memory(input_data, parameters)?;
+    output_file.write_all(&compressed_image)?;
+    Ok(())
+}
+
+pub fn compress_to_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error>
+{
+    let decoder = webp::Decoder::new(&in_file);
     let input_webp = match decoder.decode() {
         Some(img) => img,
         None => return Err(io::Error::new(io::ErrorKind::Other, "WebP decode failed!")),
     };
     let mut input_image = input_webp.to_image();
-
+    let must_resize = parameters.width > 0 || parameters.height > 0;
     if must_resize {
         input_image = resize_image(input_image, parameters.width, parameters.height)?;
     }
@@ -32,16 +40,16 @@ pub fn compress(
         Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
     };
 
-    let mut output_file = File::create(output_path)?;
-    if parameters.optimize {
+    let encoded_image = if parameters.optimize {
         if must_resize {
-            output_file.write_all(encoder.encode(100.0).deref())?;
+            encoder.encode(100.0)
         } else {
             //TODO With resize can throw an error
-            output_file.write_all(encoder.encode_lossless().deref())?;
+            encoder.encode_lossless()
         }
     } else {
-        output_file.write_all(encoder.encode(parameters.webp.quality as f32).deref())?;
-    }
-    Ok(())
+        encoder.encode(parameters.webp.quality as f32)
+    };
+
+    Ok(encoded_image.deref().to_vec())
 }

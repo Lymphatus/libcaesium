@@ -1,20 +1,15 @@
-use std::fs;
 use std::sync::Once;
+
+use crate::cleanup::remove_compressed_test_file;
+
+mod cleanup;
 
 static INIT: Once = Once::new();
 
 pub fn initialize(file: &str) {
     INIT.call_once(|| {
-        if fs::metadata(file).is_ok() {
-            fs::remove_file(file).unwrap();
-        }
+        remove_compressed_test_file(file);
     });
-}
-
-pub fn cleanup(file: &str) {
-    if fs::metadata(file).is_ok() {
-        fs::remove_file(file).unwrap();
-    }
 }
 
 #[test]
@@ -28,13 +23,13 @@ fn compress_20() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -48,13 +43,13 @@ fn compress_50() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -68,13 +63,13 @@ fn compress_80() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -88,13 +83,13 @@ fn compress_100() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -108,13 +103,13 @@ fn optimize() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -130,14 +125,14 @@ fn downscale_compress_80() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -153,12 +148,12 @@ fn downscale_optimize() {
         String::from(output),
         &params,
     )
-    .unwrap();
+        .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
     );
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }

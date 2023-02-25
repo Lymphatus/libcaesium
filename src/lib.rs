@@ -1,5 +1,8 @@
+extern crate alloc;
+
+use alloc::ffi::CString;
 use std::error::Error;
-use std::ffi::{CStr, CString};
+use std::ffi::{CStr};
 use std::os::raw::c_char;
 
 use crate::utils::get_filetype;

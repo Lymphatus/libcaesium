@@ -1,47 +1,45 @@
-use image::io::Reader as ImageReader;
-
-use oxipng::Deflaters::{Libdeflater, Zopfli};
+use std::{fs, io};
 use std::fs::File;
 use std::io::Write;
 use std::num::NonZeroU8;
-use std::{fs, io};
+use image::ImageOutputFormat;
 
-use crate::resize::resize_image;
+use oxipng::Deflaters::{Libdeflater, Zopfli};
+
 use crate::CSParameters;
+use crate::resize::resize;
 
 pub fn compress(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), io::Error> {
-    let mut original_path = input_path;
+    let mut in_file = fs::read(input_path)?;
+
     if parameters.width > 0 || parameters.height > 0 {
-        let image = match ImageReader::open(original_path)?.decode() {
-            Ok(i) => i,
-            Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e.to_string())),
-        };
-        let image = resize_image(image, parameters.width, parameters.height)?;
-        match image.save_with_format(output_path.clone(), image::ImageFormat::Png) {
-            Ok(_) => {}
-            Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e.to_string())),
-        };
-        original_path = output_path.clone();
+        in_file = resize(in_file, parameters.width, parameters.height, ImageOutputFormat::Png)?;
     }
 
-    let optimized_png: Vec<u8> = if parameters.optimize {
-        lossless(original_path, parameters)?
-    } else {
-        lossy(original_path, parameters)?
-    };
-
+    let optimized_png = compress_to_memory(in_file, parameters)?;
     let mut output_file_buffer = File::create(output_path)?;
     output_file_buffer.write_all(optimized_png.as_slice())?;
 
     Ok(())
 }
 
-fn lossy(input_path: String, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
-    let rgba_bitmap = match lodepng::decode32_file(input_path) {
+pub fn compress_to_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error>
+{
+    let optimized_png: Vec<u8> = if parameters.optimize {
+        lossless(in_file, parameters)?
+    } else {
+        lossy(in_file, parameters)?
+    };
+
+    Ok(optimized_png)
+}
+
+fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
+    let rgba_bitmap = match lodepng::decode32(in_file) {
         Ok(i) => i,
         Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
     };
@@ -85,8 +83,8 @@ fn lossy(input_path: String, parameters: &CSParameters) -> Result<Vec<u8>, io::E
     Ok(png_vec)
 }
 
-fn lossless(input_path: String, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
-    let in_file = fs::read(input_path)?;
+fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
+    // let in_file = fs::read(input_path)?;
     let mut oxipng_options = oxipng::Options::default();
     if !parameters.keep_metadata {
         oxipng_options.strip = oxipng::Headers::Safe;
@@ -98,7 +96,7 @@ fn lossless(input_path: String, parameters: &CSParameters) -> Result<Vec<u8>, io
         };
     } else {
         oxipng_options = oxipng::Options::from_preset(3);
-        oxipng_options.deflate = Libdeflater;
+        oxipng_options.deflate = Libdeflater { compression: 6 };
     }
 
     let optimized_png = match oxipng::optimize_from_memory(in_file.as_slice(), &oxipng_options) {

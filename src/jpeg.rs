@@ -15,8 +15,16 @@ pub fn compress(
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), io::Error> {
-    let mut in_file = fs::read(input_path)?;
+    let in_file = fs::read(input_path)?;
 
+    let out_buffer = compress_to_memory(in_file, parameters)?;
+    let mut out_file = File::create(output_path)?;
+    out_file.write_all(&out_buffer)?;
+    Ok(())
+}
+
+pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error>
+{
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
             let metadata = extract_metadata(in_file.clone());
@@ -33,13 +41,12 @@ pub fn compress(
         } else {
             lossy(in_file, parameters)?
         };
-        let mut output_file_buffer = File::create(output_path)?;
-        output_file_buffer.write_all(std::slice::from_raw_parts(
+        let slice = std::slice::from_raw_parts(
             compression_buffer.0,
             compression_buffer.1 as usize,
-        ))?;
+        );
+        Ok(slice.to_vec())
     }
-    Ok(())
 }
 
 unsafe fn lossless(

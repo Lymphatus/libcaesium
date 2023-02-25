@@ -1,21 +1,15 @@
 use dssim::Val;
-use std::fs;
 use std::sync::Once;
+use crate::cleanup::remove_compressed_test_file;
+
+mod cleanup;
 
 static INIT: Once = Once::new();
 
 pub fn initialize(file: &str) {
     INIT.call_once(|| {
-        if fs::metadata(file).is_ok() {
-            fs::remove_file(file).unwrap();
-        }
+        remove_compressed_test_file(file);
     });
-}
-
-pub fn cleanup(file: &str) {
-    if fs::metadata(file).is_ok() {
-        fs::remove_file(file).unwrap();
-    }
 }
 
 fn diff(compressed: &str) -> Val {
@@ -42,7 +36,7 @@ fn compress_100() {
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (2400, 1600));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -61,7 +55,7 @@ fn compress_80() {
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (2400, 1600));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -80,7 +74,7 @@ fn compress_50() {
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (2400, 1600));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -99,7 +93,7 @@ fn compress_10() {
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (2400, 1600));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -122,7 +116,7 @@ fn optimize_jpeg() {
     //Floats error
     assert!(diff(output) < 0.001);
 
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -143,7 +137,7 @@ fn downscale_exact() {
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (800, 600));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -164,5 +158,5 @@ fn downscale_exact_optimize() {
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (800, 600));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }

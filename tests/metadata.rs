@@ -3,20 +3,15 @@ use std::fs;
 use std::path::Path;
 use std::sync::Once;
 
+use crate::cleanup::remove_compressed_test_file;
+
+mod cleanup;
 static INIT: Once = Once::new();
 
 pub fn initialize(file: &str) {
     INIT.call_once(|| {
-        if fs::metadata(file).is_ok() {
-            fs::remove_file(file).unwrap();
-        }
+        remove_compressed_test_file(file);
     });
-}
-
-pub fn cleanup(file: &str) {
-    if fs::metadata(file).is_ok() {
-        fs::remove_file(file).unwrap();
-    }
 }
 
 #[test]
@@ -37,7 +32,7 @@ fn compress_80_with_metadata() {
         Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
         Path::new(output)
     ));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -58,7 +53,7 @@ fn optimize_with_metadata() {
         Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
         Path::new(output)
     ));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 #[test]
@@ -81,7 +76,7 @@ fn resize_optimize_with_metadata() {
         Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
         Path::new(output)
     ));
-    cleanup(output)
+    remove_compressed_test_file(output)
 }
 
 fn extract_exif(path: &Path) -> HashMap<String, String> {
