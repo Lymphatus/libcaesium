@@ -2,10 +2,11 @@ use image::ImageOutputFormat::Jpeg;
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 use mozjpeg_sys::*;
 
-use std::fs;
+use std::{fs, ptr};
 use std::fs::File;
 use std::io::Write;
 use std::{io, mem};
+use libc::free;
 
 use crate::resize::resize;
 use crate::CSParameters;
@@ -36,23 +37,20 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
     }
 
     unsafe {
-        let compression_buffer: (*mut u8, u64) = if parameters.optimize {
+        let compression_buffer = if parameters.optimize {
             lossless(in_file, parameters)?
         } else {
             lossy(in_file, parameters)?
         };
-        let slice = std::slice::from_raw_parts(
-            compression_buffer.0,
-            compression_buffer.1 as usize,
-        );
-        Ok(slice.to_vec())
+
+        Ok(compression_buffer)
     }
 }
 
 unsafe fn lossless(
     in_file: Vec<u8>,
     parameters: &CSParameters,
-) -> Result<(*mut u8, u64), io::Error> {
+) -> Result<Vec<u8>, io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
     let mut src_err = mem::zeroed();
@@ -80,7 +78,7 @@ unsafe fn lossless(
     let dst_coef_arrays = src_coef_arrays;
 
     dst_info.optimize_coding = i32::from(true);
-    let mut buf = std::ptr::null_mut();
+    let mut buf = ptr::null_mut();
     let mut buf_size = 0;
     jpeg_mem_dest(&mut dst_info, &mut buf, &mut buf_size);
     jpeg_write_coefficients(&mut dst_info, dst_coef_arrays);
@@ -104,10 +102,19 @@ unsafe fn lossless(
     jpeg_finish_decompress(&mut src_info);
     jpeg_destroy_decompress(&mut src_info);
 
-    Ok((buf, buf_size as u64))
+    let slice = std::slice::from_raw_parts(
+        buf,
+        buf_size as usize,
+    );
+
+    let result = slice.to_vec();
+
+    free(buf as *mut c_void);
+
+    Ok(result)
 }
 
-unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<(*mut u8, u64), io::Error> {
+unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
     let mut src_err = mem::zeroed();
     let mut dst_info: jpeg_compress_struct = mem::zeroed();
@@ -129,9 +136,6 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<(*mut u8,
     }
 
     jpeg_read_header(&mut src_info, true as boolean);
-    let mut buf = std::ptr::null_mut();
-    let mut buf_size = 0;
-    jpeg_mem_dest(&mut dst_info, &mut buf, &mut buf_size);
 
     let width = src_info.image_width;
     let height = src_info.image_height;
@@ -149,9 +153,6 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<(*mut u8,
         jpeg_read_scanlines(&mut src_info, jsamparray.as_mut_ptr(), 1);
     }
 
-    dst_info.image_width = width;
-    dst_info.image_height = height;
-    dst_info.in_color_space = color_space;
     let input_components = match color_space {
         JCS_GRAYSCALE => 1,
         JCS_RGB => 3,
@@ -160,7 +161,14 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<(*mut u8,
         JCS_YCCK => 4,
         _ => 3,
     };
-    dst_info.input_components = input_components;
+    let mut buf_size = 0;
+    let mut buf = mem::zeroed();
+    jpeg_mem_dest(&mut dst_info, &mut buf, &mut buf_size);
+
+    dst_info.image_width = width;
+    dst_info.image_height = height;
+    dst_info.in_color_space = color_space;
+    dst_info.input_components = input_components as c_int;
     jpeg_set_defaults(&mut dst_info);
 
     let row_stride = dst_info.image_width as usize * dst_info.input_components as usize;
@@ -194,14 +202,21 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<(*mut u8,
         jpeg_write_scanlines(&mut dst_info, jsamparray.as_ptr(), 1);
     }
 
-    jpeg_finish_compress(&mut dst_info);
-    jpeg_destroy_compress(&mut dst_info);
     jpeg_finish_decompress(&mut src_info);
     jpeg_destroy_decompress(&mut src_info);
+    jpeg_finish_compress(&mut dst_info);
+    jpeg_destroy_compress(&mut dst_info);
 
-    // let mut output_file_buffer = File::create(output_path)?;
-    // output_file_buffer.write_all(std::slice::from_raw_parts(buf, buf_size as usize))?;
-    Ok((buf, buf_size as u64))
+    let slice = std::slice::from_raw_parts(
+        buf,
+        buf_size as usize,
+    );
+
+    let result = slice.to_vec();
+
+    free(buf as *mut c_void);
+
+    Ok(result)
 }
 
 fn extract_metadata(image: Vec<u8>) -> (Option<img_parts::Bytes>, Option<img_parts::Bytes>) {
