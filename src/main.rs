@@ -1,4 +1,4 @@
-use caesium::{compress, compress_to_size, initialize_parameters};
+use caesium::{compress_to_size, initialize_parameters};
 use std::env;
 
 fn main() {
@@ -8,7 +8,5 @@ fn main() {
     let output = args[2].clone();
 
     let mut parameters = initialize_parameters();
-    parameters.output_size = args[3].clone().parse().unwrap();
-    compress_to_size(input, &mut parameters).unwrap();
-    // compress(input, output, &parameters).unwrap();
+    compress_to_size(input, output, &mut parameters, args[3].clone().parse().unwrap()).unwrap();
 }

@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.10.3"
+version = "0.11.0"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -28,7 +28,7 @@ libc = "0.2"
 gifsicle = { version = "1.92.5", optional = true }
 webp = { version = "0.2.2", optional = true }
 infer = "0.13.0"
-image = { version = "0.24.3", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
+image = { version = "0.24.6", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
 img-parts = "0.3"
 bytes = "1.1"
 lodepng = { version = "3.7", optional = true }

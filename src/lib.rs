@@ -5,6 +5,8 @@ use std::{cmp, fs};
 use std::error::Error;
 use std::ffi::CStr;
 use std::os::raw::c_char;
+use std::fs::File;
+use std::io::Write;
 
 use crate::utils::{get_filetype, SupportedFileTypes};
 
@@ -30,7 +32,6 @@ pub struct CCSParameters {
     pub optimize: bool,
     pub width: u32,
     pub height: u32,
-    pub output_size: u32,
 }
 
 #[repr(C)]
@@ -73,7 +74,6 @@ pub struct CSParameters {
     pub output_size: u32,
 }
 
-
 pub fn initialize_parameters() -> CSParameters {
     let jpeg = JpegParameters { quality: 80 };
 
@@ -106,26 +106,37 @@ pub unsafe extern "C" fn c_compress(
     output_path: *const c_char,
     params: CCSParameters,
 ) -> CCSResult {
-    let mut parameters = initialize_parameters();
+    let parameters = c_set_parameters(params);
 
-    parameters.jpeg.quality = params.jpeg_quality;
-    parameters.png.quality = params.png_quality;
-    parameters.optimize = params.optimize;
-    parameters.keep_metadata = params.keep_metadata;
-    parameters.png.force_zopfli = params.png_force_zopfli;
-    parameters.gif.quality = params.gif_quality;
-    parameters.webp.quality = params.webp_quality;
-    parameters.width = params.width;
-    parameters.height = params.height;
-    parameters.output_size = params.output_size;
-
-    let mut error_message = CString::new("").unwrap();
-
-    match compress(
+    c_return_result(compress(
         CStr::from_ptr(input_path).to_str().unwrap().to_string(),
         CStr::from_ptr(output_path).to_str().unwrap().to_string(),
         &parameters,
-    ) {
+    ))
+}
+
+#[no_mangle]
+#[allow(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn c_compress_to_size(
+    input_path: *const c_char,
+    output_path: *const c_char,
+    params: CCSParameters,
+    desired_output_size: usize,
+) -> CCSResult {
+    let mut parameters = c_set_parameters(params);
+
+    c_return_result(compress_to_size(
+        CStr::from_ptr(input_path).to_str().unwrap().to_string(),
+        CStr::from_ptr(output_path).to_str().unwrap().to_string(),
+        &mut parameters,
+        desired_output_size,
+    ))
+}
+
+fn c_return_result(result: Result<(), Box<dyn Error>>) -> CCSResult {
+    let mut error_message = CString::new("").unwrap();
+
+    match result {
         Ok(_) => {
             let em_pointer = error_message.as_ptr();
             std::mem::forget(error_message);
@@ -146,6 +157,22 @@ pub unsafe extern "C" fn c_compress(
     }
 }
 
+fn c_set_parameters(params: CCSParameters) -> CSParameters {
+    let mut parameters = initialize_parameters();
+
+    parameters.jpeg.quality = params.jpeg_quality;
+    parameters.png.quality = params.png_quality;
+    parameters.optimize = params.optimize;
+    parameters.keep_metadata = params.keep_metadata;
+    parameters.png.force_zopfli = params.png_force_zopfli;
+    parameters.gif.quality = params.gif_quality;
+    parameters.webp.quality = params.webp_quality;
+    parameters.width = params.width;
+    parameters.height = params.height;
+
+    parameters
+}
+
 pub fn compress(
     input_path: String,
     output_path: String,
@@ -156,19 +183,19 @@ pub fn compress(
 
     match file_type {
         #[cfg(feature = "jpg")]
-        utils::SupportedFileTypes::Jpeg => {
+        SupportedFileTypes::Jpeg => {
             jpeg::compress(input_path, output_path, parameters)?;
         }
         #[cfg(feature = "png")]
-        utils::SupportedFileTypes::Png => {
+        SupportedFileTypes::Png => {
             png::compress(input_path, output_path, parameters)?;
         }
         #[cfg(feature = "webp")]
-        utils::SupportedFileTypes::WebP => {
+        SupportedFileTypes::WebP => {
             webp::compress(input_path, output_path, parameters)?;
         }
         #[cfg(feature = "gif")]
-        utils::SupportedFileTypes::Gif => {
+        SupportedFileTypes::Gif => {
             gif::compress(input_path, output_path, parameters)?;
         }
         _ => return Err("Unknown file type".into()),
@@ -177,62 +204,67 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_to_size(input_path: String, parameters: &mut CSParameters) -> Result<(), Box<dyn Error>>
+pub fn compress_to_size(input_path: String, output_path: String, parameters: &mut CSParameters, desired_output_size: usize) -> Result<(), Box<dyn Error>>
 {
     let file_type = get_filetype(&input_path);
-    let desired_output_size = parameters.output_size;
     let in_file = fs::read(input_path)?;
     let tolerance_percentage = 3;
-    let tolerance = in_file.len() * tolerance_percentage / 100;
-    let mut delta = 10;
-    let last_was_less = false;
-    let mut starting_quality = 80;
+    let tolerance = desired_output_size * tolerance_percentage / 100;
+    let mut quality = 80;
+    let mut last_less = 1;
+    let mut last_high = 101;
+    let max_tries: u32 = 10;
+    let mut tries: u32 = 0;
 
-    println!("Desired output size: {}", desired_output_size);
+    let compressed_file = loop {
+        if tries >= max_tries {
+            return Err("Max tries reached".into());
+        }
 
-    loop {
-        println!("-- QUALITY {} --", starting_quality);
         let compressed_file = match file_type {
-            utils::SupportedFileTypes::Jpeg => {
-                parameters.jpeg.quality = starting_quality;
+            SupportedFileTypes::Jpeg => {
+                parameters.jpeg.quality = quality;
                 jpeg::compress_to_memory(in_file.clone(), parameters)? //TODO clone
             }
-            utils::SupportedFileTypes::Png => {
-                parameters.png.quality = starting_quality;
+            SupportedFileTypes::Png => {
+                parameters.png.quality = quality;
                 png::compress_to_memory(in_file.clone(), parameters)? //TODO clone
             }
-            utils::SupportedFileTypes::WebP => {
-                parameters.webp.quality = starting_quality;
+            SupportedFileTypes::WebP => {
+                parameters.webp.quality = quality;
                 webp::compress_to_memory(in_file.clone(), parameters)? //TODO clone
             }
             _ => return Err("Format not supported for compression to size".into()),
         };
 
-        let compressed_file_size = compressed_file.len() as u32;
-        println!("Compressed to: {}", compressed_file_size);
+        let compressed_file_size = compressed_file.len();
 
-        if compressed_file_size <= desired_output_size && desired_output_size - compressed_file_size < tolerance as u32 {
-            println!("[OK] Got it, exit");
-            return Ok(());
-        } else if compressed_file_size <= desired_output_size {
-            println!("[WARN] Size is less");
-            starting_quality = cmp::min(100, starting_quality + delta);
-            if !last_was_less {
-                delta /= 2;
-            }
+        if compressed_file_size <= desired_output_size && desired_output_size - compressed_file_size < tolerance {
+            break compressed_file;
+        }
+
+        if compressed_file_size <= desired_output_size {
+            last_less = quality;
         } else {
-            println!("[WARN] Size is high");
-            starting_quality = cmp::max(1, starting_quality.checked_sub(delta).unwrap_or(1));
-            if last_was_less {
-                delta /= 2;
+            last_high = quality;
+        }
+        let last_quality = quality;
+        quality = cmp::max(1, cmp::min(100, (last_high + last_less) / 2));
+        if last_quality == quality {
+            if quality == 1 && last_high == 1 {
+                return Err("Cannot compress to desired quality".into());
             }
+
+            break compressed_file;
         }
 
-        if starting_quality == 100 || starting_quality == 1 {
-            println!("[OK] Boundaries reached");
-            return Ok(());
-        }
-    }
+        tries += 1;
+    };
+
+    let mut out_file = File::create(output_path)?;
+    out_file.write_all(&compressed_file)?;
+
+    Ok(())
 }
 
 fn validate_parameters(parameters: &CSParameters) -> Result<(), Box<dyn Error>> {
