@@ -4,7 +4,8 @@ Libcaesium is a simple library performing JPEG, PNG, WebP and GIF (experimental)
 **IMPORTANT**: starting from v0.6.0 the library is written in Rust and no longer in C. There's a C interface, but it's not backward compatible with the <0.6.0.
 
 ## Usage in Rust
-Libcaesium exposes one single function, auto-detecting the input file type:
+Libcaesium exposes two functions, auto-detecting the input file type
+### Based on quality values
 ```Rust
 pub fn compress(
     input_path: String,
@@ -16,6 +17,25 @@ pub fn compress(
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
+
+### Based on output size
+```Rust
+pub fn compress_to_size(
+    input_path: String,
+    output_path: String,
+    parameters: &CSParameters,
+    desired_output_size: usize,
+) -> Result<(), Box<dyn Error>>
+```
+#### Parameters
+- `input_path` - input file path (full filename)
+- `output_path` - output file path (full filename)
+- `parameters` - options struct, containing compression parameters (see below)
+- `desired_output_size` - the desired output size, in bytes
+
+This function will attempt to compress the given file *below* the desired size. It will never exceed it. The function 
+will start looping until the best size under the desired is achieved. The function has a 2% tolerance for the output size.
+All quality value set to the parameters will be ignored and overwritten during the compression.
 
 NOTE: The output folder where the file is compressed **must** exist.
 ### Compression options
@@ -75,10 +95,13 @@ pub struct Parameters {
 ```
 - `quality`: in a range from 0 to 100, the quality of the resulting image. If the optimization flag is `true`, this option will be ignored. Default: `60`.
 
+_________________
+
 ## Usage in C
-Libcaesium exposes one single C function, auto-detecting the input file type:
+Libcaesium exposes two C functions, auto-detecting the input file type:
+### Based on quality values
 ```Rust
-pub extern fn c_compress(
+pub unsafe extern "C" fn c_compress(
     input_path: *const c_char,
     output_path: *const c_char,
     params: CCSParameters
@@ -88,6 +111,32 @@ pub extern fn c_compress(
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
+#### Return
+A `CCSResult` struct
+```Rust
+#[repr(C)]
+pub struct CCSResult {
+    pub success: bool,
+    pub error_message: *const c_char,
+}
+```
+If `success` is `true` the compression process ended successfully and `error_message` will be empty.  
+On failure, the `error_message` will be filled with a string containing a brief explanation of the error.
+
+### Based on output size
+```Rust
+pub unsafe extern "C" fn c_compress_to_size(
+    input_path: *const c_char,
+    output_path: *const c_char,
+    params: CCSParameters,
+    desired_output_size: usize,
+) -> CCSResult
+```
+#### Parameters
+- `input_path` - input file path (full filename)
+- `output_path` - output file path (full filename)
+- `parameters` - options struct, containing compression parameters (see below)
+- `desired_output_size` - the desired output size, in bytes
 #### Return
 A `CCSResult` struct
 ```Rust

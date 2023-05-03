@@ -204,11 +204,16 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_to_size(input_path: String, output_path: String, parameters: &mut CSParameters, desired_output_size: usize) -> Result<(), Box<dyn Error>>
+pub fn compress_to_size(
+    input_path: String,
+    output_path: String,
+    parameters: &mut CSParameters,
+    desired_output_size: usize
+) -> Result<(), Box<dyn Error>>
 {
     let file_type = get_filetype(&input_path);
     let in_file = fs::read(input_path)?;
-    let tolerance_percentage = 3;
+    let tolerance_percentage = 2;
     let tolerance = desired_output_size * tolerance_percentage / 100;
     let mut quality = 80;
     let mut last_less = 1;
