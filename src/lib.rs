@@ -121,7 +121,7 @@ pub unsafe extern "C" fn c_compress_to_size(
     input_path: *const c_char,
     output_path: *const c_char,
     params: CCSParameters,
-    desired_output_size: usize,
+    max_output_size: usize,
 ) -> CCSResult {
     let mut parameters = c_set_parameters(params);
 
@@ -129,7 +129,7 @@ pub unsafe extern "C" fn c_compress_to_size(
         CStr::from_ptr(input_path).to_str().unwrap().to_string(),
         CStr::from_ptr(output_path).to_str().unwrap().to_string(),
         &mut parameters,
-        desired_output_size,
+        max_output_size,
     ))
 }
 
@@ -208,13 +208,13 @@ pub fn compress_to_size(
     input_path: String,
     output_path: String,
     parameters: &mut CSParameters,
-    desired_output_size: usize
+    max_output_size: usize
 ) -> Result<(), Box<dyn Error>>
 {
     let file_type = get_filetype(&input_path);
     let in_file = fs::read(input_path)?;
     let tolerance_percentage = 2;
-    let tolerance = desired_output_size * tolerance_percentage / 100;
+    let tolerance = max_output_size * tolerance_percentage / 100;
     let mut quality = 80;
     let mut last_less = 1;
     let mut last_high = 101;
@@ -244,11 +244,11 @@ pub fn compress_to_size(
 
         let compressed_file_size = compressed_file.len();
 
-        if compressed_file_size <= desired_output_size && desired_output_size - compressed_file_size < tolerance {
+        if compressed_file_size <= max_output_size && max_output_size - compressed_file_size < tolerance {
             break compressed_file;
         }
 
-        if compressed_file_size <= desired_output_size {
+        if compressed_file_size <= max_output_size {
             last_less = quality;
         } else {
             last_high = quality;

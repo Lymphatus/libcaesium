@@ -29,19 +29,19 @@ fn compress_to_1_byte() {
 #[test]
 fn compress_to_10_mb() {
     let output = "tests/samples/output/compressed_10mb.jpg";
-    let desired_output_size = 10_000_000;
+    let max_output_size = 10_000_000;
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     caesium::compress_to_size(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
         &mut pars,
-        desired_output_size
+        max_output_size
     ).unwrap();
 
     assert_eq!(100, pars.jpeg.quality);
     assert!(std::path::Path::new(output).exists());
-    assert!(File::open(output).unwrap().metadata().unwrap().len() < desired_output_size as u64);
+    assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
     let kind = infer::get_from_path(output).unwrap().unwrap();
     assert_eq!(kind.mime_type(), "image/jpeg");
     remove_compressed_test_file(output)
@@ -51,23 +51,23 @@ fn compress_to_10_mb() {
 fn compress_to_range() {
     let output = "tests/samples/output/compressed_range.jpg";
     let max_desired_size = 2_000_000;
-    let mut desired_output_size = 500_000;
+    let mut max_output_size = 500_000;
     initialize(output);
 
-    while desired_output_size < max_desired_size {
+    while max_output_size < max_desired_size {
         let mut pars = caesium::initialize_parameters();
         caesium::compress_to_size(
             String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
             String::from(output),
             &mut pars,
-            desired_output_size
+            max_output_size
         ).unwrap();
 
         assert!(std::path::Path::new(output).exists());
-        assert!(File::open(output).unwrap().metadata().unwrap().len() < desired_output_size as u64);
+        assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
         let kind = infer::get_from_path(output).unwrap().unwrap();
         assert_eq!(kind.mime_type(), "image/jpeg");
-        desired_output_size += 100_000;
+        max_output_size += 100_000;
         remove_compressed_test_file(output);
     }
 }

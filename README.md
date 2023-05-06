@@ -24,14 +24,14 @@ pub fn compress_to_size(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
-    desired_output_size: usize,
+    max_output_size: usize,
 ) -> Result<(), Box<dyn Error>>
 ```
 #### Parameters
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
-- `desired_output_size` - the desired output size, in bytes
+- `max_output_size` - the maximum output size, in bytes
 
 This function will attempt to compress the given file *below* the desired size. It will never exceed it. The function 
 will start looping until the best size under the desired is achieved. The function has a 2% tolerance for the output size.
@@ -129,14 +129,14 @@ pub unsafe extern "C" fn c_compress_to_size(
     input_path: *const c_char,
     output_path: *const c_char,
     params: CCSParameters,
-    desired_output_size: usize,
+    max_output_size: usize,
 ) -> CCSResult
 ```
 #### Parameters
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
-- `desired_output_size` - the desired output size, in bytes
+- `max_output_size` - the maximum output size, in bytes
 #### Return
 A `CCSResult` struct
 ```Rust
