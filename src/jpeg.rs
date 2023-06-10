@@ -11,6 +11,8 @@ use libc::free;
 use crate::resize::resize;
 use crate::CSParameters;
 
+static mut JPEG_ERROR: c_int = 0;
+
 pub fn compress(
     input_path: String,
     output_path: String,
@@ -58,7 +60,10 @@ unsafe fn lossless(
     let mut dst_err = mem::zeroed();
 
     src_info.common.err = jpeg_std_error(&mut src_err);
+    (*src_info.common.err).error_exit = Option::Some(error_handler);
+
     dst_info.common.err = jpeg_std_error(&mut dst_err);
+    (*dst_info.common.err).error_exit = Option::Some(error_handler);
 
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
@@ -72,7 +77,13 @@ unsafe fn lossless(
         }
     }
 
-    jpeg_read_header(&mut src_info, i32::from(true));
+    jpeg_read_header(&mut src_info, true as boolean);
+
+    if JPEG_ERROR == 11 {
+        jpeg_destroy_decompress(&mut src_info);
+        jpeg_create_compress(&mut dst_info);
+        return Err(io::Error::new(io::ErrorKind::Other, format!("Decompress internal error: {}", JPEG_ERROR)));
+    }
     let src_coef_arrays = jpeg_read_coefficients(&mut src_info);
     jpeg_copy_critical_parameters(&src_info, &mut dst_info);
     let dst_coef_arrays = src_coef_arrays;
@@ -121,7 +132,9 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     let mut dst_err = mem::zeroed();
 
     src_info.common.err = jpeg_std_error(&mut src_err);
+    (*src_info.common.err).error_exit = Option::Some(error_handler);
     dst_info.common.err = jpeg_std_error(&mut dst_err);
+    (*dst_info.common.err).error_exit = Option::Some(error_handler);
 
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
@@ -136,6 +149,12 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     }
 
     jpeg_read_header(&mut src_info, true as boolean);
+
+    if JPEG_ERROR == 11 {
+        jpeg_destroy_decompress(&mut src_info);
+        jpeg_create_compress(&mut dst_info);
+        return Err(io::Error::new(io::ErrorKind::Other, format!("Decompress internal error: {}", JPEG_ERROR)));
+    }
 
     let width = src_info.image_width;
     let height = src_info.image_height;
@@ -256,4 +275,8 @@ fn save_metadata(
     } else {
         image_buffer
     }
+}
+
+unsafe extern "C" fn error_handler(cinfo: &mut jpeg_common_struct) {
+    JPEG_ERROR = (*cinfo.err).msg_code;
 }

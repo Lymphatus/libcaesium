@@ -97,6 +97,19 @@ fn compress_10() {
 }
 
 #[test]
+fn compress_corrupted_lossy() {
+    let output = "tests/samples/output/corrupted_lossy.jpg";
+    initialize(output);
+    let mut pars = caesium::initialize_parameters();
+    pars.jpeg.quality = 50;
+    assert!(caesium::compress(
+        String::from("tests/samples/corrupted.jpg"),
+        String::from(output),
+        &pars,
+    ).is_err())
+}
+
+#[test]
 fn optimize_jpeg() {
     let output = "tests/samples/output/compressed_optimized_드림캐쳐.jpg";
     initialize(output);
@@ -117,6 +130,19 @@ fn optimize_jpeg() {
     assert!(diff(output) < 0.001);
 
     remove_compressed_test_file(output)
+}
+
+#[test]
+fn compress_corrupted_lossless() {
+    let output = "tests/samples/output/corrupted_lossless.jpg";
+    initialize(output);
+    let mut pars = caesium::initialize_parameters();
+    pars.optimize = true;
+    assert!(caesium::compress(
+        String::from("tests/samples/corrupted.jpg"),
+        String::from(output),
+        &pars,
+    ).is_err());
 }
 
 #[test]
