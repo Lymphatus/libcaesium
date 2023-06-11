@@ -6,6 +6,7 @@ use std::{fs, ptr};
 use std::fs::File;
 use std::io::Write;
 use std::{io, mem};
+use std::panic::catch_unwind;
 use libc::free;
 
 use crate::resize::resize;
@@ -39,13 +40,16 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
     }
 
     unsafe {
-        let compression_buffer = if parameters.optimize {
-            lossless(in_file, parameters)?
-        } else {
-            lossy(in_file, parameters)?
-        };
-
-        Ok(compression_buffer)
+        return match catch_unwind(|| {
+            if parameters.optimize {
+                lossless(in_file, parameters)
+            } else {
+                lossy(in_file, parameters)
+            }
+        }) {
+            Ok(cb) => cb,
+            Err(_) => Err(io::Error::new(io::ErrorKind::Other, format!("Internal JPEG error: {}", JPEG_ERROR)))
+        }
     }
 }
 
@@ -61,9 +65,11 @@ unsafe fn lossless(
 
     src_info.common.err = jpeg_std_error(&mut src_err);
     (*src_info.common.err).error_exit = Option::Some(error_handler);
+    (*src_info.common.err).output_message = Option::Some(error_message_handler);
 
     dst_info.common.err = jpeg_std_error(&mut dst_err);
     (*dst_info.common.err).error_exit = Option::Some(error_handler);
+    (*dst_info.common.err).output_message = Option::Some(error_message_handler);
 
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
@@ -79,11 +85,6 @@ unsafe fn lossless(
 
     jpeg_read_header(&mut src_info, true as boolean);
 
-    if JPEG_ERROR == 11 {
-        jpeg_destroy_decompress(&mut src_info);
-        jpeg_create_compress(&mut dst_info);
-        return Err(io::Error::new(io::ErrorKind::Other, format!("Decompress internal error: {}", JPEG_ERROR)));
-    }
     let src_coef_arrays = jpeg_read_coefficients(&mut src_info);
     jpeg_copy_critical_parameters(&src_info, &mut dst_info);
     let dst_coef_arrays = src_coef_arrays;
@@ -133,8 +134,11 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
 
     src_info.common.err = jpeg_std_error(&mut src_err);
     (*src_info.common.err).error_exit = Option::Some(error_handler);
+    (*src_info.common.err).output_message = Option::Some(error_message_handler);
+
     dst_info.common.err = jpeg_std_error(&mut dst_err);
     (*dst_info.common.err).error_exit = Option::Some(error_handler);
+    (*dst_info.common.err).output_message = Option::Some(error_message_handler);
 
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
@@ -149,12 +153,6 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     }
 
     jpeg_read_header(&mut src_info, true as boolean);
-
-    if JPEG_ERROR == 11 {
-        jpeg_destroy_decompress(&mut src_info);
-        jpeg_create_compress(&mut dst_info);
-        return Err(io::Error::new(io::ErrorKind::Other, format!("Decompress internal error: {}", JPEG_ERROR)));
-    }
 
     let width = src_info.image_width;
     let height = src_info.image_height;
@@ -279,4 +277,8 @@ fn save_metadata(
 
 unsafe extern "C" fn error_handler(cinfo: &mut jpeg_common_struct) {
     JPEG_ERROR = (*cinfo.err).msg_code;
+    panic!("Internal JPEG error: {}", JPEG_ERROR);
+}
+
+unsafe extern "C" fn error_message_handler(_cinfo: &mut jpeg_common_struct) {
 }
