@@ -4,9 +4,9 @@ use alloc::ffi::CString;
 use std::{cmp, fs};
 use std::error::Error;
 use std::ffi::CStr;
-use std::os::raw::c_char;
 use std::fs::File;
 use std::io::Write;
+use std::os::raw::c_char;
 
 use crate::utils::{get_filetype, SupportedFileTypes};
 
@@ -208,7 +208,7 @@ pub fn compress_to_size(
     input_path: String,
     output_path: String,
     parameters: &mut CSParameters,
-    max_output_size: usize
+    max_output_size: usize,
 ) -> Result<(), Box<dyn Error>>
 {
     let file_type = get_filetype(&input_path);

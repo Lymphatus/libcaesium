@@ -1,9 +1,9 @@
-use image::imageops::FilterType;
-use image::io::Reader as ImageReader;
-use image::DynamicImage;
-
 use std::io;
 use std::io::Cursor;
+
+use image::DynamicImage;
+use image::imageops::FilterType;
+use image::io::Reader as ImageReader;
 
 #[allow(dead_code)]
 pub fn resize(

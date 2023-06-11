@@ -3,8 +3,8 @@ use std::io;
 use std::io::{Read, Write};
 use std::ops::Deref;
 
-use crate::resize::resize_image;
 use crate::CSParameters;
+use crate::resize::resize_image;
 
 pub fn compress(
     input_path: String,

@@ -1,16 +1,16 @@
-use image::ImageOutputFormat::Jpeg;
-use img_parts::{DynImage, ImageEXIF, ImageICC};
-use mozjpeg_sys::*;
-
 use std::{fs, ptr};
+use std::{io, mem};
 use std::fs::File;
 use std::io::Write;
-use std::{io, mem};
 use std::panic::catch_unwind;
-use libc::free;
 
-use crate::resize::resize;
+use image::ImageOutputFormat::Jpeg;
+use img_parts::{DynImage, ImageEXIF, ImageICC};
+use libc::free;
+use mozjpeg_sys::*;
+
 use crate::CSParameters;
+use crate::resize::resize;
 
 static mut JPEG_ERROR: c_int = 0;
 
@@ -49,7 +49,7 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
         }) {
             Ok(cb) => cb,
             Err(_) => Err(io::Error::new(io::ErrorKind::Other, format!("Internal JPEG error: {}", JPEG_ERROR)))
-        }
+        };
     }
 }
 
@@ -64,12 +64,12 @@ unsafe fn lossless(
     let mut dst_err = mem::zeroed();
 
     src_info.common.err = jpeg_std_error(&mut src_err);
-    (*src_info.common.err).error_exit = Option::Some(error_handler);
-    (*src_info.common.err).output_message = Option::Some(error_message_handler);
+    (*src_info.common.err).error_exit = Some(error_handler);
+    (*src_info.common.err).output_message = Some(error_message_handler);
 
     dst_info.common.err = jpeg_std_error(&mut dst_err);
-    (*dst_info.common.err).error_exit = Option::Some(error_handler);
-    (*dst_info.common.err).output_message = Option::Some(error_message_handler);
+    (*dst_info.common.err).error_exit = Some(error_handler);
+    (*dst_info.common.err).output_message = Some(error_message_handler);
 
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
@@ -96,17 +96,7 @@ unsafe fn lossless(
     jpeg_write_coefficients(&mut dst_info, dst_coef_arrays);
 
     if parameters.keep_metadata {
-        let mut marker = src_info.marker_list;
-
-        while !marker.is_null() {
-            jpeg_write_marker(
-                &mut dst_info,
-                (*marker).marker as i32,
-                (*marker).data,
-                (*marker).data_length,
-            );
-            marker = (*marker).next;
-        }
+        write_metadata(&mut src_info, &mut dst_info);
     }
 
     jpeg_finish_compress(&mut dst_info);
@@ -133,12 +123,12 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     let mut dst_err = mem::zeroed();
 
     src_info.common.err = jpeg_std_error(&mut src_err);
-    (*src_info.common.err).error_exit = Option::Some(error_handler);
-    (*src_info.common.err).output_message = Option::Some(error_message_handler);
+    (*src_info.common.err).error_exit = Some(error_handler);
+    (*src_info.common.err).output_message = Some(error_message_handler);
 
     dst_info.common.err = jpeg_std_error(&mut dst_err);
-    (*dst_info.common.err).error_exit = Option::Some(error_handler);
-    (*dst_info.common.err).output_message = Option::Some(error_message_handler);
+    (*dst_info.common.err).error_exit = Some(error_handler);
+    (*dst_info.common.err).output_message = Some(error_message_handler);
 
     jpeg_create_decompress(&mut src_info);
     jpeg_create_compress(&mut dst_info);
@@ -200,17 +190,7 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     jpeg_start_compress(&mut dst_info, true as boolean);
 
     if parameters.keep_metadata {
-        let mut marker = src_info.marker_list;
-
-        while !marker.is_null() {
-            jpeg_write_marker(
-                &mut dst_info,
-                (*marker).marker as i32,
-                (*marker).data,
-                (*marker).data_length,
-            );
-            marker = (*marker).next;
-        }
+        write_metadata(&mut src_info, &mut dst_info);
     }
 
     while dst_info.next_scanline < dst_info.image_height {
@@ -275,10 +255,22 @@ fn save_metadata(
     }
 }
 
+unsafe fn write_metadata(src_info: &mut jpeg_decompress_struct, dst_info: &mut jpeg_compress_struct) {
+    let mut marker = src_info.marker_list;
+
+    while !marker.is_null() {
+        jpeg_write_marker(
+            dst_info,
+            (*marker).marker as i32,
+            (*marker).data,
+            (*marker).data_length,
+        );
+        marker = (*marker).next;
+    }
+}
 unsafe extern "C" fn error_handler(cinfo: &mut jpeg_common_struct) {
     JPEG_ERROR = (*cinfo.err).msg_code;
     panic!("Internal JPEG error: {}", JPEG_ERROR);
 }
 
-unsafe extern "C" fn error_message_handler(_cinfo: &mut jpeg_common_struct) {
-}
+unsafe extern "C" fn error_message_handler(_cinfo: &mut jpeg_common_struct) {}

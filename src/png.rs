@@ -2,8 +2,8 @@ use std::{fs, io};
 use std::fs::File;
 use std::io::Write;
 use std::num::NonZeroU8;
-use image::ImageOutputFormat;
 
+use image::ImageOutputFormat;
 use oxipng::Deflaters::{Libdeflater, Zopfli};
 
 use crate::CSParameters;
