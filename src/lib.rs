@@ -7,13 +7,14 @@ use std::ffi::CStr;
 use std::fs::File;
 use std::io::Write;
 use std::os::raw::c_char;
+use crate::jpeg::ChromaSubsampling;
 
 use crate::utils::{get_filetype, SupportedFileTypes};
 
 #[cfg(feature = "gif")]
 mod gif;
 #[cfg(feature = "jpg")]
-mod jpeg;
+pub mod jpeg;
 #[cfg(feature = "png")]
 mod png;
 mod resize;
@@ -25,6 +26,7 @@ mod webp;
 pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
+    pub jpeg_chroma_subsampling: u32,
     pub png_quality: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
@@ -43,6 +45,7 @@ pub struct CCSResult {
 #[derive(Copy, Clone)]
 pub struct JpegParameters {
     pub quality: u32,
+    pub chroma_subsampling: jpeg::ChromaSubsampling
 }
 
 #[derive(Copy, Clone)]
@@ -75,7 +78,10 @@ pub struct CSParameters {
 }
 
 pub fn initialize_parameters() -> CSParameters {
-    let jpeg = JpegParameters { quality: 80 };
+    let jpeg = JpegParameters {
+        quality: 80,
+        chroma_subsampling: jpeg::ChromaSubsampling::Auto
+    };
 
     let png = PngParameters {
         quality: 80,
@@ -169,6 +175,14 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
     parameters.webp.quality = params.webp_quality;
     parameters.width = params.width;
     parameters.height = params.height;
+
+    parameters.jpeg.chroma_subsampling = match params.jpeg_chroma_subsampling {
+        444 => ChromaSubsampling::CS444,
+        422 => ChromaSubsampling::CS422,
+        420 => ChromaSubsampling::CS420,
+        411 => ChromaSubsampling::CS411,
+        _ => ChromaSubsampling::Auto
+    };
 
     parameters
 }

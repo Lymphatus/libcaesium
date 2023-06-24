@@ -63,9 +63,11 @@ Each file type has its own options, but the last two are generic:
 ```Rust
 pub struct Parameters {
     pub quality: u32,
+    pub chroma_subsampling: jpeg::ChromaSubsampling
 }
 ```
 - `quality`: in a range from 1 to 100, the quality of the resulting image. Default `80`.
+- `chroma_subsampling`: [chroma subsampling](https://en.wikipedia.org/wiki/Chroma_subsampling) to apply during compression. Default `Auto`.
 
 #### png
 ```Rust
@@ -156,6 +158,7 @@ The C options struct is slightly different from the Rust one:
 pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
+    pub jpeg_chroma_subsampling: u32,
     pub png_quality: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
@@ -166,6 +169,7 @@ pub struct CCSParameters {
 }
 ```
 The option description is the same as the Rust counterpart.
+Valid values for `jpeg_chroma_subsampling` are [444, 422, 420, 411]. Any other value will be ignored and will be used the default option.
 
 ## Download
 Binaries not available. Please refer to the compilation section below.

@@ -14,6 +14,15 @@ use crate::resize::resize;
 
 static mut JPEG_ERROR: c_int = 0;
 
+#[derive(Copy, Clone, PartialEq)]
+pub enum ChromaSubsampling {
+    CS444,
+    CS422,
+    CS420,
+    CS411,
+    Auto
+}
+
 pub fn compress(
     input_path: String,
     output_path: String,
@@ -178,6 +187,10 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     dst_info.input_components = input_components as c_int;
     jpeg_set_defaults(&mut dst_info);
 
+    if input_components == 3 && parameters.jpeg.chroma_subsampling != ChromaSubsampling::Auto {
+        set_chroma_subsampling(parameters.jpeg.chroma_subsampling, &mut dst_info);
+    }
+
     let row_stride = dst_info.image_width as usize * dst_info.input_components as usize;
     dst_info.dct_method = J_DCT_METHOD::JDCT_ISLOW;
     dst_info.optimize_coding = i32::from(true);
@@ -268,6 +281,34 @@ unsafe fn write_metadata(src_info: &mut jpeg_decompress_struct, dst_info: &mut j
         marker = (*marker).next;
     }
 }
+
+unsafe fn set_chroma_subsampling(subsampling: ChromaSubsampling, dst_info: &mut jpeg_compress_struct)
+{
+    (*dst_info.comp_info.add(1)).h_samp_factor = 1;
+    (*dst_info.comp_info.add(1)).v_samp_factor = 1;
+    (*dst_info.comp_info.add(2)).h_samp_factor = 1;
+    (*dst_info.comp_info.add(2)).v_samp_factor = 1;
+    match subsampling {
+        ChromaSubsampling::CS444 => {
+            (*dst_info.comp_info.add(0)).h_samp_factor = 1;
+            (*dst_info.comp_info.add(0)).v_samp_factor = 1;
+        }
+        ChromaSubsampling::CS422 => {
+            (*dst_info.comp_info.add(0)).h_samp_factor = 2;
+            (*dst_info.comp_info.add(0)).v_samp_factor = 1;
+        }
+        ChromaSubsampling::CS411 => {
+            (*dst_info.comp_info.add(0)).h_samp_factor = 4;
+            (*dst_info.comp_info.add(0)).v_samp_factor = 1;
+        }
+        ChromaSubsampling::CS420 => {
+            (*dst_info.comp_info.add(0)).h_samp_factor = 2;
+            (*dst_info.comp_info.add(0)).v_samp_factor = 2;
+        }
+        _ => {}
+    }
+}
+
 unsafe extern "C" fn error_handler(cinfo: &mut jpeg_common_struct) {
     JPEG_ERROR = (*cinfo.err).msg_code;
     panic!("Internal JPEG error: {}", JPEG_ERROR);
