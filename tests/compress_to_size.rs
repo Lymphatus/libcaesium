@@ -39,7 +39,7 @@ fn compress_to_10_mb() {
         max_output_size
     ).unwrap();
 
-    assert_eq!(100, pars.jpeg.quality);
+    assert_eq!(80, pars.jpeg.quality);
     assert!(std::path::Path::new(output).exists());
     assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
     let kind = infer::get_from_path(output).unwrap().unwrap();
@@ -71,4 +71,3 @@ fn compress_to_range() {
         remove_compressed_test_file(output);
     }
 }
-

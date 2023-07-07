@@ -226,7 +226,8 @@ pub fn compress_to_size(
 ) -> Result<(), Box<dyn Error>>
 {
     let file_type = get_filetype(&input_path);
-    let in_file = fs::read(input_path)?;
+    let in_file = fs::read(input_path.clone())?;
+    let original_size = in_file.len();
     let tolerance_percentage = 2;
     let tolerance = max_output_size * tolerance_percentage / 100;
     let mut quality = 80;
@@ -234,6 +235,11 @@ pub fn compress_to_size(
     let mut last_high = 101;
     let max_tries: u32 = 10;
     let mut tries: u32 = 0;
+
+    if original_size <= max_output_size {
+        fs::copy(input_path, output_path)?;
+        return Ok(());
+    }
 
     let compressed_file = loop {
         if tries >= max_tries {
