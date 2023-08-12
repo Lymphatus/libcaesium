@@ -88,7 +88,7 @@ fn extract_exif(path: &Path) -> HashMap<String, String> {
     for f in exif.fields() {
         exif_map.insert(
             format!("{}", f.tag),
-            f.display_value().to_string() as String,
+            f.display_value().to_string(),
         );
     }
 

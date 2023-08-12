@@ -175,7 +175,7 @@ Valid values for `jpeg_chroma_subsampling` are [444, 422, 420, 411]. Any other v
 Binaries not available. Please refer to the compilation section below.
 
 ## Compilation and Installation
-Compilation is available for all supported platforms: Windows, MacOS and Linux.
+Compilation is available for all supported platforms: Windows, macOS and Linux.
 
 ```
 cargo build --release

@@ -45,7 +45,7 @@ pub struct CCSResult {
 #[derive(Copy, Clone)]
 pub struct JpegParameters {
     pub quality: u32,
-    pub chroma_subsampling: jpeg::ChromaSubsampling
+    pub chroma_subsampling: ChromaSubsampling
 }
 
 #[derive(Copy, Clone)]
@@ -80,7 +80,7 @@ pub struct CSParameters {
 pub fn initialize_parameters() -> CSParameters {
     let jpeg = JpegParameters {
         quality: 80,
-        chroma_subsampling: jpeg::ChromaSubsampling::Auto
+        chroma_subsampling: ChromaSubsampling::Auto
     };
 
     let png = PngParameters {
@@ -247,14 +247,17 @@ pub fn compress_to_size(
         }
 
         let compressed_file = match file_type {
+            #[cfg(feature = "jpg")]
             SupportedFileTypes::Jpeg => {
                 parameters.jpeg.quality = quality;
                 jpeg::compress_to_memory(in_file.clone(), parameters)? //TODO clone
             }
+            #[cfg(feature = "png")]
             SupportedFileTypes::Png => {
                 parameters.png.quality = quality;
                 png::compress_to_memory(in_file.clone(), parameters)? //TODO clone
             }
+            #[cfg(feature = "webp")]
             SupportedFileTypes::WebP => {
                 parameters.webp.quality = quality;
                 webp::compress_to_memory(in_file.clone(), parameters)? //TODO clone
