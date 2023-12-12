@@ -9,7 +9,7 @@ use std::io::Write;
 use std::os::raw::c_char;
 use crate::jpeg::ChromaSubsampling;
 
-use crate::utils::{get_filetype, SupportedFileTypes};
+use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
 
 #[cfg(feature = "gif")]
 mod gif;
@@ -45,7 +45,7 @@ pub struct CCSResult {
 #[derive(Copy, Clone)]
 pub struct JpegParameters {
     pub quality: u32,
-    pub chroma_subsampling: ChromaSubsampling
+    pub chroma_subsampling: ChromaSubsampling,
 }
 
 #[derive(Copy, Clone)]
@@ -80,7 +80,7 @@ pub struct CSParameters {
 pub fn initialize_parameters() -> CSParameters {
     let jpeg = JpegParameters {
         quality: 80,
-        chroma_subsampling: ChromaSubsampling::Auto
+        chroma_subsampling: ChromaSubsampling::Auto,
     };
 
     let png = PngParameters {
@@ -193,7 +193,7 @@ pub fn compress(
     parameters: &CSParameters,
 ) -> Result<(), Box<dyn Error>> {
     validate_parameters(parameters)?;
-    let file_type = get_filetype(&input_path);
+    let file_type = get_filetype_from_path(&input_path);
 
     match file_type {
         #[cfg(feature = "jpg")]
@@ -218,6 +218,30 @@ pub fn compress(
     Ok(())
 }
 
+pub fn compress_in_memory(
+    in_file: Vec<u8>,
+    parameters: &mut CSParameters,
+) -> Result<Vec<u8>, Box<dyn Error>> {
+    let file_type = get_filetype_from_memory(in_file.as_slice());
+    let compressed_file = match file_type {
+        #[cfg(feature = "jpg")]
+        SupportedFileTypes::Jpeg => {
+            jpeg::compress_to_memory(in_file, parameters)?
+        }
+        #[cfg(feature = "png")]
+        SupportedFileTypes::Png => {
+            png::compress_to_memory(in_file, parameters)?
+        }
+        #[cfg(feature = "webp")]
+        SupportedFileTypes::WebP => {
+            webp::compress_to_memory(in_file, parameters)?
+        }
+        _ => return Err("Format not supported for compression to size".into()),
+    };
+
+    Ok(compressed_file)
+}
+
 pub fn compress_to_size(
     input_path: String,
     output_path: String,
@@ -225,7 +249,7 @@ pub fn compress_to_size(
     max_output_size: usize,
 ) -> Result<(), Box<dyn Error>>
 {
-    let file_type = get_filetype(&input_path);
+    let file_type = get_filetype_from_path(&input_path);
     let in_file = fs::read(input_path.clone())?;
     let original_size = in_file.len();
     let tolerance_percentage = 2;
