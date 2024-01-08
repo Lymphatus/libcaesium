@@ -242,16 +242,13 @@ pub fn compress_in_memory(
     Ok(compressed_file)
 }
 
-pub fn compress_to_size(
-    input_path: String,
-    output_path: String,
+pub fn compress_to_size_in_memory(
+    in_file: Vec<u8>,
     parameters: &mut CSParameters,
     max_output_size: usize,
-) -> Result<(), Box<dyn Error>>
-{
-    let file_type = get_filetype_from_path(&input_path);
-    let in_file = fs::read(input_path.clone())?;
-    let original_size = in_file.len();
+) -> Result<Vec<u8>, Box<dyn Error>> {
+    let file_type = get_filetype_from_memory(&in_file);
+
     let tolerance_percentage = 2;
     let tolerance = max_output_size * tolerance_percentage / 100;
     let mut quality = 80;
@@ -259,11 +256,6 @@ pub fn compress_to_size(
     let mut last_high = 101;
     let max_tries: u32 = 10;
     let mut tries: u32 = 0;
-
-    if original_size <= max_output_size {
-        fs::copy(input_path, output_path)?;
-        return Ok(());
-    }
 
     let compressed_file = loop {
         if tries >= max_tries {
@@ -313,6 +305,23 @@ pub fn compress_to_size(
         tries += 1;
     };
 
+    Ok(compressed_file)
+}
+
+pub fn compress_to_size(
+    input_path: String,
+    output_path: String,
+    parameters: &mut CSParameters,
+    max_output_size: usize,
+) -> Result<(), Box<dyn Error>>
+{
+    let in_file = fs::read(input_path.clone())?;
+    let original_size = in_file.len();
+    if original_size <= max_output_size {
+        fs::copy(input_path, output_path)?;
+        return Ok(());
+    }
+    let compressed_file = compress_to_size_in_memory(in_file, parameters, max_output_size)?;
     let mut out_file = File::create(output_path)?;
     out_file.write_all(&compressed_file)?;
 
