@@ -10,14 +10,14 @@ pub fn compress(
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), CaesiumError> {
-    let mut input_file = File::open(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 3100 })?;
+    let mut input_file = File::open(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20300 })?;
 
     let mut input_data = Vec::new();
-    input_file.read_to_end(&mut input_data).map_err(|e| CaesiumError { message: e.to_string(), code: 3101 })?;
+    input_file.read_to_end(&mut input_data).map_err(|e| CaesiumError { message: e.to_string(), code: 20301 })?;
 
-    let mut output_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 3102 })?;
+    let mut output_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20302 })?;
     let compressed_image = compress_to_memory(input_data, parameters)?;
-    output_file.write_all(&compressed_image).map_err(|e| CaesiumError { message: e.to_string(), code: 3103 })?;
+    output_file.write_all(&compressed_image).map_err(|e| CaesiumError { message: e.to_string(), code: 20303 })?;
     Ok(())
 }
 
@@ -28,7 +28,7 @@ pub fn compress_to_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
         Some(img) => img,
         None => return Err(CaesiumError {
             message: "Error decoding WebP image".to_string(),
-            code: 3104,
+            code: 20304,
         })
     };
     let mut input_image = input_webp.to_image();
@@ -41,7 +41,7 @@ pub fn compress_to_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
         Ok(encoder) => encoder,
         Err(e) => return Err(CaesiumError {
             message: e.to_string(),
-            code: 3105,
+            code: 20305,
         })
     };
 

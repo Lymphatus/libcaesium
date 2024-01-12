@@ -28,11 +28,11 @@ pub fn compress(
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), CaesiumError> {
-    let in_file = fs::read(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 2100 })?;
+    let in_file = fs::read(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20100 })?;
 
     let out_buffer = compress_to_memory(in_file, parameters)?;
-    let mut out_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 2101 })?;
-    out_file.write_all(&out_buffer).map_err(|e| CaesiumError { message: e.to_string(), code: 2102 })?;
+    let mut out_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20101 })?;
+    out_file.write_all(&out_buffer).map_err(|e| CaesiumError { message: e.to_string(), code: 20102 })?;
     Ok(())
 }
 
@@ -55,7 +55,7 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
             } else {
                 lossy(in_file, parameters)
             }
-        }).unwrap_or_else(|_| Err(CaesiumError { message: format!("Internal JPEG error: {}", JPEG_ERROR), code: 2104 }))
+        }).unwrap_or_else(|_| Err(CaesiumError { message: format!("Internal JPEG error: {}", JPEG_ERROR), code: 20104 }))
     }
 }
 
