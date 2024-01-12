@@ -26,7 +26,7 @@ pub fn get_filetype_from_memory(buf: &[u8]) -> SupportedFileTypes {
 }
 
 fn match_supported_filetypes(ft: Type) -> SupportedFileTypes {
-    return match ft.mime_type() {
+    match ft.mime_type() {
         "image/jpeg" => SupportedFileTypes::Jpeg,
         "image/png" => SupportedFileTypes::Png,
         "image/gif" => SupportedFileTypes::Gif,

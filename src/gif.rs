@@ -1,19 +1,15 @@
 use std::ffi::CString;
-use std::io;
 use std::os::raw::{c_int, c_void};
 
-use crate::CSParameters;
+use crate::{CaesiumError, CSParameters};
 
 pub fn compress(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
-) -> Result<(), io::Error> {
+) -> Result<(), CaesiumError> {
     if parameters.width > 0 || parameters.height > 0 {
-        return Err(io::Error::new(
-            io::ErrorKind::Other,
-            "GIF resizing is not supported",
-        ));
+        return Err(CaesiumError { message: "GIF resizing is not supported".to_string(), code: 20400 });
     }
 
     if parameters.optimize {
@@ -23,12 +19,12 @@ pub fn compress(
     }
 }
 
-fn lossless(input_path: String, output_path: String) -> Result<(), io::Error> {
+fn lossless(input_path: String, output_path: String) -> Result<(), CaesiumError> {
     let args: Vec<CString> = vec![
-        CString::new(format!("{:?}", std::env::current_exe()))?,
-        CString::new(input_path)?,
-        CString::new(format!("--output={}", output_path))?,
-        CString::new("--optimize=3")?,
+        CString::new(format!("{:?}", std::env::current_exe())).map_err(|e| CaesiumError { message: e.to_string(), code: 20401 })?,
+        CString::new(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20402 })?,
+        CString::new(format!("--output={}", output_path)).map_err(|e| CaesiumError { message: e.to_string(), code: 20403 })?,
+        CString::new("--optimize=3").map_err(|e| CaesiumError { message: e.to_string(), code: 20404 })?,
     ];
 
     let argv: Vec<_> = args.iter().map(|a| a.as_ptr()).collect();
@@ -38,10 +34,7 @@ fn lossless(input_path: String, output_path: String) -> Result<(), io::Error> {
 
         match result {
             0 => Ok(()),
-            _ => Err(io::Error::new(
-                io::ErrorKind::Other,
-                "GIF optimization failed!",
-            )),
+            _ => Err(CaesiumError { message: "GIF optimization failed!".to_string(), code: 20405 }),
         }
     }
 }
@@ -50,15 +43,15 @@ pub fn lossy(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
-) -> Result<(), io::Error> {
+) -> Result<(), CaesiumError> {
     unsafe {
         let input_file = libc::fopen(
-            CString::new(input_path)?.as_ptr(),
-            CString::new("r")?.as_ptr(),
+            CString::new(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20406 })?.as_ptr(),
+            CString::new("r").map_err(|e| CaesiumError { message: e.to_string(), code: 20407 })?.as_ptr(),
         );
         let output_file = libc::fopen(
-            CString::new(output_path)?.as_ptr(),
-            CString::new("w+")?.as_ptr(),
+            CString::new(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20408 })?.as_ptr(),
+            CString::new("w+").map_err(|e| CaesiumError { message: e.to_string(), code: 20409 })?.as_ptr(),
         );
         let input_stream = gifsicle::Gif_ReadFile(input_file);
         libc::fclose(input_file);
@@ -76,10 +69,7 @@ pub fn lossy(
 
         match write_result {
             1 => Ok(()),
-            _ => Err(io::Error::new(
-                io::ErrorKind::Other,
-                "GIF compression failed!",
-            )),
+            _ => Err(CaesiumError { message: "GIF optimization failed!".to_string(), code: 20410 }),
         }
     }
 }

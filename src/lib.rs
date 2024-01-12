@@ -2,7 +2,6 @@ extern crate alloc;
 
 use alloc::ffi::CString;
 use std::{cmp, fs};
-use std::error::Error;
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::Write;
@@ -10,6 +9,31 @@ use std::os::raw::c_char;
 use crate::jpeg::ChromaSubsampling;
 
 use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
+
+use std::fmt;
+
+type Result<T> = std::result::Result<T, CaesiumError>;
+
+#[derive(Debug, Clone)]
+pub struct CaesiumError {
+    message: String,
+    code: u32,
+}
+
+impl fmt::Display for CaesiumError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} [{}]", self.message, self.code)
+    }
+}
+
+impl From<std::io::Error> for CaesiumError {
+    fn from(err: std::io::Error) -> Self {
+        CaesiumError {
+            message: err.to_string(),
+            code: 42, // You can set an appropriate error code here
+        }
+    }
+}
 
 #[cfg(feature = "gif")]
 mod gif;
@@ -39,6 +63,7 @@ pub struct CCSParameters {
 #[repr(C)]
 pub struct CCSResult {
     pub success: bool,
+    pub code: u32,
     pub error_message: *const c_char,
 }
 
@@ -139,7 +164,7 @@ pub unsafe extern "C" fn c_compress_to_size(
     ))
 }
 
-fn c_return_result(result: Result<(), Box<dyn Error>>) -> CCSResult {
+fn c_return_result(result: Result<()>) -> CCSResult {
     let mut error_message = CString::new("").unwrap();
 
     match result {
@@ -148,6 +173,7 @@ fn c_return_result(result: Result<(), Box<dyn Error>>) -> CCSResult {
             std::mem::forget(error_message);
             CCSResult {
                 success: true,
+                code: 0,
                 error_message: em_pointer,
             }
         }
@@ -157,6 +183,7 @@ fn c_return_result(result: Result<(), Box<dyn Error>>) -> CCSResult {
             std::mem::forget(error_message);
             CCSResult {
                 success: false,
+                code: e.code,
                 error_message: em_pointer,
             }
         }
@@ -191,7 +218,7 @@ pub fn compress(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<()> {
     validate_parameters(parameters)?;
     let file_type = get_filetype_from_path(&input_path);
 
@@ -212,7 +239,10 @@ pub fn compress(
         SupportedFileTypes::Gif => {
             gif::compress(input_path, output_path, parameters)?;
         }
-        _ => return Err("Unknown file type".into()),
+        _ => return Err(CaesiumError {
+            message: "Unknown file type".into(),
+            code: 10000,
+        }),
     }
 
     Ok(())
@@ -221,7 +251,7 @@ pub fn compress(
 pub fn compress_in_memory(
     in_file: Vec<u8>,
     parameters: &mut CSParameters,
-) -> Result<Vec<u8>, Box<dyn Error>> {
+) -> Result<Vec<u8>> {
     let file_type = get_filetype_from_memory(in_file.as_slice());
     let compressed_file = match file_type {
         #[cfg(feature = "jpg")]
@@ -236,7 +266,10 @@ pub fn compress_in_memory(
         SupportedFileTypes::WebP => {
             webp::compress_to_memory(in_file, parameters)?
         }
-        _ => return Err("Format not supported for compression to size".into()),
+        _ => return Err(CaesiumError {
+            message: "Format not supported for compression to size".into(),
+            code: 10200,
+        }),
     };
 
     Ok(compressed_file)
@@ -246,7 +279,7 @@ pub fn compress_to_size_in_memory(
     in_file: Vec<u8>,
     parameters: &mut CSParameters,
     max_output_size: usize,
-) -> Result<Vec<u8>, Box<dyn Error>> {
+) -> Result<Vec<u8>> {
     let file_type = get_filetype_from_memory(&in_file);
 
     let tolerance_percentage = 2;
@@ -259,7 +292,10 @@ pub fn compress_to_size_in_memory(
 
     let compressed_file = loop {
         if tries >= max_tries {
-            return Err("Max tries reached".into());
+            return Err(CaesiumError {
+                message: "Max tries reached".into(),
+                code: 10201,
+            });
         }
 
         let compressed_file = match file_type {
@@ -278,7 +314,10 @@ pub fn compress_to_size_in_memory(
                 parameters.webp.quality = quality;
                 webp::compress_to_memory(in_file.clone(), parameters)? //TODO clone
             }
-            _ => return Err("Format not supported for compression to size".into()),
+            _ => return Err(CaesiumError {
+                message: "Format not supported for compression to size".into(),
+                code: 10200,
+            }),
         };
 
         let compressed_file_size = compressed_file.len();
@@ -296,7 +335,7 @@ pub fn compress_to_size_in_memory(
         quality = cmp::max(1, cmp::min(100, (last_high + last_less) / 2));
         if last_quality == quality {
             if quality == 1 && last_high == 1 {
-                return Err("Cannot compress to desired quality".into());
+                return Err(CaesiumError { message: "Cannot compress to desired quality".into(), code: 10202 });
             }
 
             break compressed_file;
@@ -313,7 +352,7 @@ pub fn compress_to_size(
     output_path: String,
     parameters: &mut CSParameters,
     max_output_size: usize,
-) -> Result<(), Box<dyn Error>>
+) -> Result<()>
 {
     let in_file = fs::read(input_path.clone())?;
     let original_size = in_file.len();
@@ -328,25 +367,25 @@ pub fn compress_to_size(
     Ok(())
 }
 
-fn validate_parameters(parameters: &CSParameters) -> Result<(), Box<dyn Error>> {
+fn validate_parameters(parameters: &CSParameters) -> Result<()> {
     if parameters.jpeg.quality == 0 || parameters.jpeg.quality > 100 {
-        return Err("Invalid JPEG quality value".into());
+        return Err(CaesiumError { message: "Invalid JPEG quality value".into(), code: 10001 });
     }
 
     if parameters.png.quality > 100 {
-        return Err("Invalid PNG quality value".into());
+        return Err(CaesiumError { message: "Invalid PNG quality value".into(), code: 10002 });
     }
 
     if parameters.gif.quality > 100 {
-        return Err("Invalid GIF quality value".into());
+        return Err(CaesiumError { message: "Invalid GIF quality value".into(), code: 10003 });
     }
 
     if parameters.webp.quality > 100 {
-        return Err("Invalid WebP quality value".into());
+        return Err(CaesiumError { message: "Invalid WebP quality value".into(), code: 10004 });
     }
 
     if parameters.optimize && parameters.output_size > 0 {
-        return Err("Cannot compress to desired size with lossless optimization".into());
+        return Err(CaesiumError { message: "Cannot compress to desired size with lossless optimization".into(), code: 10005 });
     }
 
     Ok(())

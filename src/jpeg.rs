@@ -1,5 +1,5 @@
 use std::{fs, ptr};
-use std::{io, mem};
+use std::{mem};
 use std::fs::File;
 use std::io::Write;
 use std::panic::catch_unwind;
@@ -9,7 +9,7 @@ use img_parts::{DynImage, ImageEXIF, ImageICC};
 use libc::free;
 use mozjpeg_sys::*;
 
-use crate::CSParameters;
+use crate::{CaesiumError, CSParameters};
 use crate::resize::resize;
 
 static mut JPEG_ERROR: c_int = 0;
@@ -20,23 +20,23 @@ pub enum ChromaSubsampling {
     CS422,
     CS420,
     CS411,
-    Auto
+    Auto,
 }
 
 pub fn compress(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
-) -> Result<(), io::Error> {
-    let in_file = fs::read(input_path)?;
+) -> Result<(), CaesiumError> {
+    let in_file = fs::read(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 2100 })?;
 
     let out_buffer = compress_to_memory(in_file, parameters)?;
-    let mut out_file = File::create(output_path)?;
-    out_file.write_all(&out_buffer)?;
+    let mut out_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 2101 })?;
+    out_file.write_all(&out_buffer).map_err(|e| CaesiumError { message: e.to_string(), code: 2102 })?;
     Ok(())
 }
 
-pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error>
+pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError>
 {
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
@@ -49,20 +49,20 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
     }
 
     unsafe {
-        return catch_unwind(|| {
+        catch_unwind(|| {
             if parameters.optimize {
                 lossless(in_file, parameters)
             } else {
                 lossy(in_file, parameters)
             }
-        }).unwrap_or_else(|_| Err(io::Error::new(io::ErrorKind::Other, format!("Internal JPEG error: {}", JPEG_ERROR))));
+        }).unwrap_or_else(|_| Err(CaesiumError { message: format!("Internal JPEG error: {}", JPEG_ERROR), code: 2104 }))
     }
 }
 
 unsafe fn lossless(
     in_file: Vec<u8>,
     parameters: &CSParameters,
-) -> Result<Vec<u8>, io::Error> {
+) -> Result<Vec<u8>, CaesiumError> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
     let mut src_err = mem::zeroed();
@@ -122,7 +122,7 @@ unsafe fn lossless(
     Ok(result)
 }
 
-unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, io::Error> {
+unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
     let mut src_err = mem::zeroed();
     let mut dst_info: jpeg_compress_struct = mem::zeroed();
