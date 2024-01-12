@@ -49,16 +49,13 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
     }
 
     unsafe {
-        return match catch_unwind(|| {
+        return catch_unwind(|| {
             if parameters.optimize {
                 lossless(in_file, parameters)
             } else {
                 lossy(in_file, parameters)
             }
-        }) {
-            Ok(cb) => cb,
-            Err(_) => Err(io::Error::new(io::ErrorKind::Other, format!("Internal JPEG error: {}", JPEG_ERROR)))
-        };
+        }).unwrap_or_else(|_| Err(io::Error::new(io::ErrorKind::Other, format!("Internal JPEG error: {}", JPEG_ERROR))));
     }
 }
 
