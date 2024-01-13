@@ -16,8 +16,8 @@ type Result<T> = std::result::Result<T, CaesiumError>;
 
 #[derive(Debug, Clone)]
 pub struct CaesiumError {
-    message: String,
-    code: u32,
+    pub message: String,
+    pub code: u32,
 }
 
 impl fmt::Display for CaesiumError {
