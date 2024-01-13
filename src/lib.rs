@@ -26,15 +26,6 @@ impl fmt::Display for CaesiumError {
     }
 }
 
-impl From<std::io::Error> for CaesiumError {
-    fn from(err: std::io::Error) -> Self {
-        CaesiumError {
-            message: err.to_string(),
-            code: 42, // You can set an appropriate error code here
-        }
-    }
-}
-
 #[cfg(feature = "gif")]
 mod gif;
 #[cfg(feature = "jpg")]
@@ -354,15 +345,15 @@ pub fn compress_to_size(
     max_output_size: usize,
 ) -> Result<()>
 {
-    let in_file = fs::read(input_path.clone())?;
+    let in_file = fs::read(input_path.clone()).map_err(|e| CaesiumError { message: e.to_string(), code: 10201 })?;
     let original_size = in_file.len();
     if original_size <= max_output_size {
-        fs::copy(input_path, output_path)?;
+        fs::copy(input_path, output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 10202 })?;
         return Ok(());
     }
     let compressed_file = compress_to_size_in_memory(in_file, parameters, max_output_size)?;
-    let mut out_file = File::create(output_path)?;
-    out_file.write_all(&compressed_file)?;
+    let mut out_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 10203 })?;
+    out_file.write_all(&compressed_file).map_err(|e| CaesiumError { message: e.to_string(), code: 10204 })?;
 
     Ok(())
 }
