@@ -144,6 +144,7 @@ pub unsafe extern "C" fn c_compress_to_size(
     output_path: *const c_char,
     params: CCSParameters,
     max_output_size: usize,
+    return_smallest: bool
 ) -> CCSResult {
     let mut parameters = c_set_parameters(params);
 
@@ -152,6 +153,7 @@ pub unsafe extern "C" fn c_compress_to_size(
         CStr::from_ptr(output_path).to_str().unwrap().to_string(),
         &mut parameters,
         max_output_size,
+        return_smallest
     ))
 }
 
@@ -270,6 +272,7 @@ pub fn compress_to_size_in_memory(
     in_file: Vec<u8>,
     parameters: &mut CSParameters,
     max_output_size: usize,
+    return_smallest: bool
 ) -> Result<Vec<u8>> {
     let file_type = get_filetype_from_memory(&in_file);
 
@@ -326,7 +329,11 @@ pub fn compress_to_size_in_memory(
         quality = cmp::max(1, cmp::min(100, (last_high + last_less) / 2));
         if last_quality == quality {
             if quality == 1 && last_high == 1 {
-                return Err(CaesiumError { message: "Cannot compress to desired quality".into(), code: 10202 });
+                return if return_smallest {
+                    Ok(compressed_file)
+                } else {
+                    Err(CaesiumError { message: "Cannot compress to desired quality".into(), code: 10202 })
+                }
             }
 
             break compressed_file;
@@ -343,6 +350,7 @@ pub fn compress_to_size(
     output_path: String,
     parameters: &mut CSParameters,
     max_output_size: usize,
+    return_smallest: bool
 ) -> Result<()>
 {
     let in_file = fs::read(input_path.clone()).map_err(|e| CaesiumError { message: e.to_string(), code: 10201 })?;
@@ -351,7 +359,7 @@ pub fn compress_to_size(
         fs::copy(input_path, output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 10202 })?;
         return Ok(());
     }
-    let compressed_file = compress_to_size_in_memory(in_file, parameters, max_output_size)?;
+    let compressed_file = compress_to_size_in_memory(in_file, parameters, max_output_size, return_smallest)?;
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 10203 })?;
     out_file.write_all(&compressed_file).map_err(|e| CaesiumError { message: e.to_string(), code: 10204 })?;
 

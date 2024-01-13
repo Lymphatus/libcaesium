@@ -21,8 +21,29 @@ fn compress_to_1_byte() {
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
         &mut pars,
-        1
+        1,
+        false
     ).expect_err("Cannot compress to desired quality");
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn compress_to_1_byte_and_return() {
+    let output = "tests/samples/output/compressed_1b_return.jpg";
+    initialize(output);
+    let mut pars = caesium::initialize_parameters();
+    caesium::compress_to_size(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        &mut pars,
+        1,
+        true
+    ).unwrap();
+
+    assert!(std::path::Path::new(output).exists());
+    assert!(File::open(output).unwrap().metadata().unwrap().len() > 1);
+    let kind = infer::get_from_path(output).unwrap().unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
     remove_compressed_test_file(output)
 }
 
@@ -36,7 +57,8 @@ fn compress_to_10_mb() {
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
         &mut pars,
-        max_output_size
+        max_output_size,
+        false
     ).unwrap();
 
     assert_eq!(80, pars.jpeg.quality);
@@ -60,7 +82,8 @@ fn compress_to_range() {
             String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
             String::from(output),
             &mut pars,
-            max_output_size
+            max_output_size,
+            false
         ).unwrap();
 
         assert!(std::path::Path::new(output).exists());
