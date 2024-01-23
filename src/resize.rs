@@ -1,9 +1,9 @@
 use std::io::Cursor;
 
-use image::DynamicImage;
+use crate::utils::CaesiumError;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
-use crate::CaesiumError;
+use image::DynamicImage;
 
 pub fn resize(
     image_buffer: Vec<u8>,
@@ -13,24 +13,31 @@ pub fn resize(
 ) -> Result<Vec<u8>, CaesiumError> {
     let mut image = ImageReader::new(Cursor::new(image_buffer))
         .with_guessed_format()
-        .map_err(|e| CaesiumError { message: e.to_string(), code: 10300 })?
+        .map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 10300,
+        })?
         .decode()
-        .map_err(|e| CaesiumError { message: e.to_string(), code: 10301 })?;
+        .map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 10301,
+        })?;
 
     let dimensions = compute_dimensions(image.width(), image.height(), width, height);
     image = image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3);
 
     let mut resized_file: Vec<u8> = vec![];
-    image.write_to(&mut Cursor::new(&mut resized_file), format).map_err(|e| CaesiumError { message: e.to_string(), code: 10302 })?;
+    image
+        .write_to(&mut Cursor::new(&mut resized_file), format)
+        .map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 10302,
+        })?;
 
     Ok(resized_file)
 }
 
-pub fn resize_image(
-    image: DynamicImage,
-    width: u32,
-    height: u32,
-) -> DynamicImage {
+pub fn resize_image(image: DynamicImage, width: u32, height: u32) -> DynamicImage {
     let dimensions = compute_dimensions(image.width(), image.height(), width, height);
     image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3)
 }

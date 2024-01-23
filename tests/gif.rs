@@ -1,14 +1,12 @@
-use std::sync::Once;
 use crate::cleanup::remove_compressed_test_file;
+use std::sync::Once;
 
 mod cleanup;
 
 static INIT: Once = Once::new();
 
 pub fn initialize(file: &str) {
-    INIT.call_once(|| {
-        remove_compressed_test_file(file)
-    });
+    INIT.call_once(|| remove_compressed_test_file(file));
 }
 
 // #[test]

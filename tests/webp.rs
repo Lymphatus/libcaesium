@@ -23,7 +23,7 @@ fn compress_20() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
@@ -43,7 +43,7 @@ fn compress_50() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
@@ -63,7 +63,7 @@ fn compress_80() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
@@ -83,7 +83,7 @@ fn compress_100() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
@@ -103,7 +103,7 @@ fn optimize() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
@@ -125,7 +125,7 @@ fn downscale_compress_80() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
@@ -148,7 +148,7 @@ fn downscale_optimize() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),

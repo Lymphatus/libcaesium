@@ -1,5 +1,5 @@
-use std::sync::Once;
 use crate::cleanup::remove_compressed_test_file;
+use std::sync::Once;
 
 mod cleanup;
 

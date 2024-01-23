@@ -86,10 +86,7 @@ fn extract_exif(path: &Path) -> HashMap<String, String> {
     let exif = exif_reader.read_from_container(&mut bufreader).unwrap();
     let mut exif_map = HashMap::new();
     for f in exif.fields() {
-        exif_map.insert(
-            format!("{}", f.tag),
-            f.display_value().to_string(),
-        );
+        exif_map.insert(format!("{}", f.tag), f.display_value().to_string());
     }
 
     exif_map

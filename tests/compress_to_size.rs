@@ -1,6 +1,6 @@
+use crate::cleanup::remove_compressed_test_file;
 use std::fs::File;
 use std::sync::Once;
-use crate::cleanup::remove_compressed_test_file;
 
 mod cleanup;
 
@@ -22,8 +22,9 @@ fn compress_to_1_byte() {
         String::from(output),
         &mut pars,
         1,
-        false
-    ).expect_err("Cannot compress to desired quality");
+        false,
+    )
+    .expect_err("Cannot compress to desired quality");
     remove_compressed_test_file(output)
 }
 
@@ -37,8 +38,9 @@ fn compress_to_1_byte_and_return() {
         String::from(output),
         &mut pars,
         1,
-        true
-    ).unwrap();
+        true,
+    )
+    .unwrap();
 
     assert!(std::path::Path::new(output).exists());
     assert!(File::open(output).unwrap().metadata().unwrap().len() > 1);
@@ -58,8 +60,9 @@ fn compress_to_10_mb() {
         String::from(output),
         &mut pars,
         max_output_size,
-        false
-    ).unwrap();
+        false,
+    )
+    .unwrap();
 
     assert_eq!(80, pars.jpeg.quality);
     assert!(std::path::Path::new(output).exists());
@@ -83,8 +86,9 @@ fn compress_to_range() {
             String::from(output),
             &mut pars,
             max_output_size,
-            false
-        ).unwrap();
+            false,
+        )
+        .unwrap();
 
         assert!(std::path::Path::new(output).exists());
         assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);

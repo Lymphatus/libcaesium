@@ -1,6 +1,6 @@
+use crate::cleanup::remove_compressed_test_file;
 use dssim::Val;
 use std::sync::Once;
-use crate::cleanup::remove_compressed_test_file;
 
 mod cleanup;
 
@@ -106,7 +106,8 @@ fn compress_corrupted_lossy() {
         String::from("tests/samples/corrupted.jpg"),
         String::from(output),
         &pars,
-    ).is_err())
+    )
+    .is_err())
 }
 
 #[test]
@@ -142,7 +143,8 @@ fn compress_corrupted_lossless() {
         String::from("tests/samples/corrupted.jpg"),
         String::from(output),
         &pars,
-    ).is_err());
+    )
+    .is_err());
 }
 
 #[test]

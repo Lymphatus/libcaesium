@@ -1,16 +1,17 @@
-use std::{fs, ptr};
-use std::{mem};
 use std::fs::File;
 use std::io::Write;
+use std::mem;
 use std::panic::catch_unwind;
+use std::{fs, ptr};
 
 use image::ImageOutputFormat::Jpeg;
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 use libc::free;
 use mozjpeg_sys::*;
 
-use crate::{CaesiumError, CSParameters};
 use crate::resize::resize;
+use crate::utils::CaesiumError;
+use crate::CSParameters;
 
 static mut JPEG_ERROR: c_int = 0;
 
@@ -28,16 +29,27 @@ pub fn compress(
     output_path: String,
     parameters: &CSParameters,
 ) -> Result<(), CaesiumError> {
-    let in_file = fs::read(input_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20100 })?;
+    let in_file = fs::read(input_path).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20100,
+    })?;
 
     let out_buffer = compress_to_memory(in_file, parameters)?;
-    let mut out_file = File::create(output_path).map_err(|e| CaesiumError { message: e.to_string(), code: 20101 })?;
-    out_file.write_all(&out_buffer).map_err(|e| CaesiumError { message: e.to_string(), code: 20102 })?;
+    let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20101,
+    })?;
+    out_file.write_all(&out_buffer).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20102,
+    })?;
     Ok(())
 }
 
-pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError>
-{
+pub fn compress_to_memory(
+    mut in_file: Vec<u8>,
+    parameters: &CSParameters,
+) -> Result<Vec<u8>, CaesiumError> {
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
             let metadata = extract_metadata(in_file.clone());
@@ -55,14 +67,17 @@ pub fn compress_to_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
             } else {
                 lossy(in_file, parameters)
             }
-        }).unwrap_or_else(|_| Err(CaesiumError { message: format!("Internal JPEG error: {}", JPEG_ERROR), code: 20104 }))
+        })
+        .unwrap_or_else(|_| {
+            Err(CaesiumError {
+                message: format!("Internal JPEG error: {}", JPEG_ERROR),
+                code: 20104,
+            })
+        })
     }
 }
 
-unsafe fn lossless(
-    in_file: Vec<u8>,
-    parameters: &CSParameters,
-) -> Result<Vec<u8>, CaesiumError> {
+unsafe fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
     let mut src_err = mem::zeroed();
@@ -110,10 +125,7 @@ unsafe fn lossless(
     jpeg_finish_decompress(&mut src_info);
     jpeg_destroy_decompress(&mut src_info);
 
-    let slice = std::slice::from_raw_parts(
-        buf,
-        buf_size as usize,
-    );
+    let slice = std::slice::from_raw_parts(buf, buf_size as usize);
 
     let result = slice.to_vec();
 
@@ -214,10 +226,7 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     jpeg_finish_compress(&mut dst_info);
     jpeg_destroy_compress(&mut dst_info);
 
-    let slice = std::slice::from_raw_parts(
-        buf,
-        buf_size as usize,
-    );
+    let slice = std::slice::from_raw_parts(buf, buf_size as usize);
 
     let result = slice.to_vec();
 
@@ -265,7 +274,10 @@ fn save_metadata(
     }
 }
 
-unsafe fn write_metadata(src_info: &mut jpeg_decompress_struct, dst_info: &mut jpeg_compress_struct) {
+unsafe fn write_metadata(
+    src_info: &mut jpeg_decompress_struct,
+    dst_info: &mut jpeg_compress_struct,
+) {
     let mut marker = src_info.marker_list;
 
     while !marker.is_null() {
@@ -279,8 +291,10 @@ unsafe fn write_metadata(src_info: &mut jpeg_decompress_struct, dst_info: &mut j
     }
 }
 
-unsafe fn set_chroma_subsampling(subsampling: ChromaSubsampling, dst_info: &mut jpeg_compress_struct)
-{
+unsafe fn set_chroma_subsampling(
+    subsampling: ChromaSubsampling,
+    dst_info: &mut jpeg_compress_struct,
+) {
     (*dst_info.comp_info.add(1)).h_samp_factor = 1;
     (*dst_info.comp_info.add(1)).v_samp_factor = 1;
     (*dst_info.comp_info.add(2)).h_samp_factor = 1;
