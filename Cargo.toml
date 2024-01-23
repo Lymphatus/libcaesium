@@ -29,21 +29,21 @@ gif = ["dep:gifsicle", "image/gif"]
 parallel = ["oxipng?/parallel", "imagequant?/threads", "dssim/threads"]
 
 [dependencies]
-mozjpeg-sys = { version = "1.0", optional = true }
-oxipng = { version = "8.0", default-features = false, features = ["filetime", "zopfli"], optional = true }
+mozjpeg-sys = { version = "1.1", optional = true }
+oxipng = { version = "9.0", default-features = false, features = ["filetime", "zopfli"], optional = true }
 libc = "0.2"
-gifsicle = { version = "1.92.5", optional = true }
-webp = { version = "0.2.2", optional = true }
+gifsicle = { version = "1.94", optional = true }
+webp = { version = "0.2.6", optional = true }
 infer = "0.15.0"
-image = { version = "0.24.6", default-features = false }
+image = { version = "0.24.8", default-features = false }
 img-parts = "0.3"
-bytes = "1.1"
-lodepng = { version = "3.7", optional = true }
-imagequant = {version = "4.1", optional = true, default-features = false}
+bytes = "1.5"
+lodepng = { version = "3.10", optional = true }
+imagequant = {version = "4.3", optional = true, default-features = false}
 
 [dev-dependencies]
-dssim = { version = "3.2.0", default-features = false, features = ["no-macos-vimage"] }
-kamadak-exif = "0.5.4"
+dssim = { version = "3.3", default-features = false, features = ["no-macos-vimage"] }
+kamadak-exif = "0.5"
 
 [[bin]]
 name = "main"

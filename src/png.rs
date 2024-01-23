@@ -114,7 +114,7 @@ fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caesium
 fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut oxipng_options = oxipng::Options::default();
     if !parameters.keep_metadata {
-        oxipng_options.strip = oxipng::Headers::Safe;
+        oxipng_options.strip = oxipng::StripChunks::Safe;
     }
 
     if parameters.optimize && parameters.png.force_zopfli {
