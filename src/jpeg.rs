@@ -5,7 +5,8 @@ use std::panic::catch_unwind;
 use std::{fs, ptr};
 
 use image::ImageOutputFormat::Jpeg;
-use img_parts::{DynImage, ImageEXIF, ImageICC};
+use img_parts::jpeg::Jpeg as PartsJpeg;
+use img_parts::{ImageEXIF, ImageICC};
 use libc::free;
 use mozjpeg_sys::*;
 
@@ -236,13 +237,10 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
 }
 
 fn extract_metadata(image: Vec<u8>) -> (Option<img_parts::Bytes>, Option<img_parts::Bytes>) {
-    let (iccp, exif) = DynImage::from_bytes(image.into())
-        .expect("image loaded")
-        .map_or((None, None), |dyn_image| {
-            (dyn_image.icc_profile(), dyn_image.exif())
-        });
-
-    (iccp, exif)
+    match PartsJpeg::from_bytes(image.into()) {
+        Ok(d) => (d.icc_profile(), d.exif()),
+        Err(_) => (None, None),
+    }
 }
 
 //TODO if image is resized, change "PixelXDimension" and "PixelYDimension"
@@ -252,14 +250,11 @@ fn save_metadata(
     exif: Option<img_parts::Bytes>,
 ) -> Vec<u8> {
     if iccp.is_some() || exif.is_some() {
-        let mut dyn_image = match DynImage::from_bytes(img_parts::Bytes::from(image_buffer.clone()))
-        {
-            Ok(o) => match o {
-                None => return image_buffer,
-                Some(d) => d,
-            },
-            Err(_) => return image_buffer,
-        };
+        let mut dyn_image =
+            match PartsJpeg::from_bytes(img_parts::Bytes::from(image_buffer.clone())) {
+                Ok(d) => d,
+                Err(_) => return image_buffer,
+            };
 
         dyn_image.set_icc_profile(iccp);
         dyn_image.set_exif(exif);
