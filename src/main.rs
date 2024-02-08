@@ -12,6 +12,9 @@ fn main() -> ExitCode {
     let parameters = initialize_parameters();
     match compress(input, output, &parameters) {
         Ok(_) => ExitCode::SUCCESS,
-        Err(_) => ExitCode::FAILURE,
+        Err(e) => {
+            eprintln!("{}", e);
+            ExitCode::FAILURE
+        },
     }
 }

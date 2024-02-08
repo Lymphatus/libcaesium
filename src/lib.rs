@@ -21,6 +21,9 @@ mod utils;
 #[cfg(feature = "webp")]
 mod webp;
 
+#[cfg(feature = "heif")]
+mod heif;
+
 #[repr(C)]
 pub struct CCSParameters {
     pub keep_metadata: bool,
@@ -65,11 +68,17 @@ pub struct WebPParameters {
 }
 
 #[derive(Copy, Clone)]
+pub struct HeifParameters {
+    pub quality: u32,
+}
+
+#[derive(Copy, Clone)]
 pub struct CSParameters {
     pub jpeg: JpegParameters,
     pub png: PngParameters,
     pub gif: GifParameters,
     pub webp: WebPParameters,
+    pub heif: HeifParameters,
     pub keep_metadata: bool,
     pub optimize: bool,
     pub width: u32,
@@ -89,14 +98,15 @@ pub fn initialize_parameters() -> CSParameters {
     };
 
     let gif = GifParameters { quality: 80 };
-
     let webp = WebPParameters { quality: 80 };
+    let heif = HeifParameters { quality: 80 };
 
     CSParameters {
         jpeg,
         png,
         gif,
         webp,
+        heif,
         keep_metadata: false,
         optimize: false,
         width: 0,

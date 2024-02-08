@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.14.1"
+version = "0.15.0"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -21,11 +21,12 @@ repository = "https://github.com/Lymphatus/libcaesium"
 license = "Apache-2.0"
 
 [features]
-default = ["jpg", "png", "webp", "gif", "parallel"]
+default = ["jpg", "png", "webp", "gif", "heif", "parallel"]
 jpg = ["dep:mozjpeg-sys", "image/jpeg"]
 png = ["dep:oxipng", "dep:lodepng", "dep:imagequant", "image/png"]
 webp = ["dep:webp", "image/webp"]
 gif = ["dep:gifsicle", "image/gif"]
+heif = ["dep:libheif-rs"]
 parallel = ["oxipng?/parallel", "imagequant?/threads", "dssim/threads"]
 
 [dependencies]
@@ -40,6 +41,7 @@ img-parts = "0.3"
 bytes = "1.5"
 lodepng = { version = "3.10", optional = true }
 imagequant = {version = "4.3", optional = true, default-features = false}
+libheif-rs = { version = "0.22.0", optional = true }
 
 [dev-dependencies]
 dssim = { version = "3.3", default-features = false, features = ["no-macos-vimage"] }
