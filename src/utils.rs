@@ -34,7 +34,7 @@ fn match_supported_filetypes(ft: Type) -> SupportedFileTypes {
         "image/png" => SupportedFileTypes::Png,
         "image/gif" => SupportedFileTypes::Gif,
         "image/webp" => SupportedFileTypes::WebP,
-        "image/heic" => SupportedFileTypes::Heic,
+        "image/heif" => SupportedFileTypes::Heic,
         "image/avif" => SupportedFileTypes::Avif,
         _ => SupportedFileTypes::Unkn,
     }

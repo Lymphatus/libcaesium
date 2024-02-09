@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::Write;
 use std::os::raw::c_char;
 use std::{cmp, fs};
+use libheif_rs::CompressionFormat::{Av1, Hevc};
 use utils::CaesiumError;
 
 #[cfg(feature = "gif")]
@@ -68,7 +69,11 @@ pub struct WebPParameters {
 }
 
 #[derive(Copy, Clone)]
-pub struct HeifParameters {
+pub struct HeicParameters {
+    pub quality: u32,
+}
+#[derive(Copy, Clone)]
+pub struct AvifParameters {
     pub quality: u32,
 }
 
@@ -78,7 +83,8 @@ pub struct CSParameters {
     pub png: PngParameters,
     pub gif: GifParameters,
     pub webp: WebPParameters,
-    pub heif: HeifParameters,
+    pub heic: HeicParameters,
+    pub avif: AvifParameters,
     pub keep_metadata: bool,
     pub optimize: bool,
     pub width: u32,
@@ -99,14 +105,16 @@ pub fn initialize_parameters() -> CSParameters {
 
     let gif = GifParameters { quality: 80 };
     let webp = WebPParameters { quality: 80 };
-    let heif = HeifParameters { quality: 80 };
+    let heic = HeicParameters { quality: 80 };
+    let avif = AvifParameters { quality: 80 };
 
     CSParameters {
         jpeg,
         png,
         gif,
         webp,
-        heif,
+        heic,
+        avif,
         keep_metadata: false,
         optimize: false,
         width: 0,
@@ -226,6 +234,14 @@ pub fn compress(
         SupportedFileTypes::Gif => {
             gif::compress(input_path, output_path, parameters)?;
         }
+        #[cfg(feature = "heif")]
+        SupportedFileTypes::Heic => {
+            heif::compress(input_path, output_path, parameters, Hevc)?;
+        }
+        #[cfg(feature = "heif")]
+        SupportedFileTypes::Avif => {
+            heif::compress(input_path, output_path, parameters, Av1)?;
+        }
         _ => {
             return Err(CaesiumError {
                 message: "Unknown file type".into(),
@@ -249,6 +265,10 @@ pub fn compress_in_memory(
         SupportedFileTypes::Png => png::compress_to_memory(in_file, parameters)?,
         #[cfg(feature = "webp")]
         SupportedFileTypes::WebP => webp::compress_to_memory(in_file, parameters)?,
+        #[cfg(feature = "heif")]
+        SupportedFileTypes::Heic => heif::compress_to_memory(in_file, parameters, Hevc)?,
+        #[cfg(feature = "heif")]
+        SupportedFileTypes::Avif => heif::compress_to_memory(in_file, parameters, Av1)?,
         _ => {
             return Err(CaesiumError {
                 message: "Format not supported for compression to size".into(),

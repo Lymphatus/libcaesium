@@ -1,7 +1,7 @@
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use libheif_rs::{Channel, RgbChroma, ColorSpace, HeifContext, Result, ItemId, LibHeif, CompressionFormat, EncoderQuality};
+use libheif_rs::{ColorSpace, HeifContext, LibHeif, CompressionFormat, EncoderQuality};
 use crate::CSParameters;
 use crate::utils::CaesiumError;
 
@@ -9,7 +9,8 @@ pub fn compress(
     input_path: String,
     output_path: String,
     parameters: &CSParameters,
-) -> std::result::Result<(), CaesiumError> {
+    format: CompressionFormat
+) -> Result<(), CaesiumError> {
     let in_file = fs::read(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20500,
@@ -19,7 +20,7 @@ pub fn compress(
         //TODO Resize
     }
 
-    let compressed_image = compress_to_memory(in_file, parameters)?;
+    let compressed_image = compress_to_memory(in_file, parameters, format)?;
     let mut output_file_buffer = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20502,
@@ -37,7 +38,8 @@ pub fn compress(
 pub fn compress_to_memory(
     in_file: Vec<u8>,
     parameters: &CSParameters,
-) -> std::result::Result<Vec<u8>, CaesiumError> {
+    format: CompressionFormat
+) -> Result<Vec<u8>, CaesiumError> {
     let lib_heif = LibHeif::new();
     let ctx = HeifContext::read_from_bytes(in_file.as_slice())
         .map_err(|e| CaesiumError {
@@ -57,38 +59,47 @@ pub fn compress_to_memory(
     // let exif: Vec<u8> = handle.metadata(meta_ids[0])?;
 
     // Decode the image
-    let image = lib_heif.decode(&handle, ColorSpace::Undefined, None)
+    let mut image = lib_heif.decode(&handle, ColorSpace::Undefined, None)
         .map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 20506,
         })?;
 
-    // Scale the image
-    // let small_img = image.scale(1024, 800, None)?;
+
+    if parameters.width > 0 || parameters.height > 0 {
+        let resized_image = image.scale(parameters.width, parameters.height, None)
+            .map_err(|e| CaesiumError {
+                message: e.to_string(),
+                code: 20511,
+            })?;
+        image = resized_image;
+    }
 
     let mut context = HeifContext::new()
         .map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 20506,
         })?;
-    let mut encoder = lib_heif.encoder_for_format(CompressionFormat::Hevc)
+    let mut encoder = lib_heif.encoder_for_format(format)
         .map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 20507,
         })?;
-    if parameters.optimize {
-        encoder.set_quality(EncoderQuality::LossLess)
-            .map_err(|e| CaesiumError {
-                message: e.to_string(),
-                code: 20508,
-            })?;
+    let encoder_quality = if parameters.optimize {
+        EncoderQuality::LossLess
     } else {
-        encoder.set_quality(EncoderQuality::Lossy(parameters.heif.quality as u8))
-            .map_err(|e| CaesiumError {
-                message: e.to_string(),
-                code: 20509,
-            })?;
-    }
+        let quality = match format {
+            CompressionFormat::Av1 => parameters.avif.quality as u8,
+            CompressionFormat::Hevc => parameters.heic.quality as u8,
+            _ => 80
+        };
+        EncoderQuality::Lossy(quality)
+    };
+    encoder.set_quality(encoder_quality)
+        .map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 20508,
+        })?;
     context.encode_image(&image, &mut encoder, None)
         .map_err(|e| CaesiumError {
             message: e.to_string(),
