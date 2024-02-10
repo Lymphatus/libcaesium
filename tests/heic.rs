@@ -1,5 +1,5 @@
+use libheif_rs::HeifContext;
 use std::sync::Once;
-use libheif_rs::{HeifContext};
 
 use crate::cleanup::remove_compressed_test_file;
 
@@ -119,8 +119,8 @@ fn downscale_compress_80() {
     initialize(output);
     let mut params = caesium::initialize_parameters();
     params.heic.quality = 80;
-    params.width = 350;
-    params.height = 238;
+    params.width = 1512;
+    params.height = 2016;
     caesium::compress(
         String::from("tests/samples/uncompressed.heic"),
         String::from(output),
@@ -134,8 +134,8 @@ fn downscale_compress_80() {
     );
     let ctx = HeifContext::read_from_file(output).unwrap();
     let handle = ctx.primary_image_handle().unwrap();
-    assert_eq!(handle.width(), 350);
-    assert_eq!(handle.height(), 238);
+    assert_eq!(handle.width(), 1512);
+    assert_eq!(handle.height(), 2016);
     remove_compressed_test_file(output)
 }
 
@@ -145,8 +145,8 @@ fn downscale_optimize() {
     initialize(output);
     let mut params = caesium::initialize_parameters();
     params.optimize = true;
-    params.width = 350;
-    params.height = 238;
+    params.width = 1512;
+    params.height = 2016;
     caesium::compress(
         String::from("tests/samples/uncompressed.heic"),
         String::from(output),
@@ -160,7 +160,7 @@ fn downscale_optimize() {
     );
     let ctx = HeifContext::read_from_file(output).unwrap();
     let handle = ctx.primary_image_handle().unwrap();
-    assert_eq!(handle.width(), 350);
-    assert_eq!(handle.height(), 238);
+    assert_eq!(handle.width(), 1512);
+    assert_eq!(handle.height(), 2016);
     remove_compressed_test_file(output)
 }

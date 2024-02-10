@@ -3,12 +3,12 @@ extern crate alloc;
 use crate::jpeg::ChromaSubsampling;
 use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
 use alloc::ffi::CString;
+use libheif_rs::CompressionFormat::{Av1, Hevc};
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::Write;
 use std::os::raw::c_char;
 use std::{cmp, fs};
-use libheif_rs::CompressionFormat::{Av1, Hevc};
 use utils::CaesiumError;
 
 #[cfg(feature = "gif")]

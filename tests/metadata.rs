@@ -15,8 +15,8 @@ pub fn initialize(file: &str) {
 }
 
 #[test]
-fn compress_80_with_metadata() {
-    let output = "tests/samples/output/compressed_80_metadata.jpg";
+fn compress_jpeg_80_with_metadata() {
+    let output = "tests/samples/output/compressed_jpeg_80_metadata.jpg";
     initialize(output);
     let mut pars = caesium::initialize_parameters();
     pars.jpeg.quality = 80;
@@ -36,7 +36,28 @@ fn compress_80_with_metadata() {
 }
 
 #[test]
-fn optimize_with_metadata() {
+fn compress_heic_80_with_metadata() {
+    let output = "tests/samples/output/compressed_heic_80_metadata.heic";
+    initialize(output);
+    let mut pars = caesium::initialize_parameters();
+    pars.jpeg.quality = 80;
+    pars.keep_metadata = true;
+    caesium::compress(
+        String::from("tests/samples/uncompressed.heic"),
+        String::from(output),
+        &pars,
+    )
+    .unwrap();
+    assert!(Path::new(output).exists());
+    assert!(metadata_is_equal(
+        Path::new("tests/samples/uncompressed.heic"),
+        Path::new(output)
+    ));
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn optimize_jpeg_with_metadata() {
     let output = "tests/samples/output/optimized_metadata.jpg";
     initialize(output);
     let mut pars = caesium::initialize_parameters();
@@ -57,7 +78,28 @@ fn optimize_with_metadata() {
 }
 
 #[test]
-fn resize_optimize_with_metadata() {
+fn optimize_heic_with_metadata() {
+    let output = "tests/samples/output/optimized_metadata.heic";
+    initialize(output);
+    let mut pars = caesium::initialize_parameters();
+    pars.optimize = true;
+    pars.keep_metadata = true;
+    caesium::compress(
+        String::from("tests/samples/uncompressed.heic"),
+        String::from(output),
+        &pars,
+    )
+    .unwrap();
+    assert!(Path::new(output).exists());
+    assert!(metadata_is_equal(
+        Path::new("tests/samples/uncompressed.heic"),
+        Path::new(output)
+    ));
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn resize_optimize_jpeg_with_metadata() {
     let output = "tests/samples/output/resized_optimized_metadata.jpg";
     initialize(output);
     let mut pars = caesium::initialize_parameters();
@@ -74,6 +116,29 @@ fn resize_optimize_with_metadata() {
     assert!(Path::new(output).exists());
     assert!(metadata_is_equal(
         Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
+        Path::new(output)
+    ));
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn resize_optimize_heic_with_metadata() {
+    let output = "tests/samples/output/resized_optimized_metadata.heic";
+    initialize(output);
+    let mut pars = caesium::initialize_parameters();
+    pars.optimize = true;
+    pars.keep_metadata = true;
+    pars.width = 200;
+    pars.height = 200;
+    caesium::compress(
+        String::from("tests/samples/uncompressed.heic"),
+        String::from(output),
+        &pars,
+    )
+    .unwrap();
+    assert!(Path::new(output).exists());
+    assert!(metadata_is_equal(
+        Path::new("tests/samples/uncompressed.heic"),
         Path::new(output)
     ));
     remove_compressed_test_file(output)

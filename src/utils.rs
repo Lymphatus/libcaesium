@@ -53,3 +53,8 @@ impl fmt::Display for CaesiumError {
         write!(f, "{} [{}]", self.message, self.code)
     }
 }
+impl CaesiumError {
+    pub fn new(message: String, code: u32) -> Self {
+        Self { message, code }
+    }
+}
