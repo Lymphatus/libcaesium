@@ -1,4 +1,3 @@
-use core::fmt;
 use infer::Type;
 
 pub enum SupportedFileTypes {
@@ -6,6 +5,7 @@ pub enum SupportedFileTypes {
     Png,
     Gif,
     WebP,
+    Tiff,
     Unkn,
 }
 
@@ -32,20 +32,7 @@ fn match_supported_filetypes(ft: Type) -> SupportedFileTypes {
         "image/png" => SupportedFileTypes::Png,
         "image/gif" => SupportedFileTypes::Gif,
         "image/webp" => SupportedFileTypes::WebP,
+        "image/tiff" => SupportedFileTypes::Tiff,
         _ => SupportedFileTypes::Unkn,
-    }
-}
-
-pub type Result<T> = std::result::Result<T, CaesiumError>;
-
-#[derive(Debug, Clone)]
-pub struct CaesiumError {
-    pub message: String,
-    pub code: u32,
-}
-
-impl fmt::Display for CaesiumError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} [{}]", self.message, self.code)
     }
 }

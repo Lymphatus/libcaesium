@@ -10,8 +10,8 @@ use img_parts::{ImageEXIF, ImageICC};
 use libc::free;
 use mozjpeg_sys::*;
 
+use crate::error::CaesiumError;
 use crate::resize::resize;
-use crate::utils::CaesiumError;
 use crate::CSParameters;
 
 static mut JPEG_ERROR: c_int = 0;

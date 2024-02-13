@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use crate::utils::CaesiumError;
+use crate::error::CaesiumError;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
 use image::DynamicImage;

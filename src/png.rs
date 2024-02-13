@@ -6,8 +6,8 @@ use std::num::NonZeroU8;
 use image::ImageOutputFormat;
 use oxipng::Deflaters::{Libdeflater, Zopfli};
 
+use crate::error::CaesiumError;
 use crate::resize::resize;
-use crate::utils::CaesiumError;
 use crate::CSParameters;
 
 pub fn compress(

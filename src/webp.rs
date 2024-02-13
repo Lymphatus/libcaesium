@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::ops::Deref;
 
+use crate::error::CaesiumError;
 use crate::resize::resize_image;
-use crate::utils::CaesiumError;
 use crate::CSParameters;
 
 pub fn compress(
