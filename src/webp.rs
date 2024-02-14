@@ -24,11 +24,13 @@ pub fn compress(
             code: 20301,
         })?;
 
+    let compressed_image = compress_to_memory(input_data, parameters)?;
+    
     let mut output_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20302,
     })?;
-    let compressed_image = compress_to_memory(input_data, parameters)?;
+    
     output_file
         .write_all(&compressed_image)
         .map_err(|e| CaesiumError {
