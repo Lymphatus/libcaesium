@@ -167,7 +167,7 @@ The C options struct is slightly different from the Rust one:
 ```Rust
 #[repr(C)]
 pub struct CCSParameters {
-     pub keep_metadata: bool,
+    pub keep_metadata: bool,
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
     pub png_quality: u32,
