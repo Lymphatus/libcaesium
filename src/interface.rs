@@ -1,7 +1,8 @@
-use crate::jpeg::ChromaSubsampling;
-use crate::{compress, compress_to_size, error, initialize_parameters, CSParameters};
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+
+use crate::jpeg::ChromaSubsampling;
+use crate::{compress, compress_to_size, error, initialize_parameters, CSParameters};
 
 #[repr(C)]
 pub struct CCSParameters {

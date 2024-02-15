@@ -1,14 +1,18 @@
 extern crate alloc;
 
-use crate::jpeg::ChromaSubsampling;
-use crate::tiff::TiffCompression;
-use crate::tiff::TiffCompression::Deflate;
-use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
-use ::tiff::encoder::compression::DeflateLevel;
-use error::CaesiumError;
 use std::fs::File;
 use std::io::Write;
 use std::{cmp, fs};
+
+use ::tiff::encoder::compression::DeflateLevel;
+use ::tiff::encoder::compression::DeflateLevel::Best;
+
+use error::CaesiumError;
+
+use crate::jpeg::ChromaSubsampling;
+use crate::tiff::TiffCompression;
+use crate::tiff::TiffCompression::{Deflate, Lzw, Packbits};
+use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
 
 mod error;
 #[cfg(feature = "gif")]
@@ -20,7 +24,7 @@ pub mod jpeg;
 mod png;
 mod resize;
 #[cfg(feature = "tiff")]
-mod tiff;
+pub mod tiff;
 mod utils;
 #[cfg(feature = "webp")]
 mod webp;
@@ -128,7 +132,7 @@ pub fn compress(
         }
         _ => {
             return Err(CaesiumError {
-                message: "Unknown file type".into(),
+                message: "Unknown file type or file not found".into(),
                 code: 10000,
             });
         }
@@ -178,70 +182,89 @@ pub fn compress_to_size_in_memory(
     let max_tries: u32 = 10;
     let mut tries: u32 = 0;
 
-    let compressed_file = loop {
-        if tries >= max_tries {
-            return Err(CaesiumError {
-                message: "Max tries reached".into(),
-                code: 10201,
-            });
+    let compressed_file = match file_type {
+        #[cfg(feature = "tiff")]
+        SupportedFileTypes::Tiff => {
+            let algorithms = [
+                Lzw,
+                Packbits
+            ];
+            parameters.tiff.deflate_level = Best;
+            parameters.tiff.algorithm = Deflate;
+            let mut smallest_result = tiff::compress_to_memory(in_file.clone(), parameters)?; //TODO clone
+            for tc in algorithms {
+                parameters.tiff.algorithm = tc;
+                let result = tiff::compress_to_memory(in_file.clone(), parameters)?; //TODO clone
+                if result.len() < smallest_result.len() {
+                    smallest_result = result;
+                }
+            }
+            smallest_result
         }
-
-        let compressed_file = match file_type {
-            #[cfg(feature = "jpg")]
-            SupportedFileTypes::Jpeg => {
-                parameters.jpeg.quality = quality;
-                jpeg::compress_to_memory(in_file.clone(), parameters)? //TODO clone
-            }
-            #[cfg(feature = "png")]
-            SupportedFileTypes::Png => {
-                parameters.png.quality = quality;
-                png::compress_to_memory(in_file.clone(), parameters)? //TODO clone
-            }
-            #[cfg(feature = "webp")]
-            SupportedFileTypes::WebP => {
-                parameters.webp.quality = quality;
-                webp::compress_to_memory(in_file.clone(), parameters)? //TODO clone
-            }
-            //TODO Tiff
-            _ => {
+        _ => loop {
+            if tries >= max_tries {
                 return Err(CaesiumError {
-                    message: "Format not supported for compression to size".into(),
-                    code: 10200,
+                    message: "Max tries reached".into(),
+                    code: 10201,
                 });
             }
-        };
 
-        let compressed_file_size = compressed_file.len();
+            let compressed_file = match file_type {
+                #[cfg(feature = "jpg")]
+                SupportedFileTypes::Jpeg => {
+                    parameters.jpeg.quality = quality;
+                    jpeg::compress_to_memory(in_file.clone(), parameters)? //TODO clone
+                }
+                #[cfg(feature = "png")]
+                SupportedFileTypes::Png => {
+                    parameters.png.quality = quality;
+                    png::compress_to_memory(in_file.clone(), parameters)? //TODO clone
+                }
+                #[cfg(feature = "webp")]
+                SupportedFileTypes::WebP => {
+                    parameters.webp.quality = quality;
+                    webp::compress_to_memory(in_file.clone(), parameters)? //TODO clone
+                }
+                _ => {
+                    return Err(CaesiumError {
+                        message: "Format not supported for compression to size".into(),
+                        code: 10200,
+                    });
+                }
+            };
 
-        if compressed_file_size <= max_output_size
-            && max_output_size - compressed_file_size < tolerance
-        {
-            break compressed_file;
-        }
+            let compressed_file_size = compressed_file.len();
 
-        if compressed_file_size <= max_output_size {
-            last_less = quality;
-        } else {
-            last_high = quality;
-        }
-        let last_quality = quality;
-        quality = cmp::max(1, cmp::min(100, (last_high + last_less) / 2));
-        if last_quality == quality {
-            if quality == 1 && last_high == 1 {
-                return if return_smallest {
-                    Ok(compressed_file)
-                } else {
-                    Err(CaesiumError {
-                        message: "Cannot compress to desired quality".into(),
-                        code: 10202,
-                    })
-                };
+            if compressed_file_size <= max_output_size
+                && max_output_size - compressed_file_size < tolerance
+            {
+                break compressed_file;
             }
 
-            break compressed_file;
-        }
+            if compressed_file_size <= max_output_size {
+                last_less = quality;
+            } else {
+                last_high = quality;
+            }
+            let last_quality = quality;
+            quality = cmp::max(1, cmp::min(100, (last_high + last_less) / 2));
+            if last_quality == quality {
+                if quality == 1 && last_high == 1 {
+                    return if return_smallest {
+                        Ok(compressed_file)
+                    } else {
+                        Err(CaesiumError {
+                            message: "Cannot compress to desired quality".into(),
+                            code: 10202,
+                        })
+                    };
+                }
 
-        tries += 1;
+                break compressed_file;
+            }
+
+            tries += 1;
+        },
     };
 
     Ok(compressed_file)

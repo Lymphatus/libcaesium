@@ -1,12 +1,14 @@
-use crate::error::CaesiumError;
-use crate::CSParameters;
-use image::ImageFormat::Tiff;
 use std::fs::File;
 use std::io::{Cursor, Read, Write};
+
+use image::ImageFormat::Tiff;
 use tiff::encoder::colortype::{RGB8, RGBA8};
 use tiff::encoder::compression::{Deflate, Lzw, Packbits, Uncompressed};
 use tiff::encoder::TiffEncoder;
+
+use crate::error::CaesiumError;
 use crate::resize::resize_image;
+use crate::CSParameters;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum TiffCompression {
@@ -40,7 +42,7 @@ pub fn compress(
         message: e.to_string(),
         code: 20502,
     })?;
-    
+
     output_file
         .write_all(&compressed_image)
         .map_err(|e| CaesiumError {
@@ -72,6 +74,7 @@ pub fn compress_to_memory(
         message: e.to_string(),
         code: 20505,
     })?;
+
     let compression_result = match parameters.tiff.algorithm {
         TiffCompression::Deflate => match color_type {
             image::ColorType::Rgb8 => encoder.write_image_with_compression::<RGB8, Deflate>(

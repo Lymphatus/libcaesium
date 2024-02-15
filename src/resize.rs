@@ -1,9 +1,10 @@
 use std::io::Cursor;
 
-use crate::error::CaesiumError;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
 use image::DynamicImage;
+
+use crate::error::CaesiumError;
 
 pub fn resize(
     image_buffer: Vec<u8>,
