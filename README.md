@@ -47,6 +47,7 @@ pub struct CSParameters {
     pub png: png::Parameters,
     pub gif: gif::Parameters,
     pub webp: webp::Parameters,
+    pub tiff: tiff::Parameters,
     pub keep_metadata: bool,
     pub optimize: bool,
     pub width: u32,
@@ -96,6 +97,16 @@ pub struct Parameters {
 }
 ```
 - `quality`: in a range from 0 to 100, the quality of the resulting image. If the optimization flag is `true`, this option will be ignored. Default: `60`.
+
+#### tiff
+Supported TIFF compression is only lossless. The supported algorithms are: Lzw, Deflate, Packbits, Uncompressed.
+```Rust
+pub struct Parameters {
+    pub algorithm: TiffCompression,
+    pub deflate_level: DeflateLevel,
+}
+```
+- `deflate_level`: can be one of `Fast`, `Balanced`, `Best`.
 
 _________________
 
@@ -156,13 +167,15 @@ The C options struct is slightly different from the Rust one:
 ```Rust
 #[repr(C)]
 pub struct CCSParameters {
-    pub keep_metadata: bool,
+     pub keep_metadata: bool,
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
     pub png_quality: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
+    pub tiff_compression: u32,
+    pub tiff_deflate_level: u32,
     pub optimize: bool,
     pub width: u32,
     pub height: u32,
@@ -170,6 +183,8 @@ pub struct CCSParameters {
 ```
 The option description is the same as the Rust counterpart.
 Valid values for `jpeg_chroma_subsampling` are [444, 422, 420, 411]. Any other value will be ignored and will be used the default option.
+Valid values for `tiff_compression` are [0 (Uncompressed), 1 (Lzw), 2 (Deflate), 3 (Packbits)]. Any other value will be ignored and `0` will be used.
+Valid values for `tiff_deflate_level` are [3 (Fast), 6 (Balanced), 9 (Best)]. Any other value will be ignored and `Best` will be used.
 
 ## Download
 Binaries not available. Please refer to the compilation section below.

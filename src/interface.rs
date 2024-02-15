@@ -1,8 +1,10 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+use tiff::encoder::compression::DeflateLevel::{Balanced, Best, Fast};
 
 use crate::jpeg::ChromaSubsampling;
 use crate::{compress, compress_to_size, error, initialize_parameters, CSParameters};
+use crate::tiff::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
 
 #[repr(C)]
 pub struct CCSParameters {
@@ -13,6 +15,8 @@ pub struct CCSParameters {
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
+    pub tiff_compression: u32,
+    pub tiff_deflate_level: u32,
     pub optimize: bool,
     pub width: u32,
     pub height: u32,
@@ -106,6 +110,19 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
         420 => ChromaSubsampling::CS420,
         411 => ChromaSubsampling::CS411,
         _ => ChromaSubsampling::Auto,
+    };
+
+    parameters.tiff.algorithm = match params.tiff_compression {
+        1 => Lzw,
+        2 => Deflate,
+        3 => Packbits,
+        _ => Uncompressed
+    };
+
+    parameters.tiff.deflate_level = match params.tiff_deflate_level {
+        3 => Fast,
+        6 => Balanced,
+        _ => Best
     };
 
     parameters

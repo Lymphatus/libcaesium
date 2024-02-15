@@ -12,10 +12,10 @@ use crate::CSParameters;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum TiffCompression {
-    Lzw,
-    Deflate,
-    Packbits,
-    Uncompressed,
+    Uncompressed = 0,
+    Lzw = 1,
+    Deflate = 2,
+    Packbits = 3,
 }
 
 pub fn compress(

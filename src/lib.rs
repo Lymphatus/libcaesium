@@ -199,7 +199,14 @@ pub fn compress_to_size_in_memory(
                     smallest_result = result;
                 }
             }
-            smallest_result
+            return if return_smallest {
+                Ok(smallest_result)
+            } else {
+                Err(CaesiumError {
+                    message: "Cannot compress to desired quality".into(),
+                    code: 10202,
+                })
+            };
         }
         _ => loop {
             if tries >= max_tries {
