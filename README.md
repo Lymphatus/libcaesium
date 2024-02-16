@@ -74,11 +74,13 @@ pub struct Parameters {
 ```Rust
 pub struct Parameters {
     pub quality: u32,
-    pub force_zopfli: bool
+    pub force_zopfli: bool,
+    pub deflater_level: u32
 }
 ```
 - `quality`: in a range from 0 to 100, the quality of the resulting image. Default `80`.
 - `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image, but it may take minutes to finish the process. Default `false`.
+- `optimization_level`: if `optimization` is `true` will set the level of oxipng optimization, from 1 to 6. Default `3`.
 
 #### gif
 GIF support is experimental, has many know issues and does not support optimization. Expect bugs (especially on Windows).
@@ -171,6 +173,7 @@ pub struct CCSParameters {
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
     pub png_quality: u32,
+    pub png_optimization_level: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,

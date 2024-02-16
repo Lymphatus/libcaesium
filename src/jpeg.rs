@@ -1,18 +1,18 @@
+use std::{fs, ptr};
 use std::fs::File;
 use std::io::Write;
 use std::mem;
 use std::panic::catch_unwind;
-use std::{fs, ptr};
 
 use image::ImageOutputFormat::Jpeg;
-use img_parts::jpeg::Jpeg as PartsJpeg;
 use img_parts::{ImageEXIF, ImageICC};
+use img_parts::jpeg::Jpeg as PartsJpeg;
 use libc::free;
 use mozjpeg_sys::*;
 
+use crate::CSParameters;
 use crate::error::CaesiumError;
 use crate::resize::resize;
-use crate::CSParameters;
 
 static mut JPEG_ERROR: c_int = 0;
 

@@ -4,11 +4,11 @@ use std::io::Write;
 use std::num::NonZeroU8;
 
 use image::ImageOutputFormat;
-use oxipng::Deflaters::{Libdeflater, Zopfli};
+use oxipng::Deflaters::Zopfli;
 
+use crate::CSParameters;
 use crate::error::CaesiumError;
 use crate::resize::resize;
-use crate::CSParameters;
 
 pub fn compress(
     input_path: String,
@@ -122,8 +122,7 @@ fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caes
             iterations: NonZeroU8::new(15).unwrap(),
         };
     } else {
-        oxipng_options = oxipng::Options::from_preset(3);
-        oxipng_options.deflate = Libdeflater { compression: 6 };
+        oxipng_options = oxipng::Options::from_preset(parameters.png.optimization_level);
     }
 
     let optimized_png =

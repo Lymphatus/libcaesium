@@ -1,8 +1,8 @@
 extern crate alloc;
 
+use std::{cmp, fs};
 use std::fs::File;
 use std::io::Write;
-use std::{cmp, fs};
 
 use ::tiff::encoder::compression::DeflateLevel;
 use ::tiff::encoder::compression::DeflateLevel::Best;
@@ -39,6 +39,7 @@ pub struct JpegParameters {
 pub struct PngParameters {
     pub quality: u32,
     pub force_zopfli: bool,
+    pub optimization_level: u8
 }
 
 #[derive(Copy, Clone)]
@@ -79,6 +80,7 @@ pub fn initialize_parameters() -> CSParameters {
     let png = PngParameters {
         quality: 80,
         force_zopfli: false,
+        optimization_level: 3,
     };
     let gif = GifParameters { quality: 80 };
     let webp = WebPParameters { quality: 80 };
@@ -324,6 +326,13 @@ fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
         return Err(CaesiumError {
             message: "Invalid PNG quality value".into(),
             code: 10002,
+        });
+    }
+
+    if parameters.png.optimization_level > 6 {
+        return Err(CaesiumError {
+            message: "Invalid PNG optimization level".into(),
+            code: 10006,
         });
     }
 

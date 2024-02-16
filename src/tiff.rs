@@ -6,9 +6,9 @@ use tiff::encoder::colortype::{RGB8, RGBA8};
 use tiff::encoder::compression::{Deflate, Lzw, Packbits, Uncompressed};
 use tiff::encoder::TiffEncoder;
 
+use crate::CSParameters;
 use crate::error::CaesiumError;
 use crate::resize::resize_image;
-use crate::CSParameters;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum TiffCompression {

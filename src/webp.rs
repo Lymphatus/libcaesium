@@ -2,9 +2,9 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::ops::Deref;
 
+use crate::CSParameters;
 use crate::error::CaesiumError;
 use crate::resize::resize_image;
-use crate::CSParameters;
 
 pub fn compress(
     input_path: String,
