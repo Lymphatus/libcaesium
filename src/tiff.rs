@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{Cursor, Read, Write};
+use std::panic;
 
 use image::ImageFormat::Tiff;
 use tiff::encoder::colortype::{RGB8, RGBA8};
@@ -56,12 +57,26 @@ pub fn compress_to_memory(
     in_file: Vec<u8>,
     parameters: &CSParameters,
 ) -> Result<Vec<u8>, CaesiumError> {
-    let mut image = image::load_from_memory_with_format(in_file.as_slice(), Tiff).map_err(|e| {
-        CaesiumError {
-            message: e.to_string(),
-            code: 20504,
+    let decoding_result =
+        match panic::catch_unwind(|| image::load_from_memory_with_format(in_file.as_slice(), Tiff))
+        {
+            Ok(i) => i,
+            Err(_) => {
+                return Err(CaesiumError {
+                    message: "Failed to decode TIFF image".to_string(),
+                    code: 20504,
+                });
+            }
+        };
+    let mut image = match decoding_result {
+        Ok(i) => i,
+        Err(e) => {
+            return Err(CaesiumError {
+                message: e.to_string(),
+                code: 20504,
+            })
         }
-    })?;
+    };
 
     if parameters.width > 0 || parameters.height > 0 {
         image = resize_image(image, parameters.width, parameters.height);

@@ -209,3 +209,16 @@ fn unsupported() {
         &params,
     ).is_err());
 }
+
+#[test]
+fn prevent_panic() {
+    let output = "tests/samples/output/panic.tif";
+    initialize(output);
+    let mut params = caesium::initialize_parameters();
+    params.tiff.algorithm = caesium::tiff::TiffCompression::Lzw;
+    assert!(caesium::compress(
+        String::from("tests/samples/unsupported.tif"),
+        String::from(output),
+        &params,
+    ).is_err());
+}
