@@ -75,7 +75,7 @@ pub struct Parameters {
 pub struct Parameters {
     pub quality: u32,
     pub force_zopfli: bool,
-    pub deflater_level: u32
+    pub optimization_level: u32
 }
 ```
 - `quality`: in a range from 0 to 100, the quality of the resulting image. Default `80`.
