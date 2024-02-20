@@ -13,7 +13,7 @@ pub struct CCSParameters {
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
     pub png_quality: u32,
-    pub png_optimization_level: bool,
+    pub png_optimization_level: u32,
     pub png_force_zopfli: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
