@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Write;
 use std::num::NonZeroU8;
 
-use image::ImageOutputFormat;
+use image::ImageFormat;
 use oxipng::Deflaters::Zopfli;
 
 use crate::CSParameters;
@@ -25,7 +25,7 @@ pub fn compress(
             in_file,
             parameters.width,
             parameters.height,
-            ImageOutputFormat::Png,
+            ImageFormat::Png,
         )?;
     }
 

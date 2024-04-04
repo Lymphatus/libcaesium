@@ -10,7 +10,7 @@ pub fn resize(
     image_buffer: Vec<u8>,
     width: u32,
     height: u32,
-    format: image::ImageOutputFormat,
+    format: image::ImageFormat,
 ) -> Result<Vec<u8>, CaesiumError> {
     let mut image = ImageReader::new(Cursor::new(image_buffer))
         .with_guessed_format()

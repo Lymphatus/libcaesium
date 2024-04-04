@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.15.2"
+version = "0.15.3"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -34,9 +34,9 @@ mozjpeg-sys = { version = "1.1", optional = true }
 oxipng = { version = "9.0", default-features = false, features = ["filetime", "zopfli"], optional = true }
 libc = "0.2"
 gifsicle = { version = "1.94", optional = true }
-webp = { version = "0.2.6", optional = true }
+webp = { version = "0.2.7", optional = true }
 infer = "0.15.0"
-image = { version = "0.24.8", default-features = false }
+image = { version = "0.25.1", default-features = false }
 img-parts = "0.3"
 bytes = "1.5"
 lodepng = { version = "3.10", optional = true }

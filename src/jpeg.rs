@@ -4,7 +4,7 @@ use std::io::Write;
 use std::mem;
 use std::panic::catch_unwind;
 
-use image::ImageOutputFormat::Jpeg;
+use image::ImageFormat::Jpeg;
 use img_parts::{ImageEXIF, ImageICC};
 use img_parts::jpeg::Jpeg as PartsJpeg;
 use libc::free;
@@ -54,10 +54,10 @@ pub fn compress_to_memory(
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
             let metadata = extract_metadata(in_file.clone());
-            in_file = resize(in_file, parameters.width, parameters.height, Jpeg(80))?;
+            in_file = resize(in_file, parameters.width, parameters.height, Jpeg)?;
             in_file = save_metadata(in_file, metadata.0, metadata.1);
         } else {
-            in_file = resize(in_file, parameters.width, parameters.height, Jpeg(80))?;
+            in_file = resize(in_file, parameters.width, parameters.height, Jpeg)?;
         }
     }
 
