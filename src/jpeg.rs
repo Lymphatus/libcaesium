@@ -306,9 +306,9 @@ unsafe fn set_chroma_subsampling(
     }
 }
 
-unsafe extern "C" fn error_handler(cinfo: &mut jpeg_common_struct) {
+unsafe extern "C-unwind" fn error_handler(cinfo: &mut jpeg_common_struct) {
     JPEG_ERROR = (*cinfo.err).msg_code;
     panic!("Internal JPEG error: {}", JPEG_ERROR);
 }
 
-unsafe extern "C" fn error_message_handler(_cinfo: &mut jpeg_common_struct) {}
+unsafe extern "C-unwind" fn error_message_handler(_cinfo: &mut jpeg_common_struct) {}

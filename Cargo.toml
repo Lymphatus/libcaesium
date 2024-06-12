@@ -30,7 +30,7 @@ tiff = ["image/tiff"]
 parallel = ["oxipng?/parallel", "imagequant?/threads", "dssim/threads"]
 
 [dependencies]
-mozjpeg-sys = { version = "1.1", optional = true }
+mozjpeg-sys = { version = "2.2", optional = true }
 oxipng = { version = "9.0", default-features = false, features = ["filetime", "zopfli"], optional = true }
 libc = "0.2"
 gifsicle = { version = "1.94", optional = true }
