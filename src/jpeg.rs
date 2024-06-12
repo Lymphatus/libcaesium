@@ -10,20 +10,11 @@ use img_parts::jpeg::Jpeg as PartsJpeg;
 use libc::free;
 use mozjpeg_sys::*;
 
-use crate::CSParameters;
+use crate::{ChromaSubsampling, CSParameters};
 use crate::error::CaesiumError;
 use crate::resize::resize;
 
 static mut JPEG_ERROR: c_int = 0;
-
-#[derive(Copy, Clone, PartialEq)]
-pub enum ChromaSubsampling {
-    CS444,
-    CS422,
-    CS420,
-    CS411,
-    Auto,
-}
 
 pub fn compress(
     input_path: String,

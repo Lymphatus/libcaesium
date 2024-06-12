@@ -7,17 +7,9 @@ use tiff::encoder::colortype::{RGB8, RGBA8};
 use tiff::encoder::compression::{Deflate, Lzw, Packbits, Uncompressed};
 use tiff::encoder::TiffEncoder;
 
-use crate::CSParameters;
+use crate::{CSParameters, TiffCompression};
 use crate::error::CaesiumError;
 use crate::resize::resize_image;
-
-#[derive(Copy, Clone, PartialEq)]
-pub enum TiffCompression {
-    Uncompressed = 0,
-    Lzw = 1,
-    Deflate = 2,
-    Packbits = 3,
-}
 
 pub fn compress(
     input_path: String,

@@ -3,9 +3,8 @@ use std::os::raw::c_char;
 
 use tiff::encoder::compression::DeflateLevel::{Balanced, Best, Fast};
 
-use crate::{compress, compress_to_size, CSParameters, error, initialize_parameters};
-use crate::jpeg::ChromaSubsampling;
-use crate::tiff::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
+use crate::{ChromaSubsampling, compress, compress_to_size, CSParameters, error, initialize_parameters};
+use crate::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
 
 #[repr(C)]
 pub struct CCSParameters {
@@ -106,7 +105,7 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
     parameters.webp.quality = params.webp_quality;
     parameters.width = params.width;
     parameters.height = params.height;
-
+    
     parameters.jpeg.chroma_subsampling = match params.jpeg_chroma_subsampling {
         444 => ChromaSubsampling::CS444,
         422 => ChromaSubsampling::CS422,

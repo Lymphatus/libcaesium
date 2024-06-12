@@ -8,13 +8,11 @@ use ::tiff::encoder::compression::DeflateLevel;
 use ::tiff::encoder::compression::DeflateLevel::Best;
 
 use error::CaesiumError;
+use crate::TiffCompression::{Deflate, Lzw, Packbits};
 
-use crate::jpeg::ChromaSubsampling;
-use crate::tiff::TiffCompression;
-use crate::tiff::TiffCompression::{Deflate, Lzw, Packbits};
 use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
 
-mod error;
+pub mod error;
 #[cfg(feature = "gif")]
 mod gif;
 mod interface;
@@ -28,6 +26,23 @@ pub mod tiff;
 mod utils;
 #[cfg(feature = "webp")]
 mod webp;
+
+#[derive(Copy, Clone, PartialEq)]
+pub enum ChromaSubsampling {
+    CS444,
+    CS422,
+    CS420,
+    CS411,
+    Auto,
+}
+
+#[derive(Copy, Clone, PartialEq)]
+pub enum TiffCompression {
+    Uncompressed = 0,
+    Lzw = 1,
+    Deflate = 2,
+    Packbits = 3,
+}
 
 #[derive(Copy, Clone)]
 pub struct JpegParameters {
