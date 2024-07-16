@@ -8,9 +8,9 @@ use ::tiff::encoder::compression::DeflateLevel;
 use ::tiff::encoder::compression::DeflateLevel::Best;
 
 use error::CaesiumError;
-use crate::TiffCompression::{Deflate, Lzw, Packbits};
 
-use crate::utils::{get_filetype_from_memory, get_filetype_from_path, SupportedFileTypes};
+use crate::TiffCompression::{Deflate, Lzw, Packbits};
+use crate::utils::{get_filetype_from_memory, get_filetype_from_path};
 
 pub mod error;
 #[cfg(feature = "gif")]
@@ -26,6 +26,7 @@ pub mod tiff;
 mod utils;
 #[cfg(feature = "webp")]
 mod webp;
+mod convert;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum ChromaSubsampling {
@@ -54,7 +55,7 @@ pub struct JpegParameters {
 pub struct PngParameters {
     pub quality: u32,
     pub force_zopfli: bool,
-    pub optimization_level: u8
+    pub optimization_level: u8,
 }
 
 #[derive(Copy, Clone)]
@@ -160,18 +161,18 @@ pub fn compress(
 
 pub fn compress_in_memory(
     in_file: Vec<u8>,
-    parameters: &mut CSParameters,
+    parameters: &CSParameters,
 ) -> error::Result<Vec<u8>> {
     let file_type = get_filetype_from_memory(in_file.as_slice());
     let compressed_file = match file_type {
         #[cfg(feature = "jpg")]
-        SupportedFileTypes::Jpeg => jpeg::compress_to_memory(in_file, parameters)?,
+        SupportedFileTypes::Jpeg => jpeg::compress_in_memory(in_file, parameters)?,
         #[cfg(feature = "png")]
-        SupportedFileTypes::Png => png::compress_to_memory(in_file, parameters)?,
+        SupportedFileTypes::Png => png::compress_in_memory(in_file, parameters)?,
         #[cfg(feature = "webp")]
-        SupportedFileTypes::WebP => webp::compress_to_memory(in_file, parameters)?,
+        SupportedFileTypes::WebP => webp::compress_in_memory(in_file, parameters)?,
         #[cfg(feature = "tiff")]
-        SupportedFileTypes::Tiff => tiff::compress_to_memory(in_file, parameters)?,
+        SupportedFileTypes::Tiff => tiff::compress_in_memory(in_file, parameters)?,
         _ => {
             return Err(CaesiumError {
                 message: "Format not supported for compression to size".into(),
@@ -208,10 +209,10 @@ pub fn compress_to_size_in_memory(
             ];
             parameters.tiff.deflate_level = Best;
             parameters.tiff.algorithm = Deflate;
-            let mut smallest_result = tiff::compress_to_memory(in_file.clone(), parameters)?; //TODO clone
+            let mut smallest_result = tiff::compress_in_memory(in_file.clone(), parameters)?; //TODO clone
             for tc in algorithms {
                 parameters.tiff.algorithm = tc;
-                let result = tiff::compress_to_memory(in_file.clone(), parameters)?; //TODO clone
+                let result = tiff::compress_in_memory(in_file.clone(), parameters)?; //TODO clone
                 if result.len() < smallest_result.len() {
                     smallest_result = result;
                 }
@@ -237,17 +238,17 @@ pub fn compress_to_size_in_memory(
                 #[cfg(feature = "jpg")]
                 SupportedFileTypes::Jpeg => {
                     parameters.jpeg.quality = quality;
-                    jpeg::compress_to_memory(in_file.clone(), parameters)? //TODO clone
+                    jpeg::compress_in_memory(in_file.clone(), parameters)? //TODO clone
                 }
                 #[cfg(feature = "png")]
                 SupportedFileTypes::Png => {
                     parameters.png.quality = quality;
-                    png::compress_to_memory(in_file.clone(), parameters)? //TODO clone
+                    png::compress_in_memory(in_file.clone(), parameters)? //TODO clone
                 }
                 #[cfg(feature = "webp")]
                 SupportedFileTypes::WebP => {
                     parameters.webp.quality = quality;
-                    webp::compress_to_memory(in_file.clone(), parameters)? //TODO clone
+                    webp::compress_in_memory(in_file.clone(), parameters)? //TODO clone
                 }
                 _ => {
                     return Err(CaesiumError {
@@ -329,6 +330,42 @@ pub fn compress_to_size(
     Ok(())
 }
 
+pub fn convert(input_path: String, output_path: String, format: SupportedFileTypes, parameters: &CSParameters) -> Result<(), CaesiumError> {
+
+    let file_type = get_filetype_from_path(&input_path);
+
+    if file_type == format {
+        return Err(CaesiumError {
+            message: "Cannot convert to the same format".into(),
+            code: 10406,
+        });
+    }
+
+    let in_file = fs::read(input_path).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10410,
+    })?;
+    let output_buffer = convert_in_memory(in_file, format, parameters).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10411,
+    })?;
+
+    let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10412,
+    })?;
+
+    out_file.write_all(&output_buffer).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10413,
+    })?;
+
+    Ok(())
+}
+pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+    convert::convert_in_memory(in_file, format, parameters)
+}
+
 fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
     if parameters.jpeg.quality == 0 || parameters.jpeg.quality > 100 {
         return Err(CaesiumError {
@@ -373,4 +410,14 @@ fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
     }
 
     Ok(())
+}
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum SupportedFileTypes {
+    Jpeg,
+    Png,
+    Gif,
+    WebP,
+    Tiff,
+    Unkn,
 }

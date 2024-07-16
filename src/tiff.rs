@@ -29,7 +29,7 @@ pub fn compress(
             code: 20501,
         })?;
 
-    let compressed_image = compress_to_memory(input_data, parameters)?;
+    let compressed_image = compress_in_memory(input_data, parameters)?;
 
     let mut output_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
@@ -45,7 +45,7 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_to_memory(
+pub fn compress_in_memory(
     in_file: Vec<u8>,
     parameters: &CSParameters,
 ) -> Result<Vec<u8>, CaesiumError> {

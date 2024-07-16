@@ -1,13 +1,5 @@
 use infer::Type;
-
-pub enum SupportedFileTypes {
-    Jpeg,
-    Png,
-    Gif,
-    WebP,
-    Tiff,
-    Unkn,
-}
+use crate::SupportedFileTypes;
 
 pub fn get_filetype_from_path(file_path: &str) -> SupportedFileTypes {
     match infer::get_from_path(file_path) {

@@ -1,6 +1,5 @@
 use std::env;
 use std::process::ExitCode;
-
 use caesium::{compress, initialize_parameters};
 
 fn main() -> ExitCode {

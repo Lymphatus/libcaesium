@@ -2,6 +2,10 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::ops::Deref;
 
+use bytes::Bytes;
+use img_parts::{DynImage, ImageEXIF, ImageICC};
+use img_parts::webp::WebP as PartsWebp;
+
 use crate::CSParameters;
 use crate::error::CaesiumError;
 use crate::resize::resize_image;
@@ -24,7 +28,7 @@ pub fn compress(
             code: 20301,
         })?;
 
-    let compressed_image = compress_to_memory(input_data, parameters)?;
+    let compressed_image = compress_in_memory(input_data, parameters)?;
 
     let mut output_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
@@ -40,11 +44,24 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_to_memory(
+pub fn compress_in_memory(
     in_file: Vec<u8>,
     parameters: &CSParameters,
 ) -> Result<Vec<u8>, CaesiumError> {
+    let mut iccp: Option<Bytes> = None;
+    let mut exif: Option<Bytes> = None;
+    
     let decoder = webp::Decoder::new(&in_file);
+
+    if parameters.keep_metadata {
+        (iccp, exif) = DynImage::from_bytes(in_file.clone().into())
+            .map_err(|e| CaesiumError {
+                message: e.to_string(),
+                code: 20306,
+            })?
+            .map_or((None, None), |dimg| (dimg.icc_profile(), dimg.exif()));
+    }
+
     let input_webp = match decoder.decode() {
         Some(img) => img,
         None => {
@@ -54,6 +71,7 @@ pub fn compress_to_memory(
             })
         }
     };
+
     let mut input_image = input_webp.to_image();
     let must_resize = parameters.width > 0 || parameters.height > 0;
     if must_resize {
@@ -70,7 +88,7 @@ pub fn compress_to_memory(
         }
     };
 
-    let encoded_image = if parameters.optimize {
+    let encoded_image_memory = if parameters.optimize {
         if must_resize {
             encoder.encode(100.0)
         } else {
@@ -81,5 +99,25 @@ pub fn compress_to_memory(
         encoder.encode(parameters.webp.quality as f32)
     };
 
-    Ok(encoded_image.deref().to_vec())
+    let encoded_image = encoded_image_memory.deref().to_vec();
+
+    if iccp.is_some() || exif.is_some() {
+        let mut image_with_metadata: Vec<u8> = vec![];
+        let mut dimg = match PartsWebp::from_bytes(encoded_image.clone().into()) {
+            Ok(d) => d,
+            Err(_) => return Ok(encoded_image)
+        };
+        dimg.set_icc_profile(iccp);
+        dimg.set_exif(exif);
+        dimg.encoder()
+            .write_to(&mut image_with_metadata)
+            .map_err(|e| CaesiumError {
+                message: e.to_string(),
+                code: 20308,
+            })?;
+
+        Ok(image_with_metadata)
+    } else {
+        Ok(encoded_image)
+    }
 }

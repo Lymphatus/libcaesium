@@ -26,7 +26,7 @@ pub fn compress(
         code: 20100,
     })?;
 
-    let out_buffer = compress_to_memory(in_file, parameters)?;
+    let out_buffer = compress_in_memory(in_file, parameters)?;
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20101,
@@ -38,7 +38,7 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_to_memory(
+pub fn compress_in_memory(
     mut in_file: Vec<u8>,
     parameters: &CSParameters,
 ) -> Result<Vec<u8>, CaesiumError> {

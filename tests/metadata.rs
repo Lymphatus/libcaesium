@@ -15,7 +15,7 @@ pub fn initialize(file: &str) {
 }
 
 #[test]
-fn compress_80_with_metadata() {
+fn jpeg_compress_80_with_metadata() {
     let output = "tests/samples/output/compressed_80_metadata.jpg";
     initialize(output);
     let mut pars = caesium::initialize_parameters();
@@ -36,7 +36,7 @@ fn compress_80_with_metadata() {
 }
 
 #[test]
-fn optimize_with_metadata() {
+fn jpeg_optimize_with_metadata() {
     let output = "tests/samples/output/optimized_metadata.jpg";
     initialize(output);
     let mut pars = caesium::initialize_parameters();
@@ -57,7 +57,7 @@ fn optimize_with_metadata() {
 }
 
 #[test]
-fn resize_optimize_with_metadata() {
+fn jpeg_resize_optimize_with_metadata() {
     let output = "tests/samples/output/resized_optimized_metadata.jpg";
     initialize(output);
     let mut pars = caesium::initialize_parameters();
