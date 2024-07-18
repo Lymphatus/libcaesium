@@ -81,47 +81,6 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
                 Ok(compressed_converted_image)
             }
         }
-
-        // match output_format {
-        //     ImageFormat::Png => {
-        //         let mut decoder = WebPDecoder::new(Cursor::new(compressed_converted_image.as_slice()))
-        //             .map_err(|e| CaesiumError {
-        //             message: e.to_string(),
-        //             code: 10405,
-        //         })?;
-        //         let bytes_per_pixel = if decoder.has_alpha() { 4 } else { 3 };
-        //         let (width, height) = decoder.dimensions();
-        //         let mut data = vec![0; width as usize * height as usize * bytes_per_pixel];
-        //         decoder.read_image(&mut data)
-        //             .map_err(|e| CaesiumError {
-        //             message: e.to_string(),
-        //             code: 10406,
-        //         })?;
-        //         let mut output_image_with_metadata: Vec<u8> = Vec::new();
-        //         let mut encoder = WebPEncoder::new(&mut output_image_with_metadata);
-        //         if iccp.is_some() {
-        //             encoder.set_icc_profile(iccp.unwrap_or(Bytes::new()).to_vec());
-        //         }
-        //         if exif.is_some() {
-        //             encoder.set_exif_metadata(exif.unwrap_or(Bytes::new()).to_vec());
-        //         }
-        //
-        //         let color_type = match bytes_per_pixel {
-        //             4 => Rgba8,
-        //             _ => Rgb8
-        //         };
-        //         encoder.encode(data.as_slice(), width, height, color_type)
-        //             .map_err(|e| CaesiumError {
-        //             message: e.to_string(),
-        //             code: 10407,
-        //         })?;
-        //
-        //         Ok(output_image_with_metadata)
-        //     }
-        //     _ => {
-        //
-        //     }
-        // }
     } else {
         Ok(compressed_converted_image)
     }

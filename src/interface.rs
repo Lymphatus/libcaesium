@@ -3,7 +3,7 @@ use std::os::raw::c_char;
 
 use tiff::encoder::compression::DeflateLevel::{Balanced, Best, Fast};
 
-use crate::{ChromaSubsampling, compress, compress_to_size, CSParameters, error, initialize_parameters};
+use crate::{ChromaSubsampling, compress, compress_to_size, convert, CSParameters, error, initialize_parameters, SupportedFileTypes};
 use crate::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
 
 #[repr(C)]
@@ -63,6 +63,24 @@ pub unsafe extern "C" fn c_compress_to_size(
         &mut parameters,
         max_output_size,
         return_smallest,
+    ))
+}
+
+#[no_mangle]
+#[allow(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn c_convert(
+    input_path: *const c_char,
+    output_path: *const c_char,
+    format: SupportedFileTypes,
+    params: CCSParameters,
+) -> CCSResult {
+    let parameters = c_set_parameters(params);
+
+    c_return_result(convert(
+        CStr::from_ptr(input_path).to_str().unwrap().to_string(),
+        CStr::from_ptr(output_path).to_str().unwrap().to_string(),
+        &parameters,
+        format
     ))
 }
 

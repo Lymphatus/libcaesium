@@ -330,7 +330,7 @@ pub fn compress_to_size(
     Ok(())
 }
 
-pub fn convert(input_path: String, output_path: String, format: SupportedFileTypes, parameters: &CSParameters) -> Result<(), CaesiumError> {
+pub fn convert(input_path: String, output_path: String, parameters: &CSParameters, format: SupportedFileTypes) -> Result<(), CaesiumError> {
 
     let file_type = get_filetype_from_path(&input_path);
 
@@ -345,7 +345,7 @@ pub fn convert(input_path: String, output_path: String, format: SupportedFileTyp
         message: e.to_string(),
         code: 10410,
     })?;
-    let output_buffer = convert_in_memory(in_file, format, parameters).map_err(|e| CaesiumError {
+    let output_buffer = convert_in_memory(in_file, parameters, format).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 10411,
     })?;
@@ -362,7 +362,7 @@ pub fn convert(input_path: String, output_path: String, format: SupportedFileTyp
 
     Ok(())
 }
-pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+pub fn convert_in_memory(in_file: Vec<u8>, parameters: &CSParameters, format: SupportedFileTypes) -> Result<Vec<u8>, CaesiumError> {
     convert::convert_in_memory(in_file, format, parameters)
 }
 
@@ -412,6 +412,7 @@ fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
     Ok(())
 }
 
+#[repr(C)]
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum SupportedFileTypes {
     Jpeg,
