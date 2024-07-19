@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use bytes::Bytes;
-use image::ImageFormat;
+use image::{ColorType, DynamicImage, ImageFormat};
 use image::io::Reader as ImageReader;
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 
@@ -22,7 +22,7 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
     }
 
     let i = in_file.as_slice();
-    let original_image = ImageReader::new(Cursor::new(i)).with_guessed_format()
+    let mut original_image = ImageReader::new(Cursor::new(i)).with_guessed_format()
         .map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 10402,
@@ -32,6 +32,15 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
             code: 10403,
         })?;
 
+    if format == SupportedFileTypes::Jpeg {
+        original_image = match original_image.color() {
+            ColorType::Rgba8 => DynamicImage::from(original_image.to_rgb8()),
+            ColorType::Rgba16 => DynamicImage::from(original_image.to_rgb16()),
+            ColorType::Rgba32F => DynamicImage::from(original_image.to_rgb32f()),
+            _ => original_image,
+        };
+    }
+    
     let mut output_image: Vec<u8> = Vec::new();
     original_image.write_to(&mut Cursor::new(&mut output_image), output_format)
         .map_err(|e| CaesiumError {

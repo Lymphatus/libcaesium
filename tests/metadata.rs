@@ -78,6 +78,27 @@ fn jpeg_resize_optimize_with_metadata() {
     ));
     remove_compressed_test_file(output)
 }
+// 
+// #[test]
+// fn webp_compress_80_with_metadata() {
+//     let output = "tests/samples/output/compressed_80_metadata.webp";
+//     initialize(output);
+//     let mut pars = caesium::initialize_parameters();
+//     pars.webp.quality = 80;
+//     pars.keep_metadata = true;
+//     caesium::compress(
+//         String::from("tests/samples/uncompressed_家.webp"),
+//         String::from(output),
+//         &pars,
+//     )
+//         .unwrap();
+//     assert!(Path::new(output).exists());
+//     assert!(metadata_is_equal(
+//         Path::new("tests/samples/uncompressed_家.webp"),
+//         Path::new(output)
+//     ));
+//     remove_compressed_test_file(output)
+// }
 
 fn extract_exif(path: &Path) -> HashMap<String, String> {
     let file = fs::File::open(path).unwrap();

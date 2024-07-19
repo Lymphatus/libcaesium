@@ -175,7 +175,7 @@ pub fn compress_in_memory(
         SupportedFileTypes::Tiff => tiff::compress_in_memory(in_file, parameters)?,
         _ => {
             return Err(CaesiumError {
-                message: "Format not supported for compression to size".into(),
+                message: "Format not supported for compression in memory".into(),
                 code: 10200,
             });
         }
