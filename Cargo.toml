@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.16.1"
+version = "0.16.2"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -42,10 +42,10 @@ bytes = "1.6"
 lodepng = { version = "3.10", optional = true }
 imagequant = { version = "4.3", optional = true, default-features = false }
 tiff = { version = "0.9" }
+kamadak-exif = "0.5"
 
 [dev-dependencies]
 dssim = { version = "3.3", default-features = false, features = ["no-macos-vimage"] }
-kamadak-exif = "0.5"
 
 [[bin]]
 name = "main"
