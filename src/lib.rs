@@ -330,7 +330,7 @@ pub fn compress_to_size(
     Ok(())
 }
 
-pub fn convert(input_path: String, output_path: String, parameters: &CSParameters, format: SupportedFileTypes) -> Result<(), CaesiumError> {
+pub fn convert(input_path: String, output_path: String, parameters: &CSParameters, format: SupportedFileTypes) -> error::Result<()> {
 
     let file_type = get_filetype_from_path(&input_path);
 
