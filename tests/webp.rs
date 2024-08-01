@@ -157,3 +157,23 @@ fn downscale_optimize() {
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
     remove_compressed_test_file(output)
 }
+
+#[test]
+fn compress_animated_80() {
+    let output = "tests/samples/output/compressed_animated_80.webp";
+    initialize(output);
+    let mut params = caesium::initialize_parameters();
+    params.webp.quality = 80;
+    caesium::compress(
+        String::from("tests/samples/uncompressed_animated.webp"),
+        String::from(output),
+        &params,
+    )
+        .unwrap();
+    assert!(std::path::Path::new(output).exists());
+    assert_eq!(
+        infer::get_from_path(output).unwrap().unwrap().mime_type(),
+        "image/webp"
+    );
+    remove_compressed_test_file(output)
+}
