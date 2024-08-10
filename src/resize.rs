@@ -1,10 +1,11 @@
 use std::io::Cursor;
 
-use image::DynamicImage;
 use image::imageops::FilterType;
 use image::io::Reader as ImageReader;
+use image::DynamicImage;
 
 use crate::error::CaesiumError;
+use crate::utils::get_jpeg_orientation;
 
 pub fn resize(
     image_buffer: Vec<u8>,
@@ -12,7 +13,15 @@ pub fn resize(
     height: u32,
     format: image::ImageFormat,
 ) -> Result<Vec<u8>, CaesiumError> {
-    let mut image = ImageReader::new(Cursor::new(image_buffer))
+    let buffer_slice = image_buffer.as_slice();
+    let (mut desired_width, mut desired_height) = (width, height);
+    if format == image::ImageFormat::Jpeg {
+        let orientation = get_jpeg_orientation(buffer_slice);
+        (desired_width, desired_height) = match orientation {
+            5..=8 => (height, width),
+            _ => (width, height)
+        };
+    }let mut image = ImageReader::new(Cursor::new(image_buffer))
         .with_guessed_format()
         .map_err(|e| CaesiumError {
             message: e.to_string(),
@@ -24,7 +33,7 @@ pub fn resize(
             code: 10301,
         })?;
 
-    let dimensions = compute_dimensions(image.width(), image.height(), width, height);
+    let dimensions = compute_dimensions(image.width(), image.height(), desired_width, desired_height);
     image = image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3);
 
     let mut resized_file: Vec<u8> = vec![];

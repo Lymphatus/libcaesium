@@ -7,7 +7,7 @@ use img_parts::{DynImage, ImageEXIF, ImageICC};
 
 use crate::{compress_in_memory, CSParameters, SupportedFileTypes};
 use crate::error::CaesiumError;
-use crate::utils::get_filetype_from_memory;
+use crate::utils::{get_filetype_from_memory, get_jpeg_orientation};
 
 pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut iccp = None;
@@ -127,21 +127,4 @@ fn map_image_format(format: SupportedFileTypes) -> Result<ImageFormat, CaesiumEr
     };
 
     Ok(image_format)
-}
-
-fn get_jpeg_orientation(data: &[u8]) -> u32 {
-    let reader = exif::Reader::new();
-    let mut cursor = Cursor::new(data);
-
-    let exif_data = match reader.read_from_container(&mut cursor) {
-        Ok(v) => v,
-        Err(_) => return 1
-    };
-
-    let exif_field = match exif_data.get_field(exif::Tag::Orientation, exif::In::PRIMARY) {
-        Some(value) => value,
-        None => return 1,
-    };
-
-    exif_field.value.get_uint(0).unwrap_or(1)
 }
