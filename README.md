@@ -80,7 +80,7 @@ pub struct Parameters {
 ```
 - `quality`: in a range from 0 to 100, the quality of the resulting image. Default `80`.
 - `force_zopfli`: if `optimization` is `true` and this option is also `true`, will use zopfli algorithm for compression, resulting in a smaller image, but it may take minutes to finish the process. Default `false`.
-- `optimization_level`: if `optimization` is `true` will set the level of oxipng optimization, from 1 to 6. Default `3`.
+- `optimization_level`: if `optimization` is `true` will set the level of oxipng optimization, from 0 to 6. Default `3`.
 
 #### gif
 GIF support is experimental, has many know issues and does not support optimization. Expect bugs (especially on Windows).

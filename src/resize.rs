@@ -1,8 +1,7 @@
 use std::io::Cursor;
 
 use image::imageops::FilterType;
-use image::io::Reader as ImageReader;
-use image::DynamicImage;
+use image::{DynamicImage, ImageReader};
 
 use crate::error::CaesiumError;
 use crate::utils::get_jpeg_orientation;
@@ -21,7 +20,9 @@ pub fn resize(
             5..=8 => (height, width),
             _ => (width, height)
         };
-    }let mut image = ImageReader::new(Cursor::new(image_buffer))
+    }
+    
+    let mut image = ImageReader::new(Cursor::new(image_buffer))
         .with_guessed_format()
         .map_err(|e| CaesiumError {
             message: e.to_string(),

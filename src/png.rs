@@ -118,11 +118,16 @@ fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caes
     }
 
     if parameters.optimize && parameters.png.force_zopfli {
+        let mut iterations = 15;
+        if in_file.len() > 2000000 {
+            iterations = 5;
+        }
         oxipng_options.deflate = Zopfli {
-            iterations: NonZeroU8::new(15).unwrap(),
+            iterations: NonZeroU8::new(iterations).unwrap(),
         };
     } else {
-        oxipng_options = oxipng::Options::from_preset(parameters.png.optimization_level);
+        let optimization_level = parameters.png.optimization_level.clamp(0, 6);
+        oxipng_options = oxipng::Options::from_preset(optimization_level);
     }
 
     let optimized_png =

@@ -1,8 +1,7 @@
 use std::io::Cursor;
 
 use bytes::Bytes;
-use image::{ColorType, DynamicImage, ImageFormat};
-use image::io::Reader as ImageReader;
+use image::{ColorType, DynamicImage, ImageFormat, ImageReader};
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 
 use crate::{compress_in_memory, CSParameters, SupportedFileTypes};
