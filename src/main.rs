@@ -1,6 +1,7 @@
+use caesium::parameters::CSParameters;
+use caesium::compress;
 use std::env;
 use std::process::ExitCode;
-use caesium::{compress, initialize_parameters};
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
@@ -8,7 +9,7 @@ fn main() -> ExitCode {
     let input = args[1].clone();
     let output = args[2].clone();
 
-    let parameters = initialize_parameters();
+    let parameters = CSParameters::new();
     match compress(input, output, &parameters) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {

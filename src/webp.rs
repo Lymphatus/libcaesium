@@ -84,6 +84,7 @@ pub fn compress_in_memory(
         config.lossless = if parameters.optimize { 1 } else { 0 };
         config.alpha_compression = if parameters.optimize { 0 } else { 1 };
         config.quality = parameters.webp.quality as f32;
+        
 
         let mut images_data = vec![];
         let mut width = 0;

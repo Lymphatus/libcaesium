@@ -1,8 +1,9 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
-use crate::{ChromaSubsampling, compress, compress_to_size, convert, CSParameters, error, initialize_parameters, SupportedFileTypes, TiffDeflateLevel};
-use crate::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
+use crate::{compress, compress_to_size, convert, CSParameters, error, SupportedFileTypes, TiffDeflateLevel};
+use crate::parameters::ChromaSubsampling;
+use crate::parameters::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
 
 #[repr(C)]
 pub struct CCSParameters {
@@ -110,7 +111,7 @@ fn c_return_result(result: error::Result<()>) -> CCSResult {
 }
 
 fn c_set_parameters(params: CCSParameters) -> CSParameters {
-    let mut parameters = initialize_parameters();
+    let mut parameters = CSParameters::new();
 
     parameters.jpeg.quality = params.jpeg_quality;
     parameters.jpeg.progressive = params.jpeg_progressive;

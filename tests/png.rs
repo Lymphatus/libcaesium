@@ -1,5 +1,6 @@
 use crate::cleanup::remove_compressed_test_file;
 use std::sync::Once;
+use caesium::parameters::CSParameters;
 
 mod cleanup;
 
@@ -18,7 +19,7 @@ fn standard_compress_png() {
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
-        &caesium::initialize_parameters(),
+        &CSParameters::new(),
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
@@ -34,7 +35,7 @@ fn standard_compress_png() {
 fn standard_compress_png_with_optimize_flag() {
     let output = "tests/samples/output/compressed_max.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.optimize = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
@@ -55,7 +56,7 @@ fn standard_compress_png_with_optimize_flag() {
 // fn zopfli_compress_png() {
 //     let output = "tests/samples/output/optimized.png";
 //     initialize(output);
-//     let mut params = caesium::initialize_parameters();
+//     let mut params = CSParameters::new();
 //     params.png.level = 3;
 //     params.optimize = true;
 //     params.png.force_zopfli = true;
@@ -73,7 +74,7 @@ fn standard_compress_png_with_optimize_flag() {
 fn downscale_standard_compress_png() {
     let output = "tests/samples/output/downscale_compressed.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.width = 150;
     params.height = 150;
     caesium::compress(
@@ -95,7 +96,7 @@ fn downscale_standard_compress_png() {
 fn downscale_standard_compress_png_with_optimize_flag() {
     let output = "tests/samples/output/downscale_compressed_max.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.width = 150;
     params.height = 150;
     params.optimize = true;
@@ -118,7 +119,7 @@ fn downscale_standard_compress_png_with_optimize_flag() {
 fn downscale_zopfli_compress_png() {
     let output = "tests/samples/output/downscale_optimized.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.width = 150;
     params.height = 150;
     params.png.quality = 80;

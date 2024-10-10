@@ -13,7 +13,7 @@ pub fn initialize(file: &str) {
 // fn compress_20() {
 //     let output = "tests/samples/output/compressed_20.gif";
 //     initialize(output);
-//     let mut params = caesium::initialize_parameters();
+//     let mut params = CSParameters::new();
 //     params.gif.quality = 20;
 //     caesium::compress(String::from("tests/samples/uncompressed_은하.gif"),
 //                       String::from(output),
@@ -28,7 +28,7 @@ pub fn initialize(file: &str) {
 // fn compress_50() {
 //     let output = "tests/samples/output/compressed_50.gif";
 //     initialize(output);
-//     let mut params = caesium::initialize_parameters();
+//     let mut params = CSParameters::new();
 //     params.gif.level = 50;
 //     caesium::compress(String::from("tests/samples/uncompressed_은하.gif"),
 //                       String::from(output),
@@ -42,7 +42,7 @@ pub fn initialize(file: &str) {
 // fn compress_80() {
 //     let output = "tests/samples/output/compressed_80.gif";
 //     initialize(output);
-//     let mut params = caesium::initialize_parameters();
+//     let mut params = CSParameters::new();
 //     params.gif.level = 80;
 //     caesium::compress(String::from("tests/samples/uncompressed_은하.gif"),
 //                       String::from(output),
@@ -56,7 +56,7 @@ pub fn initialize(file: &str) {
 // fn compress_100() {
 //     let output = "tests/samples/output/compressed_100.gif";
 //     initialize(output);
-//     let mut params = caesium::initialize_parameters();
+//     let mut params = CSParameters::new();
 //     params.gif.level = 100;
 //     caesium::compress(String::from("tests/samples/uncompressed_은하.gif"),
 //                       String::from(output),
@@ -70,7 +70,7 @@ pub fn initialize(file: &str) {
 // fn optimize_gif() {
 //     let output = "tests/samples/output/optimized.gif";
 //     initialize(output);
-//     let mut params = caesium::initialize_parameters();
+//     let mut params = CSParameters::new();
 //     params.optimize = true;
 //     caesium::compress(String::from("tests/samples/uncompressed_은하.gif"),
 //                       String::from(output),

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use std::sync::Once;
-
+use caesium::parameters::CSParameters;
 use caesium::SupportedFileTypes;
 
 use crate::cleanup::remove_compressed_test_file;
@@ -21,7 +21,7 @@ pub fn initialize(file: &str) {
 fn convert_jpg_to_png() {
     let output = "tests/samples/output/jpg.to.png";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.keep_metadata = true;
     caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
                      String::from(output),
@@ -43,7 +43,7 @@ fn convert_jpg_to_png() {
 fn convert_jpg_to_webp() {
     let output = "tests/samples/output/jpg.to.webp";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
                      String::from(output),
                      &params,
@@ -60,7 +60,7 @@ fn convert_jpg_to_webp() {
 fn convert_jpg_to_tiff() {
     let output = "tests/samples/output/jpg.to.tiff";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
                      String::from(output),
                      &params,
@@ -77,7 +77,7 @@ fn convert_jpg_to_tiff() {
 fn convert_png_to_jpg() {
     let output = "tests/samples/output/png.to.jpg";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.keep_metadata = true;
     caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.png"),
                      String::from(output),
@@ -99,7 +99,7 @@ fn convert_png_to_jpg() {
 fn convert_png_to_webp() {
     let output = "tests/samples/output/png.to.webp";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.png"),
                      String::from(output),
                      &params,
@@ -116,7 +116,7 @@ fn convert_png_to_webp() {
 fn convert_png_to_tiff() {
     let output = "tests/samples/output/png.to.tiff";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.png"),
                      String::from(output),
                      &params,
@@ -133,7 +133,7 @@ fn convert_png_to_tiff() {
 fn convert_webp_to_jpg() {
     let output = "tests/samples/output/webp.to.jpg";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.keep_metadata = true;
     caesium::convert(String::from("tests/samples/uncompressed_家.webp"),
                      String::from(output),
@@ -155,7 +155,7 @@ fn convert_webp_to_jpg() {
 fn convert_webp_to_png() {
     let output = "tests/samples/output/webp.to.png";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/uncompressed_家.webp"),
                      String::from(output),
                      &params,
@@ -172,7 +172,7 @@ fn convert_webp_to_png() {
 fn convert_webp_to_tiff() {
     let output = "tests/samples/output/webp.to.tiff";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/uncompressed_家.webp"),
                      String::from(output),
                      &params,
@@ -189,7 +189,7 @@ fn convert_webp_to_tiff() {
 fn convert_tiff_to_jpg() {
     let output = "tests/samples/output/tiff.to.jpg";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/rgba8.tif"),
                      String::from(output),
                      &params,
@@ -206,7 +206,7 @@ fn convert_tiff_to_jpg() {
 fn convert_tiff_to_png() {
     let output = "tests/samples/output/tiff.to.png";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/rgba8.tif"),
                      String::from(output),
                      &params,
@@ -223,7 +223,7 @@ fn convert_tiff_to_png() {
 fn convert_tiff_to_webp() {
     let output = "tests/samples/output/tiff.to.webp";
     initialize(output);
-    let params = caesium::initialize_parameters();
+    let params = CSParameters::new();
     caesium::convert(String::from("tests/samples/rgba8.tif"),
                      String::from(output),
                      &params,

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use std::sync::Once;
-
+use caesium::parameters::CSParameters;
 use crate::cleanup::remove_compressed_test_file;
 
 mod cleanup;
@@ -18,7 +18,7 @@ pub fn initialize(file: &str) {
 fn jpeg_compress_80_with_metadata() {
     let output = "tests/samples/output/compressed_80_metadata.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = CSParameters::new();
     pars.jpeg.quality = 80;
     pars.keep_metadata = true;
     caesium::compress(
@@ -39,7 +39,7 @@ fn jpeg_compress_80_with_metadata() {
 fn jpeg_optimize_with_metadata() {
     let output = "tests/samples/output/optimized_metadata.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = CSParameters::new();
     pars.optimize = true;
     pars.keep_metadata = true;
     caesium::compress(
@@ -60,7 +60,7 @@ fn jpeg_optimize_with_metadata() {
 fn jpeg_resize_optimize_with_metadata() {
     let output = "tests/samples/output/resized_optimized_metadata.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = CSParameters::new();
     pars.optimize = true;
     pars.keep_metadata = true;
     pars.width = 200;
@@ -83,7 +83,7 @@ fn jpeg_resize_optimize_with_metadata() {
 // fn webp_compress_80_with_metadata() {
 //     let output = "tests/samples/output/compressed_80_metadata.webp";
 //     initialize(output);
-//     let mut pars = caesium::initialize_parameters();
+//     let mut pars = CSParameters::new();
 //     pars.webp.quality = 80;
 //     pars.keep_metadata = true;
 //     caesium::compress(

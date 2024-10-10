@@ -1,5 +1,5 @@
 use std::sync::Once;
-
+use caesium::parameters::{CSParameters, TiffCompression, TiffDeflateLevel};
 use crate::cleanup::remove_compressed_test_file;
 mod cleanup;
 
@@ -15,8 +15,8 @@ pub fn initialize(file: &str) {
 fn rgb8_uncompressed() {
     let output = "tests/samples/output/uncompressed_rgb8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Uncompressed;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Uncompressed;
     caesium::compress(
         String::from("tests/samples/rgb8.tif"),
         String::from(output),
@@ -35,8 +35,8 @@ fn rgb8_uncompressed() {
 fn rgba8_uncompressed() {
     let output = "tests/samples/output/uncompressed_rgba8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Uncompressed;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Uncompressed;
     caesium::compress(
         String::from("tests/samples/rgba8.tif"),
         String::from(output),
@@ -55,9 +55,9 @@ fn rgba8_uncompressed() {
 fn rgb8_deflate() {
     let output = "tests/samples/output/deflate_rgb8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Deflate;
-    params.tiff.deflate_level = caesium::TiffDeflateLevel::Balanced;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Deflate;
+    params.tiff.deflate_level = TiffDeflateLevel::Balanced;
     caesium::compress(
         String::from("tests/samples/rgb8.tif"),
         String::from(output),
@@ -76,9 +76,9 @@ fn rgb8_deflate() {
 fn rgba8_deflate() {
     let output = "tests/samples/output/deflate_rgba8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Deflate;
-    params.tiff.deflate_level = caesium::TiffDeflateLevel::Balanced;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Deflate;
+    params.tiff.deflate_level = TiffDeflateLevel::Balanced;
     caesium::compress(
         String::from("tests/samples/rgba8.tif"),
         String::from(output),
@@ -97,8 +97,8 @@ fn rgba8_deflate() {
 fn rgb8_lzw() {
     let output = "tests/samples/output/lzw_rgb8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Lzw;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Lzw;
     caesium::compress(
         String::from("tests/samples/rgb8.tif"),
         String::from(output),
@@ -117,8 +117,8 @@ fn rgb8_lzw() {
 fn rgba8_lzw() {
     let output = "tests/samples/output/lzw_rgba8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Lzw;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Lzw;
     caesium::compress(
         String::from("tests/samples/rgba8.tif"),
         String::from(output),
@@ -137,8 +137,8 @@ fn rgba8_lzw() {
 fn rgb8_packbits() {
     let output = "tests/samples/output/packbits_rgb8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Packbits;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Packbits;
     caesium::compress(
         String::from("tests/samples/rgb8.tif"),
         String::from(output),
@@ -157,8 +157,8 @@ fn rgb8_packbits() {
 fn rgba8_packbits() {
     let output = "tests/samples/output/packbits_rgba8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Packbits;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Packbits;
     caesium::compress(
         String::from("tests/samples/rgba8.tif"),
         String::from(output),
@@ -177,8 +177,8 @@ fn rgba8_packbits() {
 fn rgb8_downscale() {
     let output = "tests/samples/output/downscale_rgb8.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Lzw;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Lzw;
     params.width = 50;
     params.height = 20;
     caesium::compress(
@@ -200,8 +200,8 @@ fn rgb8_downscale() {
 fn unsupported() {
     let output = "tests/samples/output/unsupported.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Lzw;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Lzw;
     assert!(caesium::compress(
         String::from("tests/samples/unsupported.tif"),
         String::from(output),
@@ -213,8 +213,8 @@ fn unsupported() {
 fn prevent_panic() {
     let output = "tests/samples/output/panic.tif";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
-    params.tiff.algorithm = caesium::TiffCompression::Lzw;
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Lzw;
     assert!(caesium::compress(
         String::from("tests/samples/unsupported.tif"),
         String::from(output),

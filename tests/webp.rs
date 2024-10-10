@@ -1,5 +1,5 @@
 use std::sync::Once;
-
+use caesium::parameters::CSParameters;
 use crate::cleanup::remove_compressed_test_file;
 
 mod cleanup;
@@ -16,7 +16,7 @@ pub fn initialize(file: &str) {
 fn compress_20() {
     let output = "tests/samples/output/compressed_20.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.webp.quality = 20;
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
@@ -36,7 +36,7 @@ fn compress_20() {
 fn compress_50() {
     let output = "tests/samples/output/compressed_50.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.webp.quality = 50;
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
@@ -56,7 +56,7 @@ fn compress_50() {
 fn compress_80() {
     let output = "tests/samples/output/compressed_80.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.webp.quality = 80;
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
@@ -76,7 +76,7 @@ fn compress_80() {
 fn compress_100() {
     let output = "tests/samples/output/compressed_100.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.webp.quality = 100;
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
@@ -96,7 +96,7 @@ fn compress_100() {
 fn optimize() {
     let output = "tests/samples/output/optimized.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.optimize = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
@@ -116,7 +116,7 @@ fn optimize() {
 fn downscale_compress_80() {
     let output = "tests/samples/output/downscale_compressed_80.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.webp.quality = 80;
     params.width = 150;
     params.height = 100;
@@ -139,7 +139,7 @@ fn downscale_compress_80() {
 fn downscale_optimize() {
     let output = "tests/samples/output/downscale_optimized.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.optimize = true;
     params.width = 150;
     params.height = 100;
@@ -162,7 +162,7 @@ fn downscale_optimize() {
 fn compress_animated_80() {
     let output = "tests/samples/output/compressed_animated_80.webp";
     initialize(output);
-    let mut params = caesium::initialize_parameters();
+    let mut params = CSParameters::new();
     params.webp.quality = 80;
     caesium::compress(
         String::from("tests/samples/uncompressed_animated.webp"),

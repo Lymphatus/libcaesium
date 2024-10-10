@@ -10,8 +10,9 @@ use img_parts::jpeg::Jpeg as PartsJpeg;
 use libc::free;
 use mozjpeg_sys::*;
 
-use crate::{ChromaSubsampling, CSParameters};
+use crate::{CSParameters};
 use crate::error::CaesiumError;
+use crate::parameters::ChromaSubsampling;
 use crate::resize::resize;
 
 static mut JPEG_ERROR: c_int = 0;

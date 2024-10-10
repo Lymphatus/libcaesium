@@ -7,8 +7,9 @@ use tiff::encoder::colortype::{RGB8, RGBA8};
 use tiff::encoder::compression::{Deflate, DeflateLevel, Lzw, Packbits, Uncompressed};
 use tiff::encoder::TiffEncoder;
 
-use crate::{CSParameters, TiffCompression, TiffDeflateLevel};
+use crate::{CSParameters, TiffDeflateLevel};
 use crate::error::CaesiumError;
+use crate::parameters::TiffCompression;
 use crate::resize::resize_image;
 
 pub fn compress(

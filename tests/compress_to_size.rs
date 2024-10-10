@@ -1,6 +1,7 @@
 use crate::cleanup::remove_compressed_test_file;
 use std::fs::File;
 use std::sync::Once;
+use caesium::parameters::CSParameters;
 
 mod cleanup;
 
@@ -16,7 +17,7 @@ pub fn initialize(file: &str) {
 fn compress_to_1_byte() {
     let output = "tests/samples/output/compressed_1b.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = CSParameters::new();
     caesium::compress_to_size(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
@@ -32,7 +33,7 @@ fn compress_to_1_byte() {
 fn compress_to_1_byte_and_return() {
     let output = "tests/samples/output/compressed_1b_return.jpg";
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = CSParameters::new();
     caesium::compress_to_size(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
@@ -54,7 +55,7 @@ fn compress_to_10_mb() {
     let output = "tests/samples/output/compressed_10mb.jpg";
     let max_output_size = 10_000_000;
     initialize(output);
-    let mut pars = caesium::initialize_parameters();
+    let mut pars = CSParameters::new();
     caesium::compress_to_size(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
@@ -80,7 +81,7 @@ fn compress_to_range() {
     initialize(output);
 
     while max_output_size < max_desired_size {
-        let mut pars = caesium::initialize_parameters();
+        let mut pars = CSParameters::new();
         caesium::compress_to_size(
             String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
             String::from(output),
