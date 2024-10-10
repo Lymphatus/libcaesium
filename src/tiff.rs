@@ -4,10 +4,10 @@ use std::panic;
 
 use image::ImageFormat::Tiff;
 use tiff::encoder::colortype::{RGB8, RGBA8};
-use tiff::encoder::compression::{Deflate, Lzw, Packbits, Uncompressed};
+use tiff::encoder::compression::{Deflate, DeflateLevel, Lzw, Packbits, Uncompressed};
 use tiff::encoder::TiffEncoder;
 
-use crate::{CSParameters, TiffCompression};
+use crate::{CSParameters, TiffCompression, TiffDeflateLevel};
 use crate::error::CaesiumError;
 use crate::resize::resize_image;
 
@@ -87,13 +87,13 @@ pub fn compress_in_memory(
             image::ColorType::Rgb8 => encoder.write_image_with_compression::<RGB8, Deflate>(
                 image.width(),
                 image.height(),
-                Deflate::with_level(parameters.tiff.deflate_level),
+                Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level)),
                 image.as_bytes(),
             ),
             image::ColorType::Rgba8 => encoder.write_image_with_compression::<RGBA8, Deflate>(
                 image.width(),
                 image.height(),
-                Deflate::with_level(parameters.tiff.deflate_level),
+                Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level)),
                 image.as_bytes(),
             ),
             _ => {
@@ -172,5 +172,13 @@ pub fn compress_in_memory(
             message: e.to_string(),
             code: 20507,
         }),
+    }
+}
+
+fn parse_deflate_level(level: TiffDeflateLevel) -> DeflateLevel {
+    match level {
+        TiffDeflateLevel::Fast => DeflateLevel::Fast,
+        TiffDeflateLevel::Best => DeflateLevel::Best,
+        TiffDeflateLevel::Balanced => DeflateLevel::Balanced,
     }
 }

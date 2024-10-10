@@ -4,9 +4,6 @@ use std::{cmp, fs};
 use std::fs::File;
 use std::io::Write;
 
-use ::tiff::encoder::compression::DeflateLevel;
-use ::tiff::encoder::compression::DeflateLevel::Best;
-
 use error::CaesiumError;
 
 use crate::TiffCompression::{Deflate, Lzw, Packbits};
@@ -45,10 +42,18 @@ pub enum TiffCompression {
     Packbits = 3,
 }
 
+#[derive(Copy, Clone, PartialEq)]
+pub enum TiffDeflateLevel {
+    Fast = 1,
+    Balanced = 6,
+    Best = 9,
+}
+
 #[derive(Copy, Clone)]
 pub struct JpegParameters {
     pub quality: u32,
     pub chroma_subsampling: ChromaSubsampling,
+    pub progressive: bool
 }
 
 #[derive(Copy, Clone)]
@@ -71,7 +76,7 @@ pub struct WebPParameters {
 #[derive(Copy, Clone)]
 pub struct TiffParameters {
     pub algorithm: TiffCompression,
-    pub deflate_level: DeflateLevel,
+    pub deflate_level: TiffDeflateLevel,
 }
 
 #[derive(Copy, Clone)]
@@ -92,6 +97,7 @@ pub fn initialize_parameters() -> CSParameters {
     let jpeg = JpegParameters {
         quality: 80,
         chroma_subsampling: ChromaSubsampling::Auto,
+        progressive: true
     };
     let png = PngParameters {
         quality: 80,
@@ -102,7 +108,7 @@ pub fn initialize_parameters() -> CSParameters {
     let webp = WebPParameters { quality: 80 };
     let tiff = TiffParameters {
         algorithm: Deflate,
-        deflate_level: DeflateLevel::Balanced,
+        deflate_level: TiffDeflateLevel::Balanced,
     };
 
     CSParameters {
@@ -207,7 +213,7 @@ pub fn compress_to_size_in_memory(
                 Lzw,
                 Packbits
             ];
-            parameters.tiff.deflate_level = Best;
+            parameters.tiff.deflate_level = TiffDeflateLevel::Best;
             parameters.tiff.algorithm = Deflate;
             let mut smallest_result = tiff::compress_in_memory(in_file.clone(), parameters)?; //TODO clone
             for tc in algorithms {
@@ -367,7 +373,7 @@ pub fn convert_in_memory(in_file: Vec<u8>, parameters: &CSParameters, format: Su
 }
 
 fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
-    if parameters.jpeg.quality == 0 || parameters.jpeg.quality > 100 {
+    if parameters.jpeg.quality > 100 {
         return Err(CaesiumError {
             message: "Invalid JPEG quality value".into(),
             code: 10001,

@@ -1,5 +1,4 @@
 use std::sync::Once;
-use tiff::encoder::compression::DeflateLevel::Balanced;
 
 use crate::cleanup::remove_compressed_test_file;
 mod cleanup;
@@ -58,7 +57,7 @@ fn rgb8_deflate() {
     initialize(output);
     let mut params = caesium::initialize_parameters();
     params.tiff.algorithm = caesium::TiffCompression::Deflate;
-    params.tiff.deflate_level = Balanced;
+    params.tiff.deflate_level = caesium::TiffDeflateLevel::Balanced;
     caesium::compress(
         String::from("tests/samples/rgb8.tif"),
         String::from(output),
@@ -79,7 +78,7 @@ fn rgba8_deflate() {
     initialize(output);
     let mut params = caesium::initialize_parameters();
     params.tiff.algorithm = caesium::TiffCompression::Deflate;
-    params.tiff.deflate_level = Balanced;
+    params.tiff.deflate_level = caesium::TiffDeflateLevel::Balanced;
     caesium::compress(
         String::from("tests/samples/rgba8.tif"),
         String::from(output),

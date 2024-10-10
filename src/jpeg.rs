@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Write;
 use std::mem;
 use std::panic::catch_unwind;
-
+use std::ptr::null;
 use image::ImageFormat::Jpeg;
 use img_parts::{ImageEXIF, ImageICC};
 use img_parts::jpeg::Jpeg as PartsJpeg;
@@ -200,6 +200,10 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
         parameters.jpeg.quality as i32,
         false as boolean,
     );
+
+    if !parameters.jpeg.progressive {
+        dst_info.scan_info = null();
+    }
 
     jpeg_start_compress(&mut dst_info, true as boolean);
 

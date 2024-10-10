@@ -1,9 +1,7 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
-use tiff::encoder::compression::DeflateLevel::{Balanced, Best, Fast};
-
-use crate::{ChromaSubsampling, compress, compress_to_size, convert, CSParameters, error, initialize_parameters, SupportedFileTypes};
+use crate::{ChromaSubsampling, compress, compress_to_size, convert, CSParameters, error, initialize_parameters, SupportedFileTypes, TiffDeflateLevel};
 use crate::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
 
 #[repr(C)]
@@ -11,6 +9,7 @@ pub struct CCSParameters {
     pub keep_metadata: bool,
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
+    pub jpeg_progressive: bool,
     pub png_quality: u32,
     pub png_optimization_level: u32,
     pub png_force_zopfli: bool,
@@ -114,6 +113,7 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
     let mut parameters = initialize_parameters();
 
     parameters.jpeg.quality = params.jpeg_quality;
+    parameters.jpeg.progressive = params.jpeg_progressive;
     parameters.png.quality = params.png_quality;
     parameters.optimize = params.optimize;
     parameters.keep_metadata = params.keep_metadata;
@@ -140,9 +140,9 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
     };
 
     parameters.tiff.deflate_level = match params.tiff_deflate_level {
-        3 => Fast,
-        6 => Balanced,
-        _ => Best
+        1 => TiffDeflateLevel::Fast,
+        6 => TiffDeflateLevel::Balanced,
+        _ => TiffDeflateLevel::Best
     };
 
     parameters
