@@ -59,7 +59,7 @@ pub fn compress_in_memory(
                 message: e.to_string(),
                 code: 20306,
             })?
-            .map_or((None, None), |dimg| (dimg.icc_profile(), dimg.exif()));
+            .map_or((None, None), |dyn_img| (dyn_img.icc_profile(), dyn_img.exif()));
     }
 
     let must_resize = parameters.width > 0 || parameters.height > 0;
@@ -171,13 +171,13 @@ pub fn compress_in_memory(
 
     if iccp.is_some() || exif.is_some() {
         let mut image_with_metadata: Vec<u8> = vec![];
-        let mut dimg = match PartsWebp::from_bytes(encoded_image.clone().into()) {
+        let mut dyn_img = match PartsWebp::from_bytes(encoded_image.clone().into()) {
             Ok(d) => d,
             Err(_) => return Ok(encoded_image)
         };
-        dimg.set_icc_profile(iccp);
-        dimg.set_exif(exif);
-        dimg.encoder()
+        dyn_img.set_icc_profile(iccp);
+        dyn_img.set_exif(exif);
+        dyn_img.encoder()
             .write_to(&mut image_with_metadata)
             .map_err(|e| CaesiumError {
                 message: e.to_string(),

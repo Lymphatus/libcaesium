@@ -66,13 +66,19 @@ pub struct CSParameters {
     pub height: u32,
     pub output_size: u32,
 }
+impl Default for CSParameters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CSParameters {
     pub fn new() -> CSParameters {
         initialize_parameters()
     }
 }
 
-pub fn initialize_parameters() -> CSParameters {
+fn initialize_parameters() -> CSParameters {
     let jpeg = JpegParameters {
         quality: 80,
         chroma_subsampling: ChromaSubsampling::Auto,

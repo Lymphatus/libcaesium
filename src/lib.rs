@@ -1,6 +1,6 @@
 extern crate alloc;
 
-use std::{cmp, fs};
+use std::fs;
 use std::fs::File;
 use std::io::Write;
 
@@ -14,12 +14,12 @@ pub mod error;
 mod gif;
 mod interface;
 #[cfg(feature = "jpg")]
-pub mod jpeg;
+mod jpeg;
 #[cfg(feature = "png")]
 mod png;
 mod resize;
 #[cfg(feature = "tiff")]
-pub mod tiff;
+mod tiff;
 mod utils;
 #[cfg(feature = "webp")]
 mod webp;
@@ -179,7 +179,7 @@ pub fn compress_to_size_in_memory(
                 last_high = quality;
             }
             let last_quality = quality;
-            quality = cmp::max(1, cmp::min(100, (last_high + last_less) / 2));
+            quality = ((last_high + last_less) / 2).clamp(1, 100);
             if last_quality == quality {
                 if quality == 1 && last_high == 1 {
                     return if return_smallest {

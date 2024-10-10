@@ -4,6 +4,7 @@ use std::io::Write;
 use std::mem;
 use std::panic::catch_unwind;
 use std::ptr::null;
+use std::sync::atomic::{AtomicI32, Ordering};
 use image::ImageFormat::Jpeg;
 use img_parts::{ImageEXIF, ImageICC};
 use img_parts::jpeg::Jpeg as PartsJpeg;
@@ -15,7 +16,7 @@ use crate::error::CaesiumError;
 use crate::parameters::ChromaSubsampling;
 use crate::resize::resize;
 
-static mut JPEG_ERROR: c_int = 0;
+static JPEG_ERROR: AtomicI32 = AtomicI32::new(0);
 
 pub fn compress(
     input_path: String,
@@ -63,7 +64,7 @@ pub fn compress_in_memory(
         })
         .unwrap_or_else(|_| {
             Err(CaesiumError {
-                message: format!("Internal JPEG error: {}", JPEG_ERROR),
+                message: format!("Internal JPEG error: {}", JPEG_ERROR.load(Ordering::SeqCst)),
                 code: 20104,
             })
         })
@@ -107,6 +108,9 @@ unsafe fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8
     let mut buf = ptr::null_mut();
     let mut buf_size = 0;
     jpeg_mem_dest(&mut dst_info, &mut buf, &mut buf_size);
+    if !parameters.jpeg.progressive {
+        dst_info.scan_info = null();
+    }
     jpeg_write_coefficients(&mut dst_info, dst_coef_arrays);
 
     if parameters.keep_metadata {
@@ -312,8 +316,8 @@ unsafe fn set_chroma_subsampling(
 }
 
 unsafe extern "C-unwind" fn error_handler(cinfo: &mut jpeg_common_struct) {
-    JPEG_ERROR = (*cinfo.err).msg_code;
-    panic!("Internal JPEG error: {}", JPEG_ERROR);
+    JPEG_ERROR.store((*cinfo.err).msg_code, Ordering::SeqCst);
+    panic!("Internal JPEG error: {}", JPEG_ERROR.load(Ordering::SeqCst));
 }
 
 unsafe extern "C-unwind" fn error_message_handler(_cinfo: &mut jpeg_common_struct) {}

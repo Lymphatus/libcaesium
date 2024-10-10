@@ -27,7 +27,7 @@ fn convert_jpg_to_png() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Png).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/png"
@@ -48,7 +48,7 @@ fn convert_jpg_to_webp() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::WebP).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
@@ -65,7 +65,7 @@ fn convert_jpg_to_tiff() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Tiff).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/tiff"
@@ -83,7 +83,7 @@ fn convert_png_to_jpg() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Jpeg).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/jpeg"
@@ -104,7 +104,7 @@ fn convert_png_to_webp() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::WebP).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
@@ -121,7 +121,7 @@ fn convert_png_to_tiff() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Tiff).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/tiff"
@@ -139,7 +139,7 @@ fn convert_webp_to_jpg() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Jpeg).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/jpeg"
@@ -160,7 +160,7 @@ fn convert_webp_to_png() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Png).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/png"
@@ -177,7 +177,7 @@ fn convert_webp_to_tiff() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Tiff).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/tiff"
@@ -194,7 +194,7 @@ fn convert_tiff_to_jpg() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Jpeg).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/jpeg"
@@ -211,7 +211,7 @@ fn convert_tiff_to_png() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::Png).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/png"
@@ -228,7 +228,7 @@ fn convert_tiff_to_webp() {
                      String::from(output),
                      &params,
                      SupportedFileTypes::WebP).expect("Image converted successfully");
-    assert!(std::path::Path::new(output).exists());
+    assert!(Path::new(output).exists());
     assert_eq!(
         infer::get_from_path(output).unwrap().unwrap().mime_type(),
         "image/webp"
