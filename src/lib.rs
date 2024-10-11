@@ -26,6 +26,17 @@ mod webp;
 mod convert;
 pub mod parameters;
 
+/// Compresses an image file from the input path and writes the compressed image to the output path.
+///
+/// # Arguments
+///
+/// * `input_path` - A string representing the path to the input image file.
+/// * `output_path` - A string representing the path to the output compressed image file.
+/// * `parameters` - A reference to `CSParameters` containing compression settings.
+///
+/// # Returns
+///
+/// * `Result<(), CaesiumError>` - Returns `Ok(())` if compression is successful, otherwise returns a `CaesiumError`.
 pub fn compress(
     input_path: String,
     output_path: String,
@@ -66,6 +77,16 @@ pub fn compress(
     Ok(())
 }
 
+/// Compresses an image file in memory and returns the compressed image as a byte vector.
+///
+/// # Arguments
+///
+/// * `in_file` - A vector of bytes representing the input image file.
+/// * `parameters` - A reference to `CSParameters` containing compression settings.
+///
+/// # Returns
+///
+/// * `Result<Vec<u8>, CaesiumError>` - Returns a vector of bytes representing the compressed image if successful, otherwise returns a `CaesiumError`.
 pub fn compress_in_memory(
     in_file: Vec<u8>,
     parameters: &CSParameters,
@@ -90,6 +111,19 @@ pub fn compress_in_memory(
 
     Ok(compressed_file)
 }
+
+/// Compresses an image file in memory up to a specified size and returns the compressed image as a byte vector.
+///
+/// # Arguments
+///
+/// * `in_file` - A vector of bytes representing the input image file.
+/// * `parameters` - A mutable reference to `CSParameters` containing compression settings.
+/// * `max_output_size` - The maximum size of the output compressed image in bytes.
+/// * `return_smallest` - A boolean indicating whether to return the smallest compressed image if the desired size is not achieved.
+///
+/// # Returns
+///
+/// * `Result<Vec<u8>, CaesiumError>` - Returns a vector of bytes representing the compressed image if successful, otherwise returns a `CaesiumError`.
 
 pub fn compress_to_size_in_memory(
     in_file: Vec<u8>,
@@ -202,6 +236,19 @@ pub fn compress_to_size_in_memory(
     Ok(compressed_file)
 }
 
+/// Compresses an image file from the input path up to a specified size and writes the compressed image to the output path.
+///
+/// # Arguments
+///
+/// * `input_path` - A string representing the path to the input image file.
+/// * `output_path` - A string representing the path to the output compressed image file.
+/// * `parameters` - A mutable reference to `CSParameters` containing compression settings.
+/// * `max_output_size` - The maximum size of the output compressed image in bytes.
+/// * `return_smallest` - A boolean indicating whether to return the smallest compressed image if the desired size is not achieved.
+///
+/// # Returns
+///
+/// * `Result<(), CaesiumError>` - Returns `Ok(())` if compression is successful, otherwise returns a `CaesiumError`.
 pub fn compress_to_size(
     input_path: String,
     output_path: String,
@@ -237,6 +284,19 @@ pub fn compress_to_size(
     Ok(())
 }
 
+/// Converts an image file from the input path to a specified format and writes the converted image to the output path.
+///
+/// # Arguments
+///
+/// * `input_path` - A string representing the path to the input image file.
+/// * `output_path` - A string representing the path to the output converted image file.
+/// * `parameters` - A reference to `CSParameters` containing conversion settings.
+/// * `format` - The target format to convert the image to.
+///
+/// # Returns
+///
+/// * `Result<(), CaesiumError>` - Returns `Ok(())` if conversion is successful, otherwise returns a `CaesiumError`.
+
 pub fn convert(input_path: String, output_path: String, parameters: &CSParameters, format: SupportedFileTypes) -> error::Result<()> {
 
     let file_type = get_filetype_from_path(&input_path);
@@ -269,6 +329,18 @@ pub fn convert(input_path: String, output_path: String, parameters: &CSParameter
 
     Ok(())
 }
+
+/// Converts an image file in memory to a specified format and returns the converted image as a byte vector.
+///
+/// # Arguments
+///
+/// * `in_file` - A vector of bytes representing the input image file.
+/// * `parameters` - A reference to `CSParameters` containing conversion settings.
+/// * `format` - The target format to convert the image to.
+///
+/// # Returns
+///
+/// * `Result<Vec<u8>, CaesiumError>` - Returns a vector of bytes representing the converted image if successful, otherwise returns a `CaesiumError`.
 pub fn convert_in_memory(in_file: Vec<u8>, parameters: &CSParameters, format: SupportedFileTypes) -> Result<Vec<u8>, CaesiumError> {
     convert::convert_in_memory(in_file, format, parameters)
 }
