@@ -47,10 +47,6 @@ kamadak-exif = "0.5"
 [dev-dependencies]
 dssim = { version = "3.3", default-features = false, features = ["no-macos-vimage"] }
 
-[[bin]]
-name = "main"
-path = "src/main.rs"
-
 [lib]
 name = "caesium"
 path = "src/lib.rs"

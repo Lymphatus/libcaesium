@@ -1,5 +1,5 @@
 use caesium::parameters::CSParameters;
-use caesium::compress;
+use caesium::convert;
 use std::env;
 use std::process::ExitCode;
 
@@ -9,8 +9,10 @@ fn main() -> ExitCode {
     let input = args[1].clone();
     let output = args[2].clone();
 
-    let parameters = CSParameters::new();
-    match compress(input, output, &parameters) {
+    let mut parameters = CSParameters::new();
+    parameters.png.quality = 60;
+
+    match convert(input, output, &parameters, caesium::SupportedFileTypes::Png) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("{}", e);

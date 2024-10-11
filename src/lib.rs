@@ -381,13 +381,6 @@ fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
         });
     }
 
-    if parameters.optimize && parameters.output_size > 0 {
-        return Err(CaesiumError {
-            message: "Cannot compress to desired size with lossless optimization".into(),
-            code: 10005,
-        });
-    }
-
     Ok(())
 }
 

@@ -109,7 +109,6 @@ pub struct TiffParameters {
 /// - `optimize`: Whether to use lossless compression
 /// - `width`: Width of the output image
 /// - `height`: Height of the output image
-/// - `output_size`: Desired output size of the compressed image
 #[derive(Copy, Clone)]
 pub struct CSParameters {
     pub jpeg: JpegParameters,
@@ -120,8 +119,7 @@ pub struct CSParameters {
     pub keep_metadata: bool,
     pub optimize: bool,
     pub width: u32,
-    pub height: u32,
-    pub output_size: u32,
+    pub height: u32
 }
 impl Default for CSParameters {
     fn default() -> Self {
@@ -162,7 +160,6 @@ fn initialize_parameters() -> CSParameters {
         keep_metadata: false,
         optimize: false,
         width: 0,
-        height: 0,
-        output_size: 0,
+        height: 0
     }
 }
