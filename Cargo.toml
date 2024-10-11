@@ -15,6 +15,8 @@ description = "A lossy/lossless image compression library."
 readme = "README.md"
 exclude = [
     "tests/*",
+    ".github/*",
+    ".idea/*",
 ]
 homepage = "https://github.com/Lymphatus/libcaesium"
 repository = "https://github.com/Lymphatus/libcaesium"
