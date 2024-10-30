@@ -39,7 +39,9 @@ The result will be a dynamic library usable by external applications through its
 
 ## Usage in C
 
-Libcaesium exposes two C functions, auto-detecting the input file type:
+*The header file for C can be found in the header directory.*
+
+Libcaesium exposes there C functions, auto-detecting the input file type:
 
 ### Based on quality values
 
@@ -65,6 +67,7 @@ A `CCSResult` struct
 #[repr(C)]
 pub struct CCSResult {
     pub success: bool,
+    pub code: u32,
     pub error_message: *const c_char,
 }
 ```
@@ -80,6 +83,7 @@ pub unsafe extern "C" fn c_compress_to_size(
     output_path: *const c_char,
     params: CCSParameters,
     max_output_size: usize,
+    return_smallest: bool,
 ) -> CCSResult
 ```
 
@@ -89,6 +93,7 @@ pub unsafe extern "C" fn c_compress_to_size(
 - `output_path` - output file path (full filename)
 - `parameters` - options struct, containing compression parameters (see below)
 - `max_output_size` - the maximum output size, in bytes
+- `return_smallest` - whether to return the smallest
 
 #### Return
 
@@ -98,6 +103,41 @@ A `CCSResult` struct
 #[repr(C)]
 pub struct CCSResult {
     pub success: bool,
+    pub code: u32,
+    pub error_message: *const c_char,
+}
+```
+
+If `success` is `true` the compression process ended successfully and `error_message` will be empty.  
+On failure, the `error_message` will be filled with a string containing a brief explanation of the error.
+
+### Based on convert output
+
+```Rust
+pub unsafe extern "C" fn c_convert(
+    input_path: *const c_char,
+    output_path: *const c_char,
+    format: SupportedFileTypes,
+    params: CCSParameters,
+) -> CCSResult
+```
+
+#### Parameters
+
+- `input_path` - input file path (full filename)
+- `output_path` - output file path (full filename)
+- `format` - target image format (see below)
+- `parameters` - options struct, containing compression parameters (see below)
+
+#### Return
+
+A `CCSResult` struct
+
+```Rust
+#[repr(C)]
+pub struct CCSResult {
+    pub success: bool,
+    pub code: u32,
     pub error_message: *const c_char,
 }
 ```
@@ -136,6 +176,21 @@ Valid values for `tiff_compression` are `[0 (Uncompressed), 1 (Lzw), 2 (Deflate)
 ignored and `0` will be used.  
 Valid values for `tiff_deflate_level` are `[1 (Fast), 6 (Balanced), 9 (Best)]`. Any other value will be ignored and `Best`
 will be used.
+
+### Supported file types
+
+```rust
+#[repr(C)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum SupportedFileTypes {
+    Jpeg,
+    Png,
+    Gif,
+    WebP,
+    Tiff,
+    Unkn,
+}
+```
 
 ## Compression vs Optimization
 
