@@ -39,7 +39,7 @@ The result will be a dynamic library usable by external applications through its
 
 ## Usage in C
 
-*The header file for C can be found in the header directory.*
+*You can find the C header file in the include folder in the project root directory.*
 
 Libcaesium exposes there C functions, auto-detecting the input file type:
 
