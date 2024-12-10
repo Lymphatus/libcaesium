@@ -25,7 +25,7 @@ typedef struct CCSResult {
 } CCSResult;
 
 typedef struct CCSParameters {
-    bool keep_matedata;
+    bool keep_metadata;
     uint32_t jpeg_quality;
     uint32_t jpeg_chroma_subsampling; // support 444, 422, 420, 411
     bool jpeg_progressive;
