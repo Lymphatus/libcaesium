@@ -1,5 +1,5 @@
 use caesium::parameters::CSParameters;
-use caesium::convert;
+use caesium::compress;
 use std::env;
 use std::process::ExitCode;
 
@@ -11,9 +11,9 @@ fn main() -> ExitCode {
 
     let mut parameters = CSParameters::new();
     parameters.keep_metadata = true;
-    parameters.webp.quality = 60;
+    parameters.optimize = true;
 
-    match convert(input, output, &parameters, caesium::SupportedFileTypes::WebP) {
+    match compress(input, output, &parameters) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("{}", e);
