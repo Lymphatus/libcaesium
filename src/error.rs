@@ -13,3 +13,5 @@ impl fmt::Display for CaesiumError {
         write!(f, "{} [{}]", self.message, self.code)
     }
 }
+
+impl std::error::Error for CaesiumError {}
