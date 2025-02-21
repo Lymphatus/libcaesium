@@ -18,10 +18,10 @@ pub fn resize(
         let orientation = get_jpeg_orientation(buffer_slice);
         (desired_width, desired_height) = match orientation {
             5..=8 => (height, width),
-            _ => (width, height)
+            _ => (width, height),
         };
     }
-    
+
     let mut image = ImageReader::new(Cursor::new(image_buffer))
         .with_guessed_format()
         .map_err(|e| CaesiumError {
@@ -34,8 +34,7 @@ pub fn resize(
             code: 10301,
         })?;
 
-    let dimensions =
-        compute_dimensions(image.width(), image.height(), desired_width, desired_height);
+    let dimensions = compute_dimensions(image.width(), image.height(), desired_width, desired_height);
     image = image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3);
 
     let mut resized_file: Vec<u8> = vec![];
@@ -106,10 +105,7 @@ fn downscale_on_width() {
     let original_width = 800;
     let original_height = 600;
 
-    assert_eq!(
-        compute_dimensions(original_width, original_height, 750, 0),
-        (750, 563)
-    )
+    assert_eq!(compute_dimensions(original_width, original_height, 750, 0), (750, 563))
 }
 
 #[test]
@@ -117,8 +113,5 @@ fn downscale_on_height() {
     let original_width = 800;
     let original_height = 600;
 
-    assert_eq!(
-        compute_dimensions(original_width, original_height, 0, 478),
-        (637, 478)
-    )
+    assert_eq!(compute_dimensions(original_width, original_height, 0, 478), (637, 478))
 }

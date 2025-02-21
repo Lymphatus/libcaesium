@@ -4,11 +4,7 @@ use std::os::raw::{c_int, c_void};
 use crate::error::CaesiumError;
 use crate::CSParameters;
 
-pub fn compress(
-    input_path: String,
-    output_path: String,
-    parameters: &CSParameters,
-) -> Result<(), CaesiumError> {
+pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
     if parameters.width > 0 || parameters.height > 0 {
         return Err(CaesiumError {
             message: "GIF resizing is not supported".to_string(),
@@ -58,11 +54,7 @@ fn lossless(input_path: String, output_path: String) -> Result<(), CaesiumError>
     }
 }
 
-pub fn lossy(
-    input_path: String,
-    output_path: String,
-    parameters: &CSParameters,
-) -> Result<(), CaesiumError> {
+pub fn lossy(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
     unsafe {
         let input_file = libc::fopen(
             CString::new(input_path)

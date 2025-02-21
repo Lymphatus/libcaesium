@@ -79,15 +79,14 @@ pub fn convert_in_memory(
             code: 10404,
         })?;
 
-    let compressed_converted_image =
-        compress_in_memory(output_image, parameters).map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 10405,
-        })?;
+    let compressed_converted_image = compress_in_memory(output_image, parameters).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10405,
+    })?;
 
     if parameters.keep_metadata {
-        let dyn_image = DynImage::from_bytes(Bytes::from(compressed_converted_image.clone()))
-            .map_err(|e| CaesiumError {
+        let dyn_image =
+            DynImage::from_bytes(Bytes::from(compressed_converted_image.clone())).map_err(|e| CaesiumError {
                 message: e.to_string(),
                 code: 10408,
             })?;

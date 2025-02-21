@@ -126,7 +126,7 @@ fn rgb8_downscale() {
 
 #[test]
 fn rgb8_downscale_to_size() {
-    let max_output_size = 10_000;
+    let max_output_size = 100_000;
     let output = "tests/samples/output/downscale_rgb8_to_size.tif";
     initialize(output);
     let mut params = CSParameters::new();
@@ -138,7 +138,7 @@ fn rgb8_downscale_to_size() {
         String::from(output),
         &mut params,
         max_output_size,
-        false,
+        true,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());

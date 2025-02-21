@@ -12,23 +12,17 @@ use crate::error::CaesiumError;
 use crate::resize::resize_image;
 use crate::CSParameters;
 
-pub fn compress(
-    input_path: String,
-    output_path: String,
-    parameters: &CSParameters,
-) -> Result<(), CaesiumError> {
+pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let mut input_file = File::open(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20300,
     })?;
 
     let mut input_data = Vec::new();
-    input_file
-        .read_to_end(&mut input_data)
-        .map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20301,
-        })?;
+    input_file.read_to_end(&mut input_data).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20301,
+    })?;
 
     let compressed_image = compress_in_memory(input_data, parameters)?;
 
@@ -37,19 +31,14 @@ pub fn compress(
         code: 20302,
     })?;
 
-    output_file
-        .write_all(&compressed_image)
-        .map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20303,
-        })?;
+    output_file.write_all(&compressed_image).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20303,
+    })?;
     Ok(())
 }
 
-pub fn compress_in_memory(
-    in_file: Vec<u8>,
-    parameters: &CSParameters,
-) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut iccp: Option<Bytes> = None;
     let mut exif: Option<Bytes> = None;
 
@@ -59,9 +48,7 @@ pub fn compress_in_memory(
                 message: e.to_string(),
                 code: 20306,
             })?
-            .map_or((None, None), |dyn_img| {
-                (dyn_img.icc_profile(), dyn_img.exif())
-            });
+            .map_or((None, None), |dyn_img| (dyn_img.icc_profile(), dyn_img.exif()));
     }
 
     let must_resize = parameters.width > 0 || parameters.height > 0;
@@ -120,12 +107,10 @@ pub fn compress_in_memory(
             if must_resize {
                 if images_data.get(i).is_some() {
                     encoder.add_frame(
-                        AnimFrame::from_image(images_data.get(i).unwrap(), last_ms).map_err(
-                            |e| CaesiumError {
-                                message: e.to_string(),
-                                code: 20310,
-                            },
-                        )?,
+                        AnimFrame::from_image(images_data.get(i).unwrap(), last_ms).map_err(|e| CaesiumError {
+                            message: e.to_string(),
+                            code: 20310,
+                        })?,
                     );
                 }
             } else {
@@ -206,14 +191,12 @@ fn to_rgba(value: u32) -> [u8; 4] {
 
 fn to_dynamic_image(frame: AnimFrame) -> DynamicImage {
     if frame.get_layout().is_alpha() {
-        let image =
-            ImageBuffer::from_raw(frame.width(), frame.height(), frame.get_image().to_owned())
-                .expect("ImageBuffer couldn't be created");
+        let image = ImageBuffer::from_raw(frame.width(), frame.height(), frame.get_image().to_owned())
+            .expect("ImageBuffer couldn't be created");
         DynamicImage::ImageRgba8(image)
     } else {
-        let image =
-            ImageBuffer::from_raw(frame.width(), frame.height(), frame.get_image().to_owned())
-                .expect("ImageBuffer couldn't be created");
+        let image = ImageBuffer::from_raw(frame.width(), frame.height(), frame.get_image().to_owned())
+            .expect("ImageBuffer couldn't be created");
         DynamicImage::ImageRgb8(image)
     }
 }

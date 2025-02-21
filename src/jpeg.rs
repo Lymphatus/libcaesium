@@ -18,11 +18,7 @@ use crate::CSParameters;
 
 static JPEG_ERROR: AtomicI32 = AtomicI32::new(0);
 
-pub fn compress(
-    input_path: String,
-    output_path: String,
-    parameters: &CSParameters,
-) -> Result<(), CaesiumError> {
+pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let in_file = fs::read(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20100,
@@ -40,10 +36,7 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_in_memory(
-    mut in_file: Vec<u8>,
-    parameters: &CSParameters,
-) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     if parameters.width > 0 || parameters.height > 0 {
         if parameters.keep_metadata {
             let metadata = extract_metadata(in_file.clone());
@@ -200,11 +193,7 @@ unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, 
     let row_stride = dst_info.image_width as usize * dst_info.input_components as usize;
     dst_info.dct_method = J_DCT_METHOD::JDCT_ISLOW;
     dst_info.optimize_coding = i32::from(true);
-    jpeg_set_quality(
-        &mut dst_info,
-        parameters.jpeg.quality as i32,
-        false as boolean,
-    );
+    jpeg_set_quality(&mut dst_info, parameters.jpeg.quality as i32, false as boolean);
 
     if !parameters.jpeg.progressive {
         dst_info.scan_info = null();
@@ -244,17 +233,12 @@ fn extract_metadata(image: Vec<u8>) -> (Option<img_parts::Bytes>, Option<img_par
 }
 
 //TODO if image is resized, change "PixelXDimension" and "PixelYDimension"
-fn save_metadata(
-    image_buffer: Vec<u8>,
-    iccp: Option<img_parts::Bytes>,
-    exif: Option<img_parts::Bytes>,
-) -> Vec<u8> {
+fn save_metadata(image_buffer: Vec<u8>, iccp: Option<img_parts::Bytes>, exif: Option<img_parts::Bytes>) -> Vec<u8> {
     if iccp.is_some() || exif.is_some() {
-        let mut dyn_image =
-            match PartsJpeg::from_bytes(img_parts::Bytes::from(image_buffer.clone())) {
-                Ok(d) => d,
-                Err(_) => return image_buffer,
-            };
+        let mut dyn_image = match PartsJpeg::from_bytes(img_parts::Bytes::from(image_buffer.clone())) {
+            Ok(d) => d,
+            Err(_) => return image_buffer,
+        };
 
         dyn_image.set_icc_profile(iccp);
         dyn_image.set_exif(exif);
@@ -269,27 +253,16 @@ fn save_metadata(
     }
 }
 
-unsafe fn write_metadata(
-    src_info: &mut jpeg_decompress_struct,
-    dst_info: &mut jpeg_compress_struct,
-) {
+unsafe fn write_metadata(src_info: &mut jpeg_decompress_struct, dst_info: &mut jpeg_compress_struct) {
     let mut marker = src_info.marker_list;
 
     while !marker.is_null() {
-        jpeg_write_marker(
-            dst_info,
-            (*marker).marker as i32,
-            (*marker).data,
-            (*marker).data_length,
-        );
+        jpeg_write_marker(dst_info, (*marker).marker as i32, (*marker).data, (*marker).data_length);
         marker = (*marker).next;
     }
 }
 
-unsafe fn set_chroma_subsampling(
-    subsampling: ChromaSubsampling,
-    dst_info: &mut jpeg_compress_struct,
-) {
+unsafe fn set_chroma_subsampling(subsampling: ChromaSubsampling, dst_info: &mut jpeg_compress_struct) {
     (*dst_info.comp_info.add(1)).h_samp_factor = 1;
     (*dst_info.comp_info.add(1)).v_samp_factor = 1;
     (*dst_info.comp_info.add(2)).h_samp_factor = 1;

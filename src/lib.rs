@@ -37,11 +37,7 @@ mod webp;
 /// # Returns
 ///
 /// * `Result<(), CaesiumError>` - Returns `Ok(())` if compression is successful, otherwise returns a `CaesiumError`.
-pub fn compress(
-    input_path: String,
-    output_path: String,
-    parameters: &CSParameters,
-) -> error::Result<()> {
+pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> error::Result<()> {
     validate_parameters(parameters)?;
     let file_type = get_filetype_from_path(&input_path);
 
@@ -151,7 +147,7 @@ pub fn compress_to_size_in_memory(
                     smallest_result = result;
                 }
             }
-            return if return_smallest {
+            return if return_smallest || smallest_result.len() <= max_output_size {
                 Ok(smallest_result)
             } else {
                 Err(CaesiumError {
@@ -194,9 +190,7 @@ pub fn compress_to_size_in_memory(
 
             let compressed_file_size = compressed_file.len();
 
-            if compressed_file_size <= max_output_size
-                && max_output_size - compressed_file_size < tolerance
-            {
+            if compressed_file_size <= max_output_size && max_output_size - compressed_file_size < tolerance {
                 break compressed_file;
             }
 
@@ -264,18 +258,15 @@ pub fn compress_to_size(
         return Ok(());
     }
 
-    let compressed_file =
-        compress_to_size_in_memory(in_file, parameters, max_output_size, return_smallest)?;
+    let compressed_file = compress_to_size_in_memory(in_file, parameters, max_output_size, return_smallest)?;
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 10203,
     })?;
-    out_file
-        .write_all(&compressed_file)
-        .map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 10204,
-        })?;
+    out_file.write_all(&compressed_file).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10204,
+    })?;
 
     Ok(())
 }
@@ -311,23 +302,20 @@ pub fn convert(
         message: e.to_string(),
         code: 10410,
     })?;
-    let output_buffer =
-        convert_in_memory(in_file, parameters, format).map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 10411,
-        })?;
+    let output_buffer = convert_in_memory(in_file, parameters, format).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10411,
+    })?;
 
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 10412,
     })?;
 
-    out_file
-        .write_all(&output_buffer)
-        .map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 10413,
-        })?;
+    out_file.write_all(&output_buffer).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 10413,
+    })?;
 
     Ok(())
 }

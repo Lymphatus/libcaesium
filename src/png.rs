@@ -10,23 +10,14 @@ use crate::error::CaesiumError;
 use crate::resize::resize;
 use crate::CSParameters;
 
-pub fn compress(
-    input_path: String,
-    output_path: String,
-    parameters: &CSParameters,
-) -> Result<(), CaesiumError> {
+pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let mut in_file = fs::read(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20200,
     })?;
 
     if parameters.width > 0 || parameters.height > 0 {
-        in_file = resize(
-            in_file,
-            parameters.width,
-            parameters.height,
-            ImageFormat::Png,
-        )?;
+        in_file = resize(in_file, parameters.width, parameters.height, ImageFormat::Png)?;
     }
 
     let optimized_png = compress_in_memory(in_file, parameters)?;
@@ -44,17 +35,9 @@ pub fn compress(
     Ok(())
 }
 
-pub fn compress_in_memory(
-    in_file: Vec<u8>,
-    parameters: &CSParameters,
-) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let input = if parameters.width > 0 || parameters.height > 0 {
-        resize(
-            in_file,
-            parameters.width,
-            parameters.height,
-            ImageFormat::Png,
-        )?
+        resize(in_file, parameters.width, parameters.height, ImageFormat::Png)?
     } else {
         in_file
     };
@@ -98,20 +81,16 @@ fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caesium
         code: 20207,
     })?;
 
-    let (palette, pixels) = quantization
-        .remapped(&mut liq_image)
-        .map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20208,
-        })?;
+    let (palette, pixels) = quantization.remapped(&mut liq_image).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20208,
+    })?;
 
     let mut encoder = lodepng::Encoder::new();
-    encoder
-        .set_palette(palette.as_slice())
-        .map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20212,
-        })?;
+    encoder.set_palette(palette.as_slice()).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20212,
+    })?;
     let png_vec = encoder
         .encode(pixels.as_slice(), rgba_bitmap.width, rgba_bitmap.height)
         .map_err(|e| CaesiumError {
@@ -142,11 +121,9 @@ fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caes
     }
 
     let optimized_png =
-        oxipng::optimize_from_memory(in_file.as_slice(), &oxipng_options).map_err(|e| {
-            CaesiumError {
-                message: e.to_string(),
-                code: 20210,
-            }
+        oxipng::optimize_from_memory(in_file.as_slice(), &oxipng_options).map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 20210,
         })?;
 
     Ok(optimized_png)

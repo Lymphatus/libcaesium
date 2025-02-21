@@ -37,7 +37,7 @@ oxipng = { version = "9.0", default-features = false, features = ["filetime", "z
 libc = "0.2"
 gifsicle = { version = "1.95", optional = true }
 webp = { version = "0.3.0", optional = true }
-infer = "0.16.0"
+infer = "0.19.0"
 image = { version = "0.25.1", default-features = false }
 img-parts = "0.3.3"
 bytes = "1.7"

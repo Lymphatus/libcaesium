@@ -3,9 +3,7 @@ use std::os::raw::c_char;
 
 use crate::parameters::ChromaSubsampling;
 use crate::parameters::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
-use crate::{
-    compress, compress_to_size, convert, error, CSParameters, SupportedFileTypes, TiffDeflateLevel,
-};
+use crate::{compress, compress_to_size, convert, error, CSParameters, SupportedFileTypes, TiffDeflateLevel};
 
 #[repr(C)]
 pub struct CCSParameters {
