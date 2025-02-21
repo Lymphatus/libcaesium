@@ -1,9 +1,11 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
-use crate::{compress, compress_to_size, convert, CSParameters, error, SupportedFileTypes, TiffDeflateLevel};
 use crate::parameters::ChromaSubsampling;
 use crate::parameters::TiffCompression::{Deflate, Lzw, Packbits, Uncompressed};
+use crate::{
+    compress, compress_to_size, convert, error, CSParameters, SupportedFileTypes, TiffDeflateLevel,
+};
 
 #[repr(C)]
 pub struct CCSParameters {
@@ -80,7 +82,7 @@ pub unsafe extern "C" fn c_convert(
         CStr::from_ptr(input_path).to_str().unwrap().to_string(),
         CStr::from_ptr(output_path).to_str().unwrap().to_string(),
         &parameters,
-        format
+        format,
     ))
 }
 
@@ -124,7 +126,7 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
     parameters.webp.quality = params.webp_quality;
     parameters.width = params.width;
     parameters.height = params.height;
-    
+
     parameters.jpeg.chroma_subsampling = match params.jpeg_chroma_subsampling {
         444 => ChromaSubsampling::CS444,
         422 => ChromaSubsampling::CS422,
@@ -137,13 +139,13 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
         1 => Lzw,
         2 => Deflate,
         3 => Packbits,
-        _ => Uncompressed
+        _ => Uncompressed,
     };
 
     parameters.tiff.deflate_level = match params.tiff_deflate_level {
         1 => TiffDeflateLevel::Fast,
         6 => TiffDeflateLevel::Balanced,
-        _ => TiffDeflateLevel::Best
+        _ => TiffDeflateLevel::Best,
     };
 
     parameters

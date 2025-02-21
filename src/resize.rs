@@ -34,7 +34,8 @@ pub fn resize(
             code: 10301,
         })?;
 
-    let dimensions = compute_dimensions(image.width(), image.height(), desired_width, desired_height);
+    let dimensions =
+        compute_dimensions(image.width(), image.height(), desired_width, desired_height);
     image = image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3);
 
     let mut resized_file: Vec<u8> = vec![];

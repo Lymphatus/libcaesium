@@ -1,9 +1,9 @@
+use crate::cleanup::remove_compressed_test_file;
+use caesium::parameters::CSParameters;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use std::sync::Once;
-use caesium::parameters::CSParameters;
-use crate::cleanup::remove_compressed_test_file;
 
 mod cleanup;
 static INIT: Once = Once::new();
@@ -78,7 +78,7 @@ fn jpeg_resize_optimize_with_metadata() {
     ));
     remove_compressed_test_file(output)
 }
-// 
+//
 // #[test]
 // fn webp_compress_80_with_metadata() {
 //     let output = "tests/samples/output/compressed_80_metadata.webp";

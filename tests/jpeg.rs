@@ -1,7 +1,7 @@
 use crate::cleanup::remove_compressed_test_file;
-use dssim::Val;
-use std::sync::Once;
 use caesium::parameters::CSParameters;
+use dssim::Val;
+use std::{fs::File, sync::Once};
 
 mod cleanup;
 
@@ -103,12 +103,7 @@ fn compress_corrupted_lossy() {
     initialize(output);
     let mut pars = CSParameters::new();
     pars.jpeg.quality = 50;
-    assert!(caesium::compress(
-        String::from("tests/samples/corrupted.jpg"),
-        String::from(output),
-        &pars,
-    )
-    .is_err())
+    assert!(caesium::compress(String::from("tests/samples/corrupted.jpg"), String::from(output), &pars,).is_err())
 }
 
 #[test]
@@ -140,12 +135,31 @@ fn compress_corrupted_lossless() {
     initialize(output);
     let mut pars = CSParameters::new();
     pars.optimize = true;
-    assert!(caesium::compress(
-        String::from("tests/samples/corrupted.jpg"),
+    assert!(caesium::compress(String::from("tests/samples/corrupted.jpg"), String::from(output), &pars,).is_err());
+}
+
+#[test]
+fn downscale_to_size() {
+    let max_output_size = 2_000_000;
+    let output = "tests/samples/output/downscale_800_600_to_size.jpg";
+    initialize(output);
+    let mut pars = CSParameters::new();
+    pars.width = 800;
+    pars.height = 600;
+    caesium::compress_to_size(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
-        &pars,
+        &mut pars,
+        max_output_size,
+        false,
     )
-    .is_err());
+    .unwrap();
+    assert!(std::path::Path::new(output).exists());
+    let kind = infer::get_from_path(output).unwrap().unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
+    assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
+    assert_eq!(image::image_dimensions(output).unwrap(), (800, 600));
+    remove_compressed_test_file(output)
 }
 
 #[test]

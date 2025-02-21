@@ -1,7 +1,7 @@
 use crate::parameters::TiffCompression::Deflate;
 
 /// Enum representing different chroma subsampling options for JPEG compression.
-/// 
+///
 /// - `CS444`: 4:4:4 chroma subsampling
 /// - `CS422`: 4:2:2 chroma subsampling
 /// - `CS420`: 4:2:0 chroma subsampling
@@ -17,7 +17,7 @@ pub enum ChromaSubsampling {
 }
 
 /// Enum representing different compression algorithms for TIFF images.
-/// 
+///
 /// - `Uncompressed`: No compression
 /// - `Lzw`: LZW compression
 /// - `Deflate`: Deflate compression
@@ -31,7 +31,7 @@ pub enum TiffCompression {
 }
 
 /// Enum representing different deflate levels for TIFF compression.
-/// 
+///
 /// - `Fast`: Fast compression
 /// - `Balanced`: Balanced compression
 /// - `Best`: Best compression
@@ -43,7 +43,7 @@ pub enum TiffDeflateLevel {
 }
 
 /// Struct representing parameters for JPEG compression.
-/// 
+///
 /// Fields:
 /// - `quality`: Quality of the JPEG image (0-100)
 /// - `chroma_subsampling`: Chroma subsampling option
@@ -56,7 +56,7 @@ pub struct JpegParameters {
 }
 
 /// Struct representing parameters for PNG compression.
-/// 
+///
 /// Fields:
 /// - `quality`: Quality of the PNG image (0-100)
 /// - `force_zopfli`: Whether to force the use of Zopfli compression (can be very slow)
@@ -69,7 +69,7 @@ pub struct PngParameters {
 }
 
 /// Struct representing parameters for GIF compression.
-/// 
+///
 /// Fields:
 /// - `quality`: Quality of the GIF image (0-100)
 #[derive(Copy, Clone)]
@@ -78,7 +78,7 @@ pub struct GifParameters {
 }
 
 /// Struct representing parameters for WebP compression.
-/// 
+///
 /// Fields:
 /// - `quality`: Quality of the WebP image (0-100)
 #[derive(Copy, Clone)]
@@ -87,7 +87,7 @@ pub struct WebPParameters {
 }
 
 /// Struct representing parameters for TIFF compression.
-/// 
+///
 /// Fields:
 /// - `algorithm`: Compression algorithm for TIFF
 /// - `deflate_level`: Deflate level for TIFF compression
@@ -98,7 +98,7 @@ pub struct TiffParameters {
 }
 
 /// Struct representing overall compression parameters.
-/// 
+///
 /// Fields:
 /// - `jpeg`: JPEG compression parameters
 /// - `png`: PNG compression parameters
@@ -119,7 +119,7 @@ pub struct CSParameters {
     pub keep_metadata: bool,
     pub optimize: bool,
     pub width: u32,
-    pub height: u32
+    pub height: u32,
 }
 impl Default for CSParameters {
     fn default() -> Self {
@@ -137,7 +137,7 @@ fn initialize_parameters() -> CSParameters {
     let jpeg = JpegParameters {
         quality: 80,
         chroma_subsampling: ChromaSubsampling::Auto,
-        progressive: true
+        progressive: true,
     };
     let png = PngParameters {
         quality: 80,
@@ -160,6 +160,6 @@ fn initialize_parameters() -> CSParameters {
         keep_metadata: false,
         optimize: false,
         width: 0,
-        height: 0
+        height: 0,
     }
 }

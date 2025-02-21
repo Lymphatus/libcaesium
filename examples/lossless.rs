@@ -1,5 +1,5 @@
-use caesium::parameters::CSParameters;
 use caesium::compress;
+use caesium::parameters::CSParameters;
 use std::env;
 use std::process::ExitCode;
 

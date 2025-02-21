@@ -4,11 +4,15 @@ use bytes::Bytes;
 use image::{ColorType, DynamicImage, ImageFormat, ImageReader};
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 
-use crate::{compress_in_memory, CSParameters, SupportedFileTypes};
 use crate::error::CaesiumError;
 use crate::utils::{get_filetype_from_memory, get_jpeg_orientation};
+use crate::{compress_in_memory, CSParameters, SupportedFileTypes};
 
-pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+pub fn convert_in_memory(
+    in_file: Vec<u8>,
+    format: SupportedFileTypes,
+    parameters: &CSParameters,
+) -> Result<Vec<u8>, CaesiumError> {
     let mut iccp = None;
     let mut exif = None;
 
@@ -23,11 +27,13 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
     }
 
     let i = in_file.as_slice();
-    let mut original_image = ImageReader::new(Cursor::new(i)).with_guessed_format()
+    let mut original_image = ImageReader::new(Cursor::new(i))
+        .with_guessed_format()
         .map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 10402,
-        })?.decode()
+        })?
+        .decode()
         .map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 10403,
@@ -44,7 +50,7 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
                 6 => original_image.rotate90(),
                 7 => original_image.fliph().rotate90(),
                 8 => original_image.rotate270(),
-                _ => original_image
+                _ => original_image,
             }
         }
 
@@ -66,14 +72,15 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
     }
 
     let mut output_image: Vec<u8> = Vec::new();
-    original_image.write_to(&mut Cursor::new(&mut output_image), output_format)
+    original_image
+        .write_to(&mut Cursor::new(&mut output_image), output_format)
         .map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 10404,
         })?;
 
-    let compressed_converted_image = compress_in_memory(output_image, parameters)
-        .map_err(|e| CaesiumError {
+    let compressed_converted_image =
+        compress_in_memory(output_image, parameters).map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 10405,
         })?;
@@ -103,9 +110,7 @@ pub fn convert_in_memory(in_file: Vec<u8>, format: SupportedFileTypes, parameter
 
                 Ok(output_image_with_metadata)
             }
-            None => {
-                Ok(compressed_converted_image)
-            }
+            None => Ok(compressed_converted_image),
         }
     } else {
         Ok(compressed_converted_image)
@@ -119,10 +124,12 @@ fn map_image_format(format: SupportedFileTypes) -> Result<ImageFormat, CaesiumEr
         SupportedFileTypes::Gif => ImageFormat::Gif,
         SupportedFileTypes::WebP => ImageFormat::WebP,
         SupportedFileTypes::Tiff => ImageFormat::Tiff,
-        _ => return Err(CaesiumError {
-            message: "Output format is unknown".into(),
-            code: 10400,
-        })
+        _ => {
+            return Err(CaesiumError {
+                message: "Output format is unknown".into(),
+                code: 10400,
+            })
+        }
     };
 
     Ok(image_format)

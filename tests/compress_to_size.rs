@@ -1,7 +1,7 @@
 use crate::cleanup::remove_compressed_test_file;
+use caesium::parameters::CSParameters;
 use std::fs::File;
 use std::sync::Once;
-use caesium::parameters::CSParameters;
 
 mod cleanup;
 
@@ -98,4 +98,29 @@ fn compress_to_range() {
         max_output_size += 100_000;
         remove_compressed_test_file(output);
     }
+}
+
+#[test]
+fn compress_to_higher_size_and_resize() {
+    let output = "tests/samples/output/compressed_10mb.jpg";
+    let max_output_size = 100_000_000;
+    initialize(output);
+    let mut pars = CSParameters::new();
+    pars.width = 800;
+    pars.height = 600;
+    caesium::compress_to_size(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        &mut pars,
+        max_output_size,
+        false,
+    )
+    .unwrap();
+
+    assert!(std::path::Path::new(output).exists());
+    assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
+    let kind = infer::get_from_path(output).unwrap().unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
+    assert_eq!(image::image_dimensions(output).unwrap(), (800, 600));
+    remove_compressed_test_file(output)
 }

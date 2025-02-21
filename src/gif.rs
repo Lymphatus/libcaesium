@@ -1,8 +1,8 @@
 use std::ffi::CString;
 use std::os::raw::{c_int, c_void};
 
-use crate::CSParameters;
 use crate::error::CaesiumError;
+use crate::CSParameters;
 
 pub fn compress(
     input_path: String,

@@ -1,6 +1,6 @@
-use std::sync::Once;
-use caesium::parameters::{CSParameters, TiffCompression, TiffDeflateLevel};
 use crate::cleanup::remove_compressed_test_file;
+use caesium::parameters::{CSParameters, TiffCompression, TiffDeflateLevel};
+use std::{fs::File, sync::Once};
 mod cleanup;
 
 static INIT: Once = Once::new();
@@ -17,17 +17,9 @@ fn rgb8_uncompressed() {
     initialize(output);
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Uncompressed;
-    caesium::compress(
-        String::from("tests/samples/rgb8.tif"),
-        String::from(output),
-        &params,
-    )
-    .unwrap();
+    caesium::compress(String::from("tests/samples/rgb8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -37,17 +29,9 @@ fn rgba8_uncompressed() {
     initialize(output);
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Uncompressed;
-    caesium::compress(
-        String::from("tests/samples/rgba8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgba8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -58,17 +42,9 @@ fn rgb8_deflate() {
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Deflate;
     params.tiff.deflate_level = TiffDeflateLevel::Balanced;
-    caesium::compress(
-        String::from("tests/samples/rgb8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgb8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -79,17 +55,9 @@ fn rgba8_deflate() {
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Deflate;
     params.tiff.deflate_level = TiffDeflateLevel::Balanced;
-    caesium::compress(
-        String::from("tests/samples/rgba8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgba8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -99,17 +67,9 @@ fn rgb8_lzw() {
     initialize(output);
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Lzw;
-    caesium::compress(
-        String::from("tests/samples/rgb8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgb8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -119,17 +79,9 @@ fn rgba8_lzw() {
     initialize(output);
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Lzw;
-    caesium::compress(
-        String::from("tests/samples/rgba8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgba8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -139,17 +91,9 @@ fn rgb8_packbits() {
     initialize(output);
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Packbits;
-    caesium::compress(
-        String::from("tests/samples/rgb8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgb8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -159,17 +103,9 @@ fn rgba8_packbits() {
     initialize(output);
     let mut params = CSParameters::new();
     params.tiff.algorithm = TiffCompression::Packbits;
-    caesium::compress(
-        String::from("tests/samples/rgba8.tif"),
-        String::from(output),
-        &params,
-    )
-        .unwrap();
+    caesium::compress(String::from("tests/samples/rgba8.tif"), String::from(output), &params).unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -181,17 +117,33 @@ fn rgb8_downscale() {
     params.tiff.algorithm = TiffCompression::Lzw;
     params.width = 50;
     params.height = 20;
-    caesium::compress(
+    caesium::compress(String::from("tests/samples/rgb8.tif"), String::from(output), &params).unwrap();
+    assert!(std::path::Path::new(output).exists());
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
+    assert_eq!(image::image_dimensions(output).unwrap(), (50, 20));
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn rgb8_downscale_to_size() {
+    let max_output_size = 10_000;
+    let output = "tests/samples/output/downscale_rgb8_to_size.tif";
+    initialize(output);
+    let mut params = CSParameters::new();
+    params.tiff.algorithm = TiffCompression::Lzw;
+    params.width = 50;
+    params.height = 20;
+    caesium::compress_to_size(
         String::from("tests/samples/rgb8.tif"),
         String::from(output),
-        &params,
+        &mut params,
+        max_output_size,
+        false,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
+    assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
     assert_eq!(image::image_dimensions(output).unwrap(), (50, 20));
     remove_compressed_test_file(output)
 }
@@ -206,7 +158,8 @@ fn unsupported() {
         String::from("tests/samples/unsupported.tif"),
         String::from(output),
         &params,
-    ).is_err());
+    )
+    .is_err());
 }
 
 #[test]
@@ -219,5 +172,6 @@ fn prevent_panic() {
         String::from("tests/samples/unsupported.tif"),
         String::from(output),
         &params,
-    ).is_err());
+    )
+    .is_err());
 }

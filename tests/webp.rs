@@ -1,6 +1,6 @@
-use std::sync::Once;
-use caesium::parameters::CSParameters;
 use crate::cleanup::remove_compressed_test_file;
+use caesium::parameters::CSParameters;
+use std::{fs::File, sync::Once};
 
 mod cleanup;
 
@@ -25,10 +25,7 @@ fn compress_20() {
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
@@ -45,10 +42,7 @@ fn compress_50() {
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
@@ -65,10 +59,7 @@ fn compress_80() {
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
@@ -85,10 +76,7 @@ fn compress_100() {
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
@@ -105,32 +93,29 @@ fn optimize() {
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
 #[test]
-fn downscale_compress_80() {
-    let output = "tests/samples/output/downscale_compressed_80.webp";
+fn downscale_to_size() {
+    let max_output_size = 100_000;
+    let output = "tests/samples/output/downscale_to_size.webp";
     initialize(output);
     let mut params = CSParameters::new();
-    params.webp.quality = 80;
     params.width = 150;
     params.height = 100;
-    caesium::compress(
+    caesium::compress_to_size(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
-        &params,
+        &mut params,
+        max_output_size,
+        false,
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
+    assert!(File::open(output).unwrap().metadata().unwrap().len() < max_output_size as u64);
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
     remove_compressed_test_file(output)
 }
@@ -150,10 +135,7 @@ fn downscale_optimize() {
     )
     .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
     remove_compressed_test_file(output)
 }
@@ -169,11 +151,8 @@ fn compress_animated_80() {
         String::from(output),
         &params,
     )
-        .unwrap();
+    .unwrap();
     assert!(std::path::Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }

@@ -4,17 +4,19 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 
-use error::CaesiumError;
-use crate::parameters::{CSParameters, TiffDeflateLevel};
 use crate::parameters::TiffCompression::{Deflate, Lzw, Packbits};
+use crate::parameters::{CSParameters, TiffDeflateLevel};
 use crate::utils::{get_filetype_from_memory, get_filetype_from_path};
+use error::CaesiumError;
 
+mod convert;
 pub mod error;
 #[cfg(feature = "gif")]
 mod gif;
 mod interface;
 #[cfg(feature = "jpg")]
 mod jpeg;
+pub mod parameters;
 #[cfg(feature = "png")]
 mod png;
 mod resize;
@@ -23,8 +25,6 @@ mod tiff;
 mod utils;
 #[cfg(feature = "webp")]
 mod webp;
-mod convert;
-pub mod parameters;
 
 /// Compresses an image file from the input path and writes the compressed image to the output path.
 ///
@@ -87,10 +87,7 @@ pub fn compress(
 /// # Returns
 ///
 /// * `Result<Vec<u8>, CaesiumError>` - Returns a vector of bytes representing the compressed image if successful, otherwise returns a `CaesiumError`.
-pub fn compress_in_memory(
-    in_file: Vec<u8>,
-    parameters: &CSParameters,
-) -> error::Result<Vec<u8>> {
+pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> error::Result<Vec<u8>> {
     let file_type = get_filetype_from_memory(in_file.as_slice());
     let compressed_file = match file_type {
         #[cfg(feature = "jpg")]
@@ -124,7 +121,6 @@ pub fn compress_in_memory(
 /// # Returns
 ///
 /// * `Result<Vec<u8>, CaesiumError>` - Returns a vector of bytes representing the compressed image if successful, otherwise returns a `CaesiumError`.
-
 pub fn compress_to_size_in_memory(
     in_file: Vec<u8>,
     parameters: &mut CSParameters,
@@ -136,7 +132,7 @@ pub fn compress_to_size_in_memory(
     let tolerance_percentage = 2;
     let tolerance = max_output_size * tolerance_percentage / 100;
     let mut quality = 80;
-    let mut last_less = 1;
+    let mut last_less = 0;
     let mut last_high = 101;
     let max_tries: u32 = 10;
     let mut tries: u32 = 0;
@@ -144,10 +140,7 @@ pub fn compress_to_size_in_memory(
     let compressed_file = match file_type {
         #[cfg(feature = "tiff")]
         SupportedFileTypes::Tiff => {
-            let algorithms = [
-                Lzw,
-                Packbits
-            ];
+            let algorithms = [Lzw, Packbits];
             parameters.tiff.deflate_level = TiffDeflateLevel::Best;
             parameters.tiff.algorithm = Deflate;
             let mut smallest_result = tiff::compress_in_memory(in_file.clone(), parameters)?; //TODO clone
@@ -261,13 +254,16 @@ pub fn compress_to_size(
         code: 10201,
     })?;
     let original_size = in_file.len();
-    if original_size <= max_output_size {
+
+    // If we resize, we should always go for at least a round of compression
+    if !(parameters.width > 0 || parameters.height > 0) && original_size <= max_output_size {
         fs::copy(input_path, output_path).map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 10202,
         })?;
         return Ok(());
     }
+
     let compressed_file =
         compress_to_size_in_memory(in_file, parameters, max_output_size, return_smallest)?;
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
@@ -296,9 +292,12 @@ pub fn compress_to_size(
 /// # Returns
 ///
 /// * `Result<(), CaesiumError>` - Returns `Ok(())` if conversion is successful, otherwise returns a `CaesiumError`.
-
-pub fn convert(input_path: String, output_path: String, parameters: &CSParameters, format: SupportedFileTypes) -> error::Result<()> {
-
+pub fn convert(
+    input_path: String,
+    output_path: String,
+    parameters: &CSParameters,
+    format: SupportedFileTypes,
+) -> error::Result<()> {
     let file_type = get_filetype_from_path(&input_path);
 
     if file_type == format {
@@ -312,20 +311,23 @@ pub fn convert(input_path: String, output_path: String, parameters: &CSParameter
         message: e.to_string(),
         code: 10410,
     })?;
-    let output_buffer = convert_in_memory(in_file, parameters, format).map_err(|e| CaesiumError {
-        message: e.to_string(),
-        code: 10411,
-    })?;
+    let output_buffer =
+        convert_in_memory(in_file, parameters, format).map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 10411,
+        })?;
 
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 10412,
     })?;
 
-    out_file.write_all(&output_buffer).map_err(|e| CaesiumError {
-        message: e.to_string(),
-        code: 10413,
-    })?;
+    out_file
+        .write_all(&output_buffer)
+        .map_err(|e| CaesiumError {
+            message: e.to_string(),
+            code: 10413,
+        })?;
 
     Ok(())
 }
@@ -341,7 +343,11 @@ pub fn convert(input_path: String, output_path: String, parameters: &CSParameter
 /// # Returns
 ///
 /// * `Result<Vec<u8>, CaesiumError>` - Returns a vector of bytes representing the converted image if successful, otherwise returns a `CaesiumError`.
-pub fn convert_in_memory(in_file: Vec<u8>, parameters: &CSParameters, format: SupportedFileTypes) -> Result<Vec<u8>, CaesiumError> {
+pub fn convert_in_memory(
+    in_file: Vec<u8>,
+    parameters: &CSParameters,
+    format: SupportedFileTypes,
+) -> Result<Vec<u8>, CaesiumError> {
     convert::convert_in_memory(in_file, format, parameters)
 }
 

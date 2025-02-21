@@ -6,9 +6,9 @@ use std::num::NonZeroU8;
 use image::ImageFormat;
 use oxipng::Deflaters::Zopfli;
 
-use crate::CSParameters;
 use crate::error::CaesiumError;
 use crate::resize::resize;
+use crate::CSParameters;
 
 pub fn compress(
     input_path: String,
@@ -48,10 +48,21 @@ pub fn compress_in_memory(
     in_file: Vec<u8>,
     parameters: &CSParameters,
 ) -> Result<Vec<u8>, CaesiumError> {
-    let optimized_png: Vec<u8> = if parameters.optimize {
-        lossless(in_file, parameters)?
+    let input = if parameters.width > 0 || parameters.height > 0 {
+        resize(
+            in_file,
+            parameters.width,
+            parameters.height,
+            ImageFormat::Png,
+        )?
     } else {
-        lossy(in_file, parameters)?
+        in_file
+    };
+
+    let optimized_png = if parameters.optimize {
+        lossless(input, parameters)?
+    } else {
+        lossy(input, parameters)?
     };
 
     Ok(optimized_png)

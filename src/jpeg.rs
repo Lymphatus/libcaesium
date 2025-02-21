@@ -1,20 +1,20 @@
-use std::{fs, ptr};
+use image::ImageFormat::Jpeg;
+use img_parts::jpeg::Jpeg as PartsJpeg;
+use img_parts::{ImageEXIF, ImageICC};
+use libc::free;
+use mozjpeg_sys::*;
 use std::fs::File;
 use std::io::Write;
 use std::mem;
 use std::panic::catch_unwind;
 use std::ptr::null;
 use std::sync::atomic::{AtomicI32, Ordering};
-use image::ImageFormat::Jpeg;
-use img_parts::{ImageEXIF, ImageICC};
-use img_parts::jpeg::Jpeg as PartsJpeg;
-use libc::free;
-use mozjpeg_sys::*;
+use std::{fs, ptr};
 
-use crate::{CSParameters};
 use crate::error::CaesiumError;
 use crate::parameters::ChromaSubsampling;
 use crate::resize::resize;
+use crate::CSParameters;
 
 static JPEG_ERROR: AtomicI32 = AtomicI32::new(0);
 

@@ -1,9 +1,9 @@
+use caesium::parameters::CSParameters;
+use caesium::SupportedFileTypes;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use std::sync::Once;
-use caesium::parameters::CSParameters;
-use caesium::SupportedFileTypes;
 
 use crate::cleanup::remove_compressed_test_file;
 
@@ -23,15 +23,15 @@ fn convert_jpg_to_png() {
     initialize(output);
     let mut params = CSParameters::new();
     params.keep_metadata = true;
-    caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Png).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Png,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/png"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
     assert!(metadata_is_equal(
         Path::new("tests/samples/uncompressed_드림캐쳐.jpg"),
         Path::new(output)
@@ -44,15 +44,15 @@ fn convert_jpg_to_webp() {
     let output = "tests/samples/output/jpg.to.webp";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::WebP).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::WebP,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
@@ -61,15 +61,15 @@ fn convert_jpg_to_tiff() {
     let output = "tests/samples/output/jpg.to.tiff";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Tiff).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Tiff,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -79,15 +79,15 @@ fn convert_png_to_jpg() {
     initialize(output);
     let mut params = CSParameters::new();
     params.keep_metadata = true;
-    caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Jpeg).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Jpeg,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/jpeg"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/jpeg");
     // assert!(metadata_is_equal(
     //     Path::new("tests/samples/uncompressed_드림캐쳐.png"),
     //     Path::new(output)
@@ -100,15 +100,15 @@ fn convert_png_to_webp() {
     let output = "tests/samples/output/png.to.webp";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::WebP).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::WebP,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
@@ -117,15 +117,15 @@ fn convert_png_to_tiff() {
     let output = "tests/samples/output/png.to.tiff";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/uncompressed_드림캐쳐.png"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Tiff).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_드림캐쳐.png"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Tiff,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -135,15 +135,15 @@ fn convert_webp_to_jpg() {
     initialize(output);
     let mut params = CSParameters::new();
     params.keep_metadata = true;
-    caesium::convert(String::from("tests/samples/uncompressed_家.webp"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Jpeg).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_家.webp"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Jpeg,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/jpeg"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/jpeg");
     // assert!(metadata_is_equal(
     //     Path::new("tests/samples/uncompressed_家.webp"),
     //     Path::new(output)
@@ -156,15 +156,15 @@ fn convert_webp_to_png() {
     let output = "tests/samples/output/webp.to.png";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/uncompressed_家.webp"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Png).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_家.webp"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Png,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/png"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
     remove_compressed_test_file(output)
 }
 
@@ -173,15 +173,15 @@ fn convert_webp_to_tiff() {
     let output = "tests/samples/output/webp.to.tiff";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/uncompressed_家.webp"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Tiff).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/uncompressed_家.webp"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Tiff,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/tiff"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/tiff");
     remove_compressed_test_file(output)
 }
 
@@ -190,15 +190,15 @@ fn convert_tiff_to_jpg() {
     let output = "tests/samples/output/tiff.to.jpg";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/rgba8.tif"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Jpeg).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/rgba8.tif"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Jpeg,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/jpeg"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/jpeg");
     remove_compressed_test_file(output)
 }
 
@@ -207,15 +207,15 @@ fn convert_tiff_to_png() {
     let output = "tests/samples/output/tiff.to.png";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/rgba8.tif"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::Png).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/rgba8.tif"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::Png,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/png"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/png");
     remove_compressed_test_file(output)
 }
 
@@ -224,15 +224,15 @@ fn convert_tiff_to_webp() {
     let output = "tests/samples/output/tiff.to.webp";
     initialize(output);
     let params = CSParameters::new();
-    caesium::convert(String::from("tests/samples/rgba8.tif"),
-                     String::from(output),
-                     &params,
-                     SupportedFileTypes::WebP).expect("Image converted successfully");
+    caesium::convert(
+        String::from("tests/samples/rgba8.tif"),
+        String::from(output),
+        &params,
+        SupportedFileTypes::WebP,
+    )
+    .expect("Image converted successfully");
     assert!(Path::new(output).exists());
-    assert_eq!(
-        infer::get_from_path(output).unwrap().unwrap().mime_type(),
-        "image/webp"
-    );
+    assert_eq!(infer::get_from_path(output).unwrap().unwrap().mime_type(), "image/webp");
     remove_compressed_test_file(output)
 }
 
