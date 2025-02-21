@@ -1,6 +1,6 @@
 # libcaesium
 
-[![Test](https://github.com/Lymphatus/libcaesium/actions/workflows/rust.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/test.yml)
+[![Test](https://github.com/Lymphatus/libcaesium/actions/workflows/test.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/test.yml)
 [![Clippy](https://github.com/Lymphatus/caesium-clt/actions/workflows/clippy.yml/badge.svg)](https://github.com/Lymphatus/caesium-clt/actions/workflows/clippy.yml)
 [![Code formatting](https://github.com/Lymphatus/caesium-clt/actions/workflows/fmt.yml/badge.svg)](https://github.com/Lymphatus/caesium-clt/actions/workflows/fmt.yml)
 
