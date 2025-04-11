@@ -5,7 +5,7 @@ use std::num::NonZeroU8;
 
 use image::ImageFormat;
 use oxipng::Deflaters::Zopfli;
-
+use imagequant::RGBA;
 use crate::error::CaesiumError;
 use crate::resize::resize;
 use crate::CSParameters;
@@ -85,6 +85,14 @@ fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caesium
         message: e.to_string(),
         code: 20208,
     })?;
+     
+    let palette = palette.iter()
+    .map(|px| if px.a == 0 {
+        RGBA { r: 0, g: 0, b: 0, a: 0 }
+    } else {
+        *px
+    }).collect::<Vec<RGBA>>();
+
 
     let mut encoder = lodepng::Encoder::new();
     encoder.set_palette(palette.as_slice()).map_err(|e| CaesiumError {
