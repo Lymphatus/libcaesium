@@ -84,7 +84,8 @@ let converted_bytes = convert_in_memory(image_bytes, &parameters, SupportedFileT
 ```
 
 You can find more real-world usage in the [examples](examples) folder.  
-To run an example, use:  
+To run an example, use:
+
 ```bash
 cargo run --example <example_name>
 ```
@@ -108,7 +109,7 @@ The result will be a dynamic library usable by external applications through its
 
 *You can find the C header file in the include folder in the project root directory.*
 
-Libcaesium exposes there C functions, auto-detecting the input file type:
+Libcaesium exposes C functions, auto-detecting the input file type:
 
 ### Based on quality values
 
@@ -223,11 +224,14 @@ pub struct CCSParameters {
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
     pub jpeg_progressive: bool,
+    pub jpeg_optimize: bool,
     pub png_quality: u32,
     pub png_optimization_level: u32,
     pub png_force_zopfli: bool,
+    pub png_optimize: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
+    pub webp_lossless: bool,
     pub tiff_compression: u32,
     pub tiff_deflate_level: u32,
     pub optimize: bool,
@@ -238,6 +242,7 @@ pub struct CCSParameters {
 
 The option description is the same as the Rust counterpart.  
 Valid values for `jpeg_chroma_subsampling` are `[444, 422, 420, 411]`. Any other value will be ignored and will be used
+as
 the default option.  
 Valid values for `tiff_compression` are `[0 (Uncompressed), 1 (Lzw), 2 (Deflate), 3 (Packbits)]`. Any other value will
 be ignored and `0` will be used.  
@@ -263,9 +268,9 @@ pub enum SupportedFileTypes {
 ## Compression vs Optimization
 
 JPEG is a lossy format: that means you will always lose some information after each compression. So, compressing a file
-with 100 quality for 10 times will result in an always different image, even though you can't really see the difference.
+with quality 100 for 10 times will result in an always different image, even though you can't really see the difference.
 Libcaesium also supports optimization. This performs a lossless process, resulting in the
 same exact image, but with a smaller size (10–12% usually).  
-GIF optimization is possible, but currently not supported.
+GIF optimization is possible but currently not supported.
 WebP's optimization is also possible, but it will probably result in a bigger output file as it's well suited to
 losslessly convert from PNG or JPEG.
