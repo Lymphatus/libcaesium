@@ -18,7 +18,7 @@ use crate::CSParameters;
 
 static JPEG_ERROR: AtomicI32 = AtomicI32::new(0);
 
-pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
+pub fn compress(input_path: &str, output_path: &str, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let in_file = fs::read(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20100,

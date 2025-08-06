@@ -26,8 +26,103 @@ mod utils;
 #[cfg(feature = "webp")]
 mod webp;
 
-/// Compresses an image file from the input path and writes the compressed image to the output path.
-///
+pub struct Compressor {
+    target_size: Option<usize>,
+    parameters: CSParameters,
+    output_format: Option<SupportedFileTypes>,
+}
+
+impl Default for Compressor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Compressor {
+    pub fn new() -> Self {
+        Compressor {
+            target_size: None,
+            parameters: CSParameters::default(),
+            output_format: None,
+        }
+    }
+
+    pub fn with_target_size(&mut self, target_size: usize) -> &mut Self {
+        self.target_size = Some(target_size);
+        self
+    }
+
+    pub fn with_parameters(&mut self, parameters: CSParameters) -> &mut Self {
+        self.parameters = parameters;
+        self
+    }
+
+    pub fn with_output_format(&mut self, output_format: SupportedFileTypes) -> &mut Self {
+        self.output_format = Some(output_format);
+        self
+    }
+
+    pub fn compress_file(&self, input_path: &str, output_path: &str) -> Result<(), CaesiumError> {
+        validate_parameters(&self.parameters)?;
+        let file_type = get_filetype_from_path(&input_path);
+
+        match file_type {
+            #[cfg(feature = "jpg")]
+            SupportedFileTypes::Jpeg => {
+                jpeg::compress(input_path, output_path, &self.parameters)?;
+            }
+            #[cfg(feature = "png")]
+            SupportedFileTypes::Png => {
+                png::compress(input_path, output_path, &self.parameters)?;
+            }
+            #[cfg(feature = "webp")]
+            SupportedFileTypes::WebP => {
+                webp::compress(input_path, output_path, &self.parameters)?;
+            }
+            #[cfg(feature = "gif")]
+            SupportedFileTypes::Gif => {
+                gif::compress(input_path, output_path, &self.parameters)?;
+            }
+            #[cfg(feature = "tiff")]
+            SupportedFileTypes::Tiff => {
+                tiff::compress(input_path, output_path, &self.parameters)?;
+            }
+            _ => {
+                return Err(CaesiumError {
+                    message: "Unknown file type or file not found".into(),
+                    code: 10000,
+                });
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn compress(&self, in_file: Vec<u8>) -> Result<Vec<u8>, CaesiumError> {
+        let file_type = get_filetype_from_memory(in_file.as_slice());
+        let compressed_file = match file_type {
+            #[cfg(feature = "jpg")]
+            SupportedFileTypes::Jpeg => jpeg::compress_in_memory(in_file, &self.parameters)?,
+            #[cfg(feature = "png")]
+            SupportedFileTypes::Png => png::compress_in_memory(in_file, &self.parameters)?,
+            #[cfg(feature = "webp")]
+            SupportedFileTypes::WebP => webp::compress_in_memory(in_file, &self.parameters)?,
+            #[cfg(feature = "tiff")]
+            SupportedFileTypes::Tiff => tiff::compress_in_memory(in_file, &self.parameters)?,
+            _ => {
+                return Err(CaesiumError {
+                    message: "Format not supported for compression in memory".into(),
+                    code: 10200,
+                });
+            }
+        };
+
+        Ok(compressed_file)
+    }
+}
+
+// /// Compresses an image file from the input path and writes the compressed image to the output path.
+// ///
 /// # Arguments
 ///
 /// * `input_path` - A string representing the path to the input image file.
@@ -38,38 +133,6 @@ mod webp;
 ///
 /// * `Result<(), CaesiumError>` - Returns `Ok(())` if compression is successful, otherwise returns a `CaesiumError`.
 pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> error::Result<()> {
-    validate_parameters(parameters)?;
-    let file_type = get_filetype_from_path(&input_path);
-
-    match file_type {
-        #[cfg(feature = "jpg")]
-        SupportedFileTypes::Jpeg => {
-            jpeg::compress(input_path, output_path, parameters)?;
-        }
-        #[cfg(feature = "png")]
-        SupportedFileTypes::Png => {
-            png::compress(input_path, output_path, parameters)?;
-        }
-        #[cfg(feature = "webp")]
-        SupportedFileTypes::WebP => {
-            webp::compress(input_path, output_path, parameters)?;
-        }
-        #[cfg(feature = "gif")]
-        SupportedFileTypes::Gif => {
-            gif::compress(input_path, output_path, parameters)?;
-        }
-        #[cfg(feature = "tiff")]
-        SupportedFileTypes::Tiff => {
-            tiff::compress(input_path, output_path, parameters)?;
-        }
-        _ => {
-            return Err(CaesiumError {
-                message: "Unknown file type or file not found".into(),
-                code: 10000,
-            });
-        }
-    }
-
     Ok(())
 }
 

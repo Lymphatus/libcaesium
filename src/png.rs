@@ -10,7 +10,7 @@ use image::ImageFormat;
 use imagequant::RGBA;
 use oxipng::Deflaters::Zopfli;
 
-pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
+pub fn compress(input_path: &str, output_path: &str, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let mut in_file = fs::read(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20200,

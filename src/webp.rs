@@ -12,7 +12,7 @@ use crate::error::CaesiumError;
 use crate::resize::resize_image;
 use crate::CSParameters;
 
-pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
+pub fn compress(input_path: &str, output_path: &str, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let mut input_file = File::open(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20300,
