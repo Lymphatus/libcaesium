@@ -111,7 +111,7 @@ fn optimize_jpeg() {
     let output = "tests/samples/output/compressed_optimized_드림캐쳐.jpg";
     initialize(output);
     let mut pars = CSParameters::new();
-    pars.optimize = true;
+    pars.jpeg.optimize = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
         String::from(output),
@@ -134,7 +134,7 @@ fn compress_corrupted_lossless() {
     let output = "tests/samples/output/corrupted_lossless.jpg";
     initialize(output);
     let mut pars = CSParameters::new();
-    pars.optimize = true;
+    pars.jpeg.optimize = true;
     assert!(caesium::compress(String::from("tests/samples/corrupted.jpg"), String::from(output), &pars,).is_err());
 }
 
@@ -188,7 +188,7 @@ fn downscale_exact_optimize() {
     let output = "tests/samples/output/downscale_optimize_800_600.jpg";
     initialize(output);
     let mut pars = CSParameters::new();
-    pars.optimize = true;
+    pars.jpeg.optimize = true;
     pars.width = 800;
     pars.height = 600;
     caesium::compress(

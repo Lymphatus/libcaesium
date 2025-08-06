@@ -40,7 +40,7 @@ fn jpeg_optimize_with_metadata() {
     let output = "tests/samples/output/optimized_metadata.jpg";
     initialize(output);
     let mut pars = CSParameters::new();
-    pars.optimize = true;
+    pars.jpeg.optimize = true;
     pars.keep_metadata = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.jpg"),
@@ -61,7 +61,7 @@ fn jpeg_resize_optimize_with_metadata() {
     let output = "tests/samples/output/resized_optimized_metadata.jpg";
     initialize(output);
     let mut pars = CSParameters::new();
-    pars.optimize = true;
+    pars.jpeg.optimize = true;
     pars.keep_metadata = true;
     pars.width = 200;
     pars.height = 200;

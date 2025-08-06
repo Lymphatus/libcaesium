@@ -70,82 +70,36 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
         code: 20505,
     })?;
 
-    let compression_result = match parameters.tiff.algorithm {
-        TiffCompression::Deflate => match color_type {
-            image::ColorType::Rgb8 => encoder.write_image_with_compression::<RGB8, Deflate>(
-                image.width(),
-                image.height(),
-                Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level)),
-                image.as_bytes(),
-            ),
-            image::ColorType::Rgba8 => encoder.write_image_with_compression::<RGBA8, Deflate>(
-                image.width(),
-                image.height(),
-                Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level)),
-                image.as_bytes(),
-            ),
-            _ => {
-                return Err(CaesiumError {
-                    message: format!("Unsupported TIFF color type ({:?})", color_type).to_string(),
-                    code: 20506,
-                });
+    macro_rules! write_with_compression {
+        ($compression:expr) => {
+            match color_type {
+                image::ColorType::Rgb8 => encoder.write_image_with_compression::<RGB8, _>(
+                    image.width(),
+                    image.height(),
+                    $compression,
+                    image.as_bytes(),
+                ),
+                image::ColorType::Rgba8 => encoder.write_image_with_compression::<RGBA8, _>(
+                    image.width(),
+                    image.height(),
+                    $compression,
+                    image.as_bytes(),
+                ),
+                _ => {
+                    return Err(CaesiumError {
+                        message: format!("Unsupported TIFF color type ({color_type:?})"),
+                        code: 20506,
+                    });
+                }
             }
-        },
+        };
+    }
 
-        TiffCompression::Lzw => match color_type {
-            image::ColorType::Rgb8 => {
-                encoder.write_image_with_compression::<RGB8, Lzw>(image.width(), image.height(), Lzw, image.as_bytes())
-            }
-            image::ColorType::Rgba8 => {
-                encoder.write_image_with_compression::<RGBA8, Lzw>(image.width(), image.height(), Lzw, image.as_bytes())
-            }
-            _ => {
-                return Err(CaesiumError {
-                    message: format!("Unsupported TIFF color type ({:?})", color_type).to_string(),
-                    code: 20506,
-                });
-            }
-        },
-        TiffCompression::Packbits => match color_type {
-            image::ColorType::Rgb8 => encoder.write_image_with_compression::<RGB8, Packbits>(
-                image.width(),
-                image.height(),
-                Packbits,
-                image.as_bytes(),
-            ),
-            image::ColorType::Rgba8 => encoder.write_image_with_compression::<RGBA8, Packbits>(
-                image.width(),
-                image.height(),
-                Packbits,
-                image.as_bytes(),
-            ),
-            _ => {
-                return Err(CaesiumError {
-                    message: format!("Unsupported TIFF color type ({:?})", color_type).to_string(),
-                    code: 20506,
-                });
-            }
-        },
-        TiffCompression::Uncompressed => match color_type {
-            image::ColorType::Rgb8 => encoder.write_image_with_compression::<RGB8, Uncompressed>(
-                image.width(),
-                image.height(),
-                Uncompressed,
-                image.as_bytes(),
-            ),
-            image::ColorType::Rgba8 => encoder.write_image_with_compression::<RGBA8, Uncompressed>(
-                image.width(),
-                image.height(),
-                Uncompressed,
-                image.as_bytes(),
-            ),
-            _ => {
-                return Err(CaesiumError {
-                    message: format!("Unsupported TIFF color type ({:?})", color_type).to_string(),
-                    code: 20506,
-                });
-            }
-        },
+    let compression_result = match parameters.tiff.algorithm {
+        TiffCompression::Deflate => write_with_compression!(Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level))),
+        TiffCompression::Lzw => write_with_compression!(Lzw),
+        TiffCompression::Packbits => write_with_compression!(Packbits),
+        TiffCompression::Uncompressed => write_with_compression!(Uncompressed),
     };
 
     match compression_result {

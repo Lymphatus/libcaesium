@@ -1,54 +1,54 @@
-#ifndef LIB_CAESIUM_H
-#define LIB_CAESIUM_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdint.h>
+#include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 typedef enum SupportedFileTypes {
-    Jpeg = 0,
-    Png = 1,
-    Gif = 2,
-    WebP = 3,
-    Tiff = 4,
-    Unkn = 5
+  Jpeg,
+  Png,
+  Gif,
+  WebP,
+  Tiff,
+  Unkn,
 } SupportedFileTypes;
 
 typedef struct CCSResult {
-    bool success;
-    uint32_t code;
-    char *error_message;
+  bool success;
+  uint32_t code;
+  const char *error_message;
 } CCSResult;
 
 typedef struct CCSParameters {
-    bool keep_metadata;
-    uint32_t jpeg_quality;
-    uint32_t jpeg_chroma_subsampling; // support 444, 422, 420, 411
-    bool jpeg_progressive;
-    uint32_t  png_quality;
-    uint32_t  png_optimization_level;
-    bool  png_force_zopfli;
-    uint32_t  gif_quality;
-    uint32_t  webp_quality;
-    uint32_t  tiff_compression; // support 1:Lzw 2:Deflate 3:Packbits Other Int:Uncompressed
-    uint32_t  tiff_deflate_level; // support 1:Fast 6:Balanced Other Int:Best
-    bool  optimize;
-    uint32_t  width;
-    uint32_t  height;
+  bool keep_metadata;
+  uint32_t jpeg_quality;
+  uint32_t jpeg_chroma_subsampling;
+  bool jpeg_progressive;
+  bool jpeg_optimize;
+  uint32_t png_quality;
+  uint32_t png_optimization_level;
+  bool png_force_zopfli;
+  bool png_optimize;
+  uint32_t gif_quality;
+  uint32_t webp_quality;
+  bool webp_lossless;
+  uint32_t tiff_compression;
+  uint32_t tiff_deflate_level;
+  bool optimize;
+  uint32_t width;
+  uint32_t height;
 } CCSParameters;
 
-CCSResult c_compress(const char* input_path, const char* output_path, CCSParameters* params);
+struct CCSResult c_compress(const char *input_path,
+                            const char *output_path,
+                            struct CCSParameters params);
 
-CCSResult c_compress_to_size(const char* input_path, const char* output_path, CCSParameters* params, uint64_t max_output_size, bool return_smallest);
+struct CCSResult c_compress_to_size(const char *input_path,
+                                    const char *output_path,
+                                    struct CCSParameters params,
+                                    uintptr_t max_output_size,
+                                    bool return_smallest);
 
-CCSResult c_convert(const char* input_path, const char* output_path, SupportedFileTypes format, CCSParameters* params);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+struct CCSResult c_convert(const char *input_path,
+                           const char *output_path,
+                           enum SupportedFileTypes format,
+                           struct CCSParameters params);

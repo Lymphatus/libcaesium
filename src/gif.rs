@@ -12,46 +12,7 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
         });
     }
 
-    if parameters.optimize {
-        lossless(input_path, output_path)
-    } else {
-        lossy(input_path, output_path, parameters)
-    }
-}
-
-fn lossless(input_path: String, output_path: String) -> Result<(), CaesiumError> {
-    let args: Vec<CString> = vec![
-        CString::new(format!("{:?}", std::env::current_exe())).map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20401,
-        })?,
-        CString::new(input_path).map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20402,
-        })?,
-        CString::new(format!("--output={}", output_path)).map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20403,
-        })?,
-        CString::new("--optimize=3").map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20404,
-        })?,
-    ];
-
-    let argv: Vec<_> = args.iter().map(|a| a.as_ptr()).collect();
-
-    unsafe {
-        let result = gifsicle::gifsicle_main(argv.len() as _, argv.as_ptr());
-
-        match result {
-            0 => Ok(()),
-            _ => Err(CaesiumError {
-                message: "GIF optimization failed!".to_string(),
-                code: 20405,
-            }),
-        }
-    }
+    lossy(input_path, output_path, parameters)
 }
 
 pub fn lossy(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
@@ -101,7 +62,7 @@ pub fn lossy(input_path: String, output_path: String, parameters: &CSParameters)
         match write_result {
             1 => Ok(()),
             _ => Err(CaesiumError {
-                message: "GIF optimization failed!".to_string(),
+                message: "GIF compression failed!".to_string(),
                 code: 20410,
             }),
         }

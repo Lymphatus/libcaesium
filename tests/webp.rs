@@ -85,7 +85,7 @@ fn optimize() {
     let output = "tests/samples/output/optimized.webp";
     initialize(output);
     let mut params = CSParameters::new();
-    params.optimize = true;
+    params.webp.lossless = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_家.webp"),
         String::from(output),
@@ -125,7 +125,7 @@ fn downscale_optimize() {
     let output = "tests/samples/output/downscale_optimized.webp";
     initialize(output);
     let mut params = CSParameters::new();
-    params.optimize = true;
+    params.webp.lossless = true;
     params.width = 150;
     params.height = 100;
     caesium::compress(

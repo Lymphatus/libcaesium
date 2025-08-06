@@ -33,7 +33,7 @@ fn standard_compress_png_with_optimize_flag() {
     let output = "tests/samples/output/compressed_max.png";
     initialize(output);
     let mut params = CSParameters::new();
-    params.optimize = true;
+    params.png.optimize = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
@@ -51,7 +51,7 @@ fn zopfli_compress_png() {
     let output = "tests/samples/output/optimized.png";
     initialize(output);
     let mut params = CSParameters::new();
-    params.optimize = true;
+    params.png.optimize = true;
     params.png.force_zopfli = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
@@ -91,7 +91,7 @@ fn downscale_standard_compress_png_with_optimize_flag() {
     let mut params = CSParameters::new();
     params.width = 150;
     params.height = 150;
-    params.optimize = true;
+    params.png.optimize = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),
         String::from(output),
@@ -112,7 +112,7 @@ fn downscale_zopfli_compress_png() {
     params.width = 150;
     params.height = 150;
     params.png.quality = 80;
-    params.optimize = true;
+    params.png.optimize = true;
     params.png.force_zopfli = true;
     caesium::compress(
         String::from("tests/samples/uncompressed_드림캐쳐.png"),

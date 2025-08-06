@@ -4,18 +4,16 @@
 [![Clippy](https://github.com/Lymphatus/caesium-clt/actions/workflows/clippy.yml/badge.svg)](https://github.com/Lymphatus/caesium-clt/actions/workflows/clippy.yml)
 [![Code formatting](https://github.com/Lymphatus/caesium-clt/actions/workflows/fmt.yml/badge.svg)](https://github.com/Lymphatus/caesium-clt/actions/workflows/fmt.yml)
 
-Libcaesium is a simple library performing JPEG, PNG, WebP and GIF (experimental) compression/optimization written in
+Libcaesium is a simple library performing JPEG, PNG, WebP, TIFF and GIF (partial) compression/optimization written in
 Rust, with a C interface.
-
-> [!WARNING]
-> starting from v0.6.0 the library is written in Rust and no longer in C. There's a C interface, but it's not backward
-> compatible with the <0.6.0.
 
 ## Usage example
 
-Libcaesium exposes two functions, auto-detecting the input file type
+Libcaesium exposes several functions for compressing and converting images, both from files and in-memory buffers.
 
-```Rust
+### Compress an image file
+
+```rust
 use caesium::parameters::CSParameters;
 use caesium::compress;
 
@@ -23,7 +21,72 @@ let mut parameters = CSParameters::new();
 parameters.keep_metadata = true;
 parameters.jpeg.quality = 60;
 
-let success = compress(input, output, &parameters).is_ok();
+let input_file_path = "input.jpg".to_string();
+let output_file_path = "output.jpg".to_string();
+
+let result = compress(input_file_path, output_file_path, &parameters);
+assert!(result.is_ok());
+```
+
+### Compress an image in memory
+
+```rust
+use caesium::parameters::CSParameters;
+use caesium::compress_in_memory;
+use std::fs;
+
+let parameters = CSParameters::new();
+let image_bytes = fs::read("input.png").unwrap();
+
+let compressed_bytes = compress_in_memory(image_bytes, &parameters).unwrap();
+// You can now write `compressed_bytes` to a file or use it as needed
+```
+
+### Compress an image to a target size
+
+```rust
+use caesium::parameters::CSParameters;
+use caesium::compress_to_size;
+
+let mut parameters = CSParameters::new();
+let input_file_path = "input.webp".to_string();
+let output_file_path = "output.webp".to_string();
+let max_output_size = 100_000; // 100 KB
+
+let result = compress_to_size(input_file_path, output_file_path, &mut parameters, max_output_size, true);
+assert!(result.is_ok());
+```
+
+### Convert an image to another format
+
+```rust
+use caesium::{parameters::CSParameters, convert, SupportedFileTypes};
+
+let parameters = CSParameters::new();
+let input_file_path = "input.png".to_string();
+let output_file_path = "output.jpg".to_string();
+
+let result = convert(input_file_path, output_file_path, &parameters, SupportedFileTypes::Jpeg);
+assert!(result.is_ok());
+```
+
+### Convert an image in memory
+
+```rust
+use caesium::{parameters::CSParameters, convert_in_memory, SupportedFileTypes};
+use std::fs;
+
+let parameters = CSParameters::new();
+let image_bytes = fs::read("input.tiff").unwrap();
+
+let converted_bytes = convert_in_memory(image_bytes, &parameters, SupportedFileTypes::Png).unwrap();
+// Use `converted_bytes` as needed
+```
+
+You can find more real-world usage in the [examples](examples) folder.  
+To run an example, use:  
+```bash
+cargo run --example <example_name>
 ```
 
 ## Compilation
@@ -202,7 +265,7 @@ pub enum SupportedFileTypes {
 JPEG is a lossy format: that means you will always lose some information after each compression. So, compressing a file
 with 100 quality for 10 times will result in an always different image, even though you can't really see the difference.
 Libcaesium also supports optimization. This performs a lossless process, resulting in the
-same exact image, but with a smaller size (10-12% usually).  
+same exact image, but with a smaller size (10–12% usually).  
 GIF optimization is possible, but currently not supported.
 WebP's optimization is also possible, but it will probably result in a bigger output file as it's well suited to
 losslessly convert from PNG or JPEG.

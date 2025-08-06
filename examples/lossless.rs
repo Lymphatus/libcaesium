@@ -11,7 +11,9 @@ fn main() -> ExitCode {
 
     let mut parameters = CSParameters::new();
     parameters.keep_metadata = true;
-    parameters.optimize = true;
+    parameters.jpeg.optimize = true;
+    parameters.png.optimize = true;
+    parameters.webp.lossless = true;
 
     match compress(input, output, &parameters) {
         Ok(_) => ExitCode::SUCCESS,

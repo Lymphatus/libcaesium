@@ -49,7 +49,7 @@ pub fn compress_in_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
 
     unsafe {
         catch_unwind(|| {
-            if parameters.optimize {
+            if parameters.jpeg.optimize {
                 lossless(in_file, parameters)
             } else {
                 lossy(in_file, parameters)

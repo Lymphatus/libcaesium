@@ -70,8 +70,8 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
                 });
             }
         };
-        config.lossless = if parameters.optimize { 1 } else { 0 };
-        config.alpha_compression = if parameters.optimize { 0 } else { 1 };
+        config.lossless = if parameters.webp.lossless { 1 } else { 0 };
+        config.alpha_compression = if parameters.webp.lossless { 0 } else { 1 };
         config.quality = parameters.webp.quality as f32;
 
         let mut images_data = vec![];
@@ -144,7 +144,7 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
             }
         };
 
-        if parameters.optimize {
+        if parameters.webp.lossless {
             if must_resize {
                 encoder.encode(100.0)
             } else {

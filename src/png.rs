@@ -42,7 +42,7 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
         in_file
     };
 
-    let optimized_png = if parameters.optimize {
+    let optimized_png = if parameters.png.optimize {
         lossless(input, parameters)?
     } else {
         lossy(input, parameters)?
@@ -118,7 +118,7 @@ fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caes
         oxipng_options.strip = oxipng::StripChunks::Safe;
     }
 
-    if parameters.optimize && parameters.png.force_zopfli {
+    if parameters.png.optimize && parameters.png.force_zopfli {
         let mut iterations = 15;
         if in_file.len() > 2000000 {
             iterations = 5;

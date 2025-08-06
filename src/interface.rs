@@ -11,11 +11,14 @@ pub struct CCSParameters {
     pub jpeg_quality: u32,
     pub jpeg_chroma_subsampling: u32,
     pub jpeg_progressive: bool,
+    pub jpeg_optimize: bool,
     pub png_quality: u32,
     pub png_optimization_level: u32,
     pub png_force_zopfli: bool,
+    pub png_optimize: bool,
     pub gif_quality: u32,
     pub webp_quality: u32,
+    pub webp_lossless: bool,
     pub tiff_compression: u32,
     pub tiff_deflate_level: u32,
     pub optimize: bool,
@@ -115,13 +118,15 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
 
     parameters.jpeg.quality = params.jpeg_quality;
     parameters.jpeg.progressive = params.jpeg_progressive;
+    parameters.jpeg.optimize = params.jpeg_optimize;
     parameters.png.quality = params.png_quality;
-    parameters.optimize = params.optimize;
+    parameters.png.optimize = params.png_optimize;
     parameters.keep_metadata = params.keep_metadata;
     parameters.png.optimization_level = params.png_optimization_level as u8;
     parameters.png.force_zopfli = params.png_force_zopfli;
     parameters.gif.quality = params.gif_quality;
     parameters.webp.quality = params.webp_quality;
+    parameters.webp.lossless = params.webp_lossless;
     parameters.width = params.width;
     parameters.height = params.height;
 
