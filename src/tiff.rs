@@ -96,7 +96,9 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
     }
 
     let compression_result = match parameters.tiff.algorithm {
-        TiffCompression::Deflate => write_with_compression!(Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level))),
+        TiffCompression::Deflate => {
+            write_with_compression!(Deflate::with_level(parse_deflate_level(parameters.tiff.deflate_level)))
+        }
         TiffCompression::Lzw => write_with_compression!(Lzw),
         TiffCompression::Packbits => write_with_compression!(Packbits),
         TiffCompression::Uncompressed => write_with_compression!(Uncompressed),

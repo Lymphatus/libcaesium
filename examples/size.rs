@@ -14,7 +14,7 @@ fn main() -> ExitCode {
     match compress_to_size(input, output, &mut parameters, 1000000, true) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }

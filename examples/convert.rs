@@ -16,7 +16,7 @@ fn main() -> ExitCode {
     match convert(input, output, &parameters, caesium::SupportedFileTypes::WebP) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }

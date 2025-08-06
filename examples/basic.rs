@@ -16,7 +16,7 @@ fn main() -> ExitCode {
     match compress(input, output, &parameters) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }
