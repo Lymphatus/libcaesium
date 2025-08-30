@@ -43,7 +43,7 @@ img-parts = "0.3.3"
 bytes = "1.7"
 lodepng = { version = "3.10", optional = true }
 imagequant = { version = "4.3", optional = true, default-features = false }
-tiff = { version= "0.9", optional = true }
+tiff = { version = "0.9", optional = true }
 kamadak-exif = "0.6"
 
 [target.wasm32-unknown-emscripten.dependencies]
