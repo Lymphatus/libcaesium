@@ -33,14 +33,23 @@ typedef struct CCSParameters {
   bool webp_lossless;
   uint32_t tiff_compression;
   uint32_t tiff_deflate_level;
-  bool optimize;
   uint32_t width;
   uint32_t height;
 } CCSParameters;
 
+typedef struct CByteArray {
+  uint8_t *data;
+  uintptr_t length;
+} CByteArray;
+
 struct CCSResult c_compress(const char *input_path,
                             const char *output_path,
                             struct CCSParameters params);
+
+struct CCSResult c_compress_in_memory(const uint8_t *input_data,
+                                      uintptr_t input_length,
+                                      struct CCSParameters params,
+                                      struct CByteArray *output);
 
 struct CCSResult c_compress_to_size(const char *input_path,
                                     const char *output_path,
@@ -52,3 +61,7 @@ struct CCSResult c_convert(const char *input_path,
                            const char *output_path,
                            enum SupportedFileTypes format,
                            struct CCSParameters params);
+
+void c_free_byte_array(struct CByteArray byte_array);
+
+void c_free_string(char *ptr);
