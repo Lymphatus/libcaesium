@@ -111,83 +111,94 @@ The result will be a dynamic library usable by external applications through its
 
 Libcaesium exposes C functions, auto-detecting the input file type:
 
-### Based on quality values
+### Compress an image file
 
-```Rust
-pub unsafe extern "C" fn c_compress(
-    input_path: *const c_char,
-    output_path: *const c_char,
-    params: CCSParameters
-) -> CCSResult
+```c
+struct CCSResult c_compress(
+    const char *input_path,
+    const char *output_path,
+    struct CCSParameters params
+);
 ```
 
 #### Parameters
 
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
-- `parameters` - options struct, containing compression parameters (see below)
+- `params` - options struct, containing compression parameters (see below)
 
 #### Return
 
 A `CCSResult` struct
 
-```Rust
-#[repr(C)]
-pub struct CCSResult {
-    pub success: bool,
-    pub code: u32,
-    pub error_message: *const c_char,
-}
+```c
+typedef struct CCSResult {
+    bool success;
+    uint32_t code;
+    const char *error_message;
+} CCSResult;
 ```
 
 If `success` is `true` the compression process ended successfully and `error_message` will be empty.  
 On failure, the `error_message` will be filled with a string containing a brief explanation of the error.
 
-### Based on output size
+### Compress an image in memory
 
-```Rust
-pub unsafe extern "C" fn c_compress_to_size(
-    input_path: *const c_char,
-    output_path: *const c_char,
-    params: CCSParameters,
-    max_output_size: usize,
-    return_smallest: bool,
-) -> CCSResult
+```c
+struct CCSResult c_compress_in_memory(
+    const uint8_t *input_data,
+    uintptr_t input_length,
+    struct CCSParameters params,
+    struct CByteArray *output
+);
+```
+
+#### Parameters
+
+- `input_data` - pointer to input image data
+- `input_length` - length of input data in bytes
+- `params` - options struct, containing compression parameters (see below)
+- `output` - pointer to a `CByteArray` struct that will be filled with the compressed data
+
+#### Return
+
+A `CCSResult` struct (see above).
+
+After use, free the output buffer with `c_free_byte_array`.
+
+### Compress an image to a target size
+
+```c
+struct CCSResult c_compress_to_size(
+    const char *input_path,
+    const char *output_path,
+    struct CCSParameters params,
+    uintptr_t max_output_size,
+    bool return_smallest
+);
 ```
 
 #### Parameters
 
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
-- `parameters` - options struct, containing compression parameters (see below)
+- `params` - options struct, containing compression parameters (see below)
 - `max_output_size` - the maximum output size, in bytes
 - `return_smallest` - whether to return the smallest
 
 #### Return
 
-A `CCSResult` struct
+A `CCSResult` struct (see above).
 
-```Rust
-#[repr(C)]
-pub struct CCSResult {
-    pub success: bool,
-    pub code: u32,
-    pub error_message: *const c_char,
-}
-```
+### Convert an image to another format
 
-If `success` is `true` the compression process ended successfully and `error_message` will be empty.  
-On failure, the `error_message` will be filled with a string containing a brief explanation of the error.
-
-### Based on convert output
-
-```Rust
-pub unsafe extern "C" fn c_convert(
-    input_path: *const c_char,
-    output_path: *const c_char,
-    format: SupportedFileTypes,
-    params: CCSParameters,
-) -> CCSResult
+```c
+struct CCSResult c_convert(
+    const char *input_path,
+    const char *output_path,
+    enum SupportedFileTypes format,
+    struct CCSParameters params
+);
 ```
 
 #### Parameters
@@ -195,74 +206,88 @@ pub unsafe extern "C" fn c_convert(
 - `input_path` - input file path (full filename)
 - `output_path` - output file path (full filename)
 - `format` - target image format (see below)
-- `parameters` - options struct, containing compression parameters (see below)
+- `params` - options struct, containing compression parameters (see below)
 
 #### Return
 
-A `CCSResult` struct
+A `CCSResult` struct (see above).
 
-```Rust
-#[repr(C)]
-pub struct CCSResult {
-    pub success: bool,
-    pub code: u32,
-    pub error_message: *const c_char,
-}
+### Memory management helpers
+
+After using functions that allocate memory (such as `c_compress_in_memory`), you must free the returned buffers:
+
+```c
+void c_free_byte_array(struct CByteArray byte_array);
+void c_free_string(char *ptr);
 ```
 
-If `success` is `true` the compression process ended successfully and `error_message` will be empty.  
-On failure, the `error_message` will be filled with a string containing a brief explanation of the error.
+- `c_free_byte_array` frees the memory allocated for a `CByteArray`'s data.
+- `c_free_string` frees a string allocated by the library.
 
 ### Compression options
 
-The C options struct is slightly different from the Rust one:
+The C options struct is as follows:
 
-```Rust
-#[repr(C)]
-pub struct CCSParameters {
-    pub keep_metadata: bool,
-    pub jpeg_quality: u32,
-    pub jpeg_chroma_subsampling: u32,
-    pub jpeg_progressive: bool,
-    pub jpeg_optimize: bool,
-    pub png_quality: u32,
-    pub png_optimization_level: u32,
-    pub png_force_zopfli: bool,
-    pub png_optimize: bool,
-    pub gif_quality: u32,
-    pub webp_quality: u32,
-    pub webp_lossless: bool,
-    pub tiff_compression: u32,
-    pub tiff_deflate_level: u32,
-    pub optimize: bool,
-    pub width: u32,
-    pub height: u32,
-}
+```c
+typedef struct CCSParameters {
+    bool keep_metadata;
+    uint32_t jpeg_quality;
+    uint32_t jpeg_chroma_subsampling;
+    bool jpeg_progressive;
+    bool jpeg_optimize;
+    uint32_t png_quality;
+    uint32_t png_optimization_level;
+    bool png_force_zopfli;
+    bool png_optimize;
+    uint32_t gif_quality;
+    uint32_t webp_quality;
+    bool webp_lossless;
+    uint32_t tiff_compression;
+    uint32_t tiff_deflate_level;
+    uint32_t width;
+    uint32_t height;
+} CCSParameters;
 ```
 
-The option description is the same as the Rust counterpart.  
-Valid values for `jpeg_chroma_subsampling` are `[444, 422, 420, 411]`. Any other value will be ignored and will be used
-as
-the default option.  
-Valid values for `tiff_compression` are `[0 (Uncompressed), 1 (Lzw), 2 (Deflate), 3 (Packbits)]`. Any other value will
-be ignored and `0` will be used.  
-Valid values for `tiff_deflate_level` are `[1 (Fast), 6 (Balanced), 9 (Best)]`. Any other value will be ignored and
-`Best`
-will be used.
+- `keep_metadata`: preserve image metadata (EXIF, etc.)
+- `jpeg_quality`: JPEG quality (0-100)
+- `jpeg_chroma_subsampling`: JPEG chroma subsampling (`444`, `422`, `420`, `411`)
+- `jpeg_progressive`: enable progressive JPEG
+- `jpeg_optimize`: enable JPEG optimization
+- `png_quality`: PNG quality (0-100)
+- `png_optimization_level`: PNG optimization level
+- `png_force_zopfli`: force Zopfli compression for PNG
+- `png_optimize`: enable PNG optimization
+- `gif_quality`: GIF quality (0-100)
+- `webp_quality`: WebP quality (0-100)
+- `webp_lossless`: enable WebP lossless mode
+- `tiff_compression`: TIFF compression (`0`=Uncompressed, `1`=Lzw, `2`=Deflate, `3`=Packbits)
+- `tiff_deflate_level`: TIFF deflate level (`1`=Fast, `6`=Balanced, `9`=Best)
+- `width`, `height`: resize output image (set to `0` to keep original size)
+
+### Byte array struct
+
+```c
+typedef struct CByteArray {
+    uint8_t *data;
+    uintptr_t length;
+} CByteArray;
+```
+
+- `data`: pointer to the buffer
+- `length`: length of the buffer in bytes
 
 ### Supported file types
 
-```rust
-#[repr(C)]
-#[derive(PartialEq, Eq, Clone, Copy)]
-pub enum SupportedFileTypes {
+```c
+typedef enum SupportedFileTypes {
     Jpeg,
     Png,
     Gif,
     WebP,
     Tiff,
     Unkn,
-}
+} SupportedFileTypes;
 ```
 
 ## Compression vs Optimization
