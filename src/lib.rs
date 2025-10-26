@@ -90,6 +90,8 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> error:
         SupportedFileTypes::Jpeg => jpeg::compress_in_memory(in_file, parameters)?,
         #[cfg(feature = "png")]
         SupportedFileTypes::Png => png::compress_in_memory(in_file, parameters)?,
+        #[cfg(feature = "gif")]
+        SupportedFileTypes::Gif => gif::compress_in_memory(in_file, parameters)?,
         #[cfg(feature = "webp")]
         SupportedFileTypes::WebP => webp::compress_in_memory(in_file, parameters)?,
         #[cfg(feature = "tiff")]
@@ -174,6 +176,11 @@ pub fn compress_to_size_in_memory(
                 SupportedFileTypes::Png => {
                     parameters.png.quality = quality;
                     png::compress_in_memory(in_file.clone(), parameters)? //TODO clone
+                }
+                #[cfg(feature = "gif")]
+                SupportedFileTypes::Gif => {
+                    parameters.gif.quality = quality;
+                    gif::compress_in_memory(in_file.clone(), parameters)? //TODO clone
                 }
                 #[cfg(feature = "webp")]
                 SupportedFileTypes::WebP => {
@@ -361,7 +368,7 @@ fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
         });
     }
 
-    if parameters.gif.quality > 100 {
+    if parameters.gif.quality > 100 || parameters.gif.quality < 1 {
         return Err(CaesiumError {
             message: "Invalid GIF quality value".into(),
             code: 10003,

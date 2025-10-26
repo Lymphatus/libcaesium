@@ -53,7 +53,7 @@ pub fn resize_image(image: DynamicImage, width: u32, height: u32) -> DynamicImag
     image.resize_exact(dimensions.0, dimensions.1, FilterType::Lanczos3)
 }
 
-fn compute_dimensions(
+pub fn compute_dimensions(
     original_width: u32,
     original_height: u32,
     desired_width: u32,
