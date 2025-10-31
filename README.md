@@ -235,6 +235,7 @@ typedef struct CCSParameters {
     uint32_t jpeg_chroma_subsampling;
     bool jpeg_progressive;
     bool jpeg_optimize;
+    bool jpeg_preserve_icc;
     uint32_t png_quality;
     uint32_t png_optimization_level;
     bool png_force_zopfli;
@@ -254,6 +255,7 @@ typedef struct CCSParameters {
 - `jpeg_chroma_subsampling`: JPEG chroma subsampling (`444`, `422`, `420`, `411`)
 - `jpeg_progressive`: enable progressive JPEG
 - `jpeg_optimize`: enable JPEG optimization
+- `jpeg_preserve_icc`: allows to preserve ICC profile regardless of `keep_metadata`
 - `png_quality`: PNG quality (0-100)
 - `png_optimization_level`: PNG optimization level
 - `png_force_zopfli`: force Zopfli compression for PNG
@@ -264,6 +266,9 @@ typedef struct CCSParameters {
 - `tiff_compression`: TIFF compression (`0`=Uncompressed, `1`=Lzw, `2`=Deflate, `3`=Packbits)
 - `tiff_deflate_level`: TIFF deflate level (`1`=Fast, `6`=Balanced, `9`=Best)
 - `width`, `height`: resize output image (set to `0` to keep original size)
+
+You can generate a C header file containing the options struct with the following command:
+`cbindgen --config cbindgen.toml --crate libcaesium --output include/libcaesium.h`
 
 ### Byte array struct
 

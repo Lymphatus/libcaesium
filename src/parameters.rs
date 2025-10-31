@@ -49,12 +49,14 @@ pub enum TiffDeflateLevel {
 /// - `chroma_subsampling`: Chroma subsampling option
 /// - `progressive`: Whether to use progressive JPEG
 /// - `optimize`: Whether to use lossless optimization for JPEG
+/// - `preserve_icc`: Always keep the original ICC data regardless of other options
 #[derive(Copy, Clone)]
 pub struct JpegParameters {
     pub quality: u32,
     pub chroma_subsampling: ChromaSubsampling,
     pub progressive: bool,
     pub optimize: bool,
+    pub preserve_icc: bool,
 }
 
 /// Struct representing parameters for PNG compression.
@@ -143,6 +145,7 @@ fn initialize_parameters() -> CSParameters {
         chroma_subsampling: ChromaSubsampling::Auto,
         progressive: true,
         optimize: false,
+        preserve_icc: true,
     };
     let png = PngParameters {
         quality: 80,

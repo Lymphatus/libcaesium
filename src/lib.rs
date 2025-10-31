@@ -4,6 +4,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 
+#[cfg(feature = "tiff")]
 use crate::parameters::TiffCompression::{Deflate, Lzw, Packbits};
 use crate::parameters::{CSParameters, TiffDeflateLevel};
 use crate::utils::{get_filetype_from_memory, get_filetype_from_path};

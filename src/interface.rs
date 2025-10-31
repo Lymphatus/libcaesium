@@ -20,6 +20,7 @@ pub struct CCSParameters {
     pub jpeg_chroma_subsampling: u32,
     pub jpeg_progressive: bool,
     pub jpeg_optimize: bool,
+    pub jpeg_preserve_icc: bool,
     pub png_quality: u32,
     pub png_optimization_level: u32,
     pub png_force_zopfli: bool,
@@ -189,6 +190,7 @@ fn c_set_parameters(params: CCSParameters) -> CSParameters {
     parameters.jpeg.quality = params.jpeg_quality;
     parameters.jpeg.progressive = params.jpeg_progressive;
     parameters.jpeg.optimize = params.jpeg_optimize;
+    parameters.jpeg.preserve_icc = params.jpeg_preserve_icc;
     parameters.png.quality = params.png_quality;
     parameters.png.optimize = params.png_optimize;
     parameters.keep_metadata = params.keep_metadata;

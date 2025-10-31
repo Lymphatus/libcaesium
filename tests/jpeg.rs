@@ -1,7 +1,8 @@
 use crate::cleanup::remove_compressed_test_file;
 use caesium::parameters::CSParameters;
 use dssim::Val;
-use std::{fs::File, sync::Once};
+use img_parts::ImageICC;
+use std::{fs, fs::File, sync::Once};
 
 mod cleanup;
 
@@ -202,4 +203,74 @@ fn downscale_exact_optimize() {
     assert_eq!(kind.mime_type(), "image/jpeg");
     assert_eq!(image::image_dimensions(output).unwrap(), (800, 600));
     remove_compressed_test_file(output)
+}
+
+#[test]
+fn preserve_icc() {
+    let mut pars = CSParameters::new();
+    // lossy
+    pars.keep_metadata = false;
+    pars.jpeg.preserve_icc = true;
+
+    let in_file = fs::read("tests/samples/icc.jpg").unwrap();
+    let input_iccp = img_parts::jpeg::Jpeg::from_bytes(in_file.to_vec().into())
+        .unwrap()
+        .icc_profile();
+
+    assert!(input_iccp.is_some());
+    let input_iccp = input_iccp.unwrap();
+
+    let output_buffer = caesium::compress_in_memory(in_file.clone(), &pars).unwrap(); //TODO too many clones
+    let kind = infer::get(&output_buffer).unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
+
+    let output_iccp = img_parts::jpeg::Jpeg::from_bytes(output_buffer.to_vec().into())
+        .unwrap()
+        .icc_profile();
+
+    assert!(output_iccp.is_some());
+    let output_iccp = output_iccp.unwrap();
+    assert_eq!(input_iccp, output_iccp);
+
+    // lossless
+    pars.jpeg.optimize = true;
+    let output_buffer = caesium::compress_in_memory(in_file.clone(), &pars).unwrap(); //TODO too many clones
+    let kind = infer::get(&output_buffer).unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
+
+    let output_iccp = img_parts::jpeg::Jpeg::from_bytes(output_buffer.to_vec().into())
+        .unwrap()
+        .icc_profile();
+
+    assert!(output_iccp.is_some());
+    let output_iccp = output_iccp.unwrap();
+    assert_eq!(input_iccp, output_iccp);
+
+    // resize
+    pars.jpeg.optimize = false;
+    pars.width = 200;
+    let output_buffer = caesium::compress_in_memory(in_file.clone(), &pars).unwrap();
+    let kind = infer::get(&output_buffer).unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
+
+    let output_iccp = img_parts::jpeg::Jpeg::from_bytes(output_buffer.to_vec().into())
+        .unwrap()
+        .icc_profile();
+    assert!(output_iccp.is_some());
+    let output_iccp = output_iccp.unwrap();
+    assert_eq!(input_iccp, output_iccp);
+
+    assert_eq!(input_iccp, output_iccp);
+
+    // strip
+    pars.jpeg.preserve_icc = false;
+    let output_buffer = caesium::compress_in_memory(in_file.clone(), &pars).unwrap(); //TODO too many clones
+    let kind = infer::get(&output_buffer).unwrap();
+    assert_eq!(kind.mime_type(), "image/jpeg");
+
+    let output_iccp = img_parts::jpeg::Jpeg::from_bytes(output_buffer.to_vec().into())
+        .unwrap()
+        .icc_profile();
+
+    assert!(output_iccp.is_none());
 }

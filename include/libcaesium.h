@@ -24,6 +24,7 @@ typedef struct CCSParameters {
   uint32_t jpeg_chroma_subsampling;
   bool jpeg_progressive;
   bool jpeg_optimize;
+  bool jpeg_preserve_icc;
   uint32_t png_quality;
   uint32_t png_optimization_level;
   bool png_force_zopfli;
