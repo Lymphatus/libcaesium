@@ -24,7 +24,7 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
         code: 20100,
     })?;
 
-    let out_buffer = compress_in_memory(in_file, parameters)?;
+    let out_buffer = compress_in_memory(&in_file, parameters)?;
     let mut out_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20101,
@@ -36,19 +36,37 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     Ok(())
 }
 
-pub fn compress_in_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     if parameters.width > 0 || parameters.height > 0 {
+        let mut input = resize(in_file, parameters.width, parameters.height, Jpeg)?;
         if parameters.keep_metadata || parameters.jpeg.preserve_icc {
-            let metadata = extract_metadata(&in_file);
-            in_file = resize(in_file, parameters.width, parameters.height, Jpeg)?;
-            in_file = save_metadata(
-                in_file,
-                metadata.0,
-                metadata.1,
-                parameters.jpeg.preserve_icc && !parameters.keep_metadata,
-            );
-        } else {
-            in_file = resize(in_file, parameters.width, parameters.height, Jpeg)?;
+            let (iccp, exif) = extract_metadata(in_file);
+
+            if iccp.is_some() || exif.is_some() {
+                input = save_metadata(
+                    &input,
+                    iccp,
+                    exif,
+                    parameters.jpeg.preserve_icc && !parameters.keep_metadata,
+                )
+                .unwrap_or(input);
+            }
+        }
+
+        unsafe {
+            return catch_unwind(|| {
+                if parameters.jpeg.optimize {
+                    lossless(&input, parameters)
+                } else {
+                    lossy(&input, parameters)
+                }
+            })
+            .unwrap_or_else(|_| {
+                Err(CaesiumError {
+                    message: format!("Internal JPEG error: {}", JPEG_ERROR.load(Ordering::SeqCst)),
+                    code: 20104,
+                })
+            });
         }
     }
 
@@ -69,7 +87,7 @@ pub fn compress_in_memory(mut in_file: Vec<u8>, parameters: &CSParameters) -> Re
     }
 }
 
-unsafe fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+unsafe fn lossless(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
 
     let mut src_err = mem::zeroed();
@@ -124,7 +142,7 @@ unsafe fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8
     Ok(result)
 }
 
-unsafe fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+unsafe fn lossy(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut src_info: jpeg_decompress_struct = mem::zeroed();
     let mut src_err = mem::zeroed();
     let mut dst_info: jpeg_compress_struct = mem::zeroed();
@@ -239,25 +257,21 @@ fn extract_metadata(image: &[u8]) -> (Option<Bytes>, Option<Bytes>) {
 }
 
 //TODO if image is resized, change "PixelXDimension" and "PixelYDimension"
-fn save_metadata(image_buffer: Vec<u8>, iccp: Option<Bytes>, exif: Option<Bytes>, only_icc: bool) -> Vec<u8> {
-    if iccp.is_some() || exif.is_some() {
-        let mut dyn_image = match PartsJpeg::from_bytes(img_parts::Bytes::from(image_buffer.clone())) {
-            Ok(d) => d,
-            Err(_) => return image_buffer,
-        };
+fn save_metadata(image_buffer: &[u8], iccp: Option<Bytes>, exif: Option<Bytes>, only_icc: bool) -> Option<Vec<u8>> {
+    let mut dyn_image = match PartsJpeg::from_bytes(img_parts::Bytes::from(image_buffer.to_vec())) {
+        Ok(d) => d,
+        Err(_) => return None,
+    };
 
-        dyn_image.set_icc_profile(iccp);
-        if !only_icc {
-            dyn_image.set_exif(exif);
-        }
+    dyn_image.set_icc_profile(iccp);
+    if !only_icc {
+        dyn_image.set_exif(exif);
+    }
 
-        let mut image_with_metadata: Vec<u8> = vec![];
-        match dyn_image.encoder().write_to(&mut image_with_metadata) {
-            Ok(_) => image_with_metadata,
-            Err(_) => image_buffer,
-        }
-    } else {
-        image_buffer
+    let mut image_with_metadata: Vec<u8> = vec![];
+    match dyn_image.encoder().write_to(&mut image_with_metadata) {
+        Ok(_) => Some(image_with_metadata),
+        Err(_) => None,
     }
 }
 

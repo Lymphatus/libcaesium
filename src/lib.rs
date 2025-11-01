@@ -88,15 +88,15 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> error:
     let file_type = get_filetype_from_memory(in_file.as_slice());
     let compressed_file = match file_type {
         #[cfg(feature = "jpg")]
-        SupportedFileTypes::Jpeg => jpeg::compress_in_memory(in_file, parameters)?,
+        SupportedFileTypes::Jpeg => jpeg::compress_in_memory(&in_file, parameters)?,
         #[cfg(feature = "png")]
-        SupportedFileTypes::Png => png::compress_in_memory(in_file, parameters)?,
+        SupportedFileTypes::Png => png::compress_in_memory(&in_file, parameters)?,
         #[cfg(feature = "gif")]
-        SupportedFileTypes::Gif => gif::compress_in_memory(in_file, parameters)?,
+        SupportedFileTypes::Gif => gif::compress_in_memory(&in_file, parameters)?,
         #[cfg(feature = "webp")]
-        SupportedFileTypes::WebP => webp::compress_in_memory(in_file, parameters)?,
+        SupportedFileTypes::WebP => webp::compress_in_memory(&in_file, parameters)?,
         #[cfg(feature = "tiff")]
-        SupportedFileTypes::Tiff => tiff::compress_in_memory(in_file, parameters)?,
+        SupportedFileTypes::Tiff => tiff::compress_in_memory(&in_file, parameters)?,
         _ => {
             return Err(CaesiumError {
                 message: "Format not supported for compression in memory".into(),
@@ -142,10 +142,10 @@ pub fn compress_to_size_in_memory(
             let algorithms = [Lzw, Packbits];
             parameters.tiff.deflate_level = TiffDeflateLevel::Best;
             parameters.tiff.algorithm = Deflate;
-            let mut smallest_result = tiff::compress_in_memory(in_file.clone(), parameters)?; //TODO clone
+            let mut smallest_result = tiff::compress_in_memory(&in_file, parameters)?;
             for tc in algorithms {
                 parameters.tiff.algorithm = tc;
-                let result = tiff::compress_in_memory(in_file.clone(), parameters)?; //TODO clone
+                let result = tiff::compress_in_memory(&in_file, parameters)?;
                 if result.len() < smallest_result.len() {
                     smallest_result = result;
                 }
@@ -171,22 +171,22 @@ pub fn compress_to_size_in_memory(
                 #[cfg(feature = "jpg")]
                 SupportedFileTypes::Jpeg => {
                     parameters.jpeg.quality = quality;
-                    jpeg::compress_in_memory(in_file.clone(), parameters)? //TODO clone
+                    jpeg::compress_in_memory(&in_file, parameters)?
                 }
                 #[cfg(feature = "png")]
                 SupportedFileTypes::Png => {
                     parameters.png.quality = quality;
-                    png::compress_in_memory(in_file.clone(), parameters)? //TODO clone
+                    png::compress_in_memory(&in_file, parameters)?
                 }
                 #[cfg(feature = "gif")]
                 SupportedFileTypes::Gif => {
                     parameters.gif.quality = quality;
-                    gif::compress_in_memory(in_file.clone(), parameters)? //TODO clone
+                    gif::compress_in_memory(&in_file, parameters)?
                 }
                 #[cfg(feature = "webp")]
                 SupportedFileTypes::WebP => {
                     parameters.webp.quality = quality;
-                    webp::compress_in_memory(in_file.clone(), parameters)? //TODO clone
+                    webp::compress_in_memory(&in_file, parameters)?
                 }
                 _ => {
                     return Err(CaesiumError {

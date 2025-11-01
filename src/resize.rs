@@ -7,15 +7,14 @@ use crate::error::CaesiumError;
 use crate::utils::get_jpeg_orientation;
 
 pub fn resize(
-    image_buffer: Vec<u8>,
+    image_buffer: &[u8],
     width: u32,
     height: u32,
     format: image::ImageFormat,
 ) -> Result<Vec<u8>, CaesiumError> {
-    let buffer_slice = image_buffer.as_slice();
     let (mut desired_width, mut desired_height) = (width, height);
     if format == image::ImageFormat::Jpeg {
-        let orientation = get_jpeg_orientation(buffer_slice);
+        let orientation = get_jpeg_orientation(image_buffer);
         (desired_width, desired_height) = match orientation {
             5..=8 => (height, width),
             _ => (width, height),

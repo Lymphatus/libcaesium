@@ -17,10 +17,10 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     })?;
 
     if parameters.width > 0 || parameters.height > 0 {
-        in_file = resize(in_file, parameters.width, parameters.height, ImageFormat::Png)?;
+        in_file = resize(&in_file, parameters.width, parameters.height, ImageFormat::Png)?;
     }
 
-    let optimized_png = compress_in_memory(in_file, parameters)?;
+    let optimized_png = compress_in_memory(&in_file, parameters)?;
     let mut output_file_buffer = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20202,
@@ -35,23 +35,23 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     Ok(())
 }
 
-pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
-    let input = if parameters.width > 0 || parameters.height > 0 {
-        resize(in_file, parameters.width, parameters.height, ImageFormat::Png)?
-    } else {
-        in_file
-    };
+pub fn compress_in_memory(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+    if parameters.width > 0 || parameters.height > 0 {
+        let input = resize(in_file, parameters.width, parameters.height, ImageFormat::Png)?;
 
-    let optimized_png = if parameters.png.optimize {
-        lossless(input, parameters)?
+        if parameters.png.optimize {
+            Ok(lossless(&input, parameters)?)
+        } else {
+            Ok(lossy(&input, parameters)?)
+        }
+    } else if parameters.png.optimize {
+        Ok(lossless(in_file, parameters)?)
     } else {
-        lossy(input, parameters)?
-    };
-
-    Ok(optimized_png)
+        Ok(lossy(in_file, parameters)?)
+    }
 }
 
-fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+fn lossy(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let rgba_bitmap = lodepng::decode32(in_file).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20204,
@@ -112,7 +112,7 @@ fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caesium
     Ok(png_vec)
 }
 
-fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+fn lossless(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut oxipng_options = oxipng::Options::default();
     if !parameters.keep_metadata {
         oxipng_options.strip = oxipng::StripChunks::Safe;
@@ -131,11 +131,10 @@ fn lossless(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caes
         oxipng_options = oxipng::Options::from_preset(optimization_level);
     }
 
-    let optimized_png =
-        oxipng::optimize_from_memory(in_file.as_slice(), &oxipng_options).map_err(|e| CaesiumError {
-            message: e.to_string(),
-            code: 20210,
-        })?;
+    let optimized_png = oxipng::optimize_from_memory(in_file, &oxipng_options).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20210,
+    })?;
 
     Ok(optimized_png)
 }

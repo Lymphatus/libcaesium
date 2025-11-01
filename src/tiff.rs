@@ -24,7 +24,7 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
         code: 20501,
     })?;
 
-    let compressed_image = compress_in_memory(input_data, parameters)?;
+    let compressed_image = compress_in_memory(&input_data, parameters)?;
 
     let mut output_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
@@ -38,7 +38,7 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     Ok(())
 }
 
-pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(in_file: &Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let decoding_result = match panic::catch_unwind(|| image::load_from_memory_with_format(in_file.as_slice(), Tiff)) {
         Ok(i) => i,
         Err(_) => {

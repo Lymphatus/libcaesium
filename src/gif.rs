@@ -12,7 +12,7 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
         code: 20400,
     })?;
 
-    let optimized_gif = compress_in_memory(in_file, parameters)?;
+    let optimized_gif = compress_in_memory(&in_file, parameters)?;
     let mut output_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20402,
@@ -27,13 +27,13 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     Ok(())
 }
 
-pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(in_file: &Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let compressed = lossy(in_file, parameters)?;
 
     Ok(compressed)
 }
 
-fn lossy(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+fn lossy(in_file: &Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut decoder = gif::DecodeOptions::new();
     decoder.set_color_output(gif::ColorOutput::Indexed);
     let mut decoder = decoder.read_info(in_file.as_slice()).map_err(|e| CaesiumError {

@@ -24,7 +24,7 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
         code: 20301,
     })?;
 
-    let compressed_image = compress_in_memory(input_data, parameters)?;
+    let compressed_image = compress_in_memory(&input_data, parameters)?;
 
     let mut output_file = File::create(output_path).map_err(|e| CaesiumError {
         message: e.to_string(),
@@ -38,12 +38,12 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     Ok(())
 }
 
-pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+pub fn compress_in_memory(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
     let mut iccp: Option<Bytes> = None;
     let mut exif: Option<Bytes> = None;
 
     if parameters.keep_metadata {
-        (iccp, exif) = DynImage::from_bytes(in_file.clone().into())
+        (iccp, exif) = DynImage::from_bytes(in_file.to_vec().into())
             .map_err(|e| CaesiumError {
                 message: e.to_string(),
                 code: 20306,
@@ -53,7 +53,7 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> Result
 
     let must_resize = parameters.width > 0 || parameters.height > 0;
 
-    let anim_decoder = AnimDecoder::new(&in_file);
+    let anim_decoder = AnimDecoder::new(in_file);
     let frames = anim_decoder.decode().map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20304,
