@@ -259,6 +259,9 @@ pub fn compress_to_size(
 
     // If we resize, we should always go for at least a round of compression
     if !(parameters.width > 0 || parameters.height > 0) && original_size <= max_output_size {
+        if input_path == output_path {
+            return Ok(());
+        }
         fs::copy(input_path, output_path).map_err(|e| CaesiumError {
             message: e.to_string(),
             code: 10202,
