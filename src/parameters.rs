@@ -94,6 +94,17 @@ pub struct WebPParameters {
     pub lossless: bool,
 }
 
+/// Struct representing parameters for AVIF compression.
+///
+/// Fields:
+/// - `quality`: Quality of the AVIF image (0-100)
+/// - `speed`: Encoding speed (1-10, lower is slower but better quality)
+#[derive(Copy, Clone)]
+pub struct AvifParameters {
+    pub quality: u32,
+    pub speed: u8,
+}
+
 /// Struct representing parameters for TIFF compression.
 ///
 /// Fields:
@@ -113,6 +124,7 @@ pub struct TiffParameters {
 /// - `gif`: GIF compression parameters
 /// - `webp`: WebP compression parameters
 /// - `tiff`: TIFF compression parameters
+/// - `avif`: AVIF compression parameters
 /// - `keep_metadata`: Whether to keep metadata in the compressed image
 /// - `width`: Width of the output image
 /// - `height`: Height of the output image
@@ -123,6 +135,7 @@ pub struct CSParameters {
     pub gif: GifParameters,
     pub webp: WebPParameters,
     pub tiff: TiffParameters,
+    pub avif: AvifParameters,
     pub keep_metadata: bool,
     pub width: u32,
     pub height: u32,
@@ -162,6 +175,10 @@ fn initialize_parameters() -> CSParameters {
         algorithm: Deflate,
         deflate_level: TiffDeflateLevel::Balanced,
     };
+    let avif = AvifParameters {
+        quality: 80,
+        speed: 4,
+    };
 
     CSParameters {
         jpeg,
@@ -169,6 +186,7 @@ fn initialize_parameters() -> CSParameters {
         gif,
         webp,
         tiff,
+        avif,
         keep_metadata: false,
         width: 0,
         height: 0,

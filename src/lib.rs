@@ -26,6 +26,8 @@ mod tiff;
 mod utils;
 #[cfg(feature = "webp")]
 mod webp;
+#[cfg(feature = "avif")]
+mod avif;
 
 /// Compresses an image file from the input path and writes the compressed image to the output path.
 ///
@@ -63,6 +65,10 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
         SupportedFileTypes::Tiff => {
             tiff::compress(input_path, output_path, parameters)?;
         }
+        #[cfg(feature = "avif")]
+        SupportedFileTypes::Avif => {
+            avif::compress(input_path, output_path, parameters)?;
+        }
         _ => {
             return Err(CaesiumError {
                 message: "Unknown file type or file not found".into(),
@@ -97,6 +103,8 @@ pub fn compress_in_memory(in_file: Vec<u8>, parameters: &CSParameters) -> error:
         SupportedFileTypes::WebP => webp::compress_in_memory(&in_file, parameters)?,
         #[cfg(feature = "tiff")]
         SupportedFileTypes::Tiff => tiff::compress_in_memory(&in_file, parameters)?,
+        #[cfg(feature = "avif")]
+        SupportedFileTypes::Avif => avif::compress_in_memory(&in_file, parameters)?,
         _ => {
             return Err(CaesiumError {
                 message: "Format not supported for compression in memory".into(),
@@ -187,6 +195,11 @@ pub fn compress_to_size_in_memory(
                 SupportedFileTypes::WebP => {
                     parameters.webp.quality = quality;
                     webp::compress_in_memory(&in_file, parameters)?
+                }
+                #[cfg(feature = "avif")]
+                SupportedFileTypes::Avif => {
+                    parameters.avif.quality = quality;
+                    avif::compress_in_memory(&in_file, parameters)?
                 }
                 _ => {
                     return Err(CaesiumError {
@@ -386,6 +399,20 @@ fn validate_parameters(parameters: &CSParameters) -> error::Result<()> {
         });
     }
 
+    if parameters.avif.quality > 100 {
+        return Err(CaesiumError {
+            message: "Invalid AVIF quality value".into(),
+            code: 10005,
+        });
+    }
+
+    if parameters.avif.speed < 1 || parameters.avif.speed > 10 {
+        return Err(CaesiumError {
+            message: "Invalid AVIF speed value (must be 1-10)".into(),
+            code: 10007,
+        });
+    }
+
     Ok(())
 }
 
@@ -397,5 +424,6 @@ pub enum SupportedFileTypes {
     Gif,
     WebP,
     Tiff,
+    Avif,
     Unkn,
 }

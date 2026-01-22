@@ -123,6 +123,7 @@ fn map_image_format(format: SupportedFileTypes) -> Result<ImageFormat, CaesiumEr
         SupportedFileTypes::Gif => ImageFormat::Gif,
         SupportedFileTypes::WebP => ImageFormat::WebP,
         SupportedFileTypes::Tiff => ImageFormat::Tiff,
+        SupportedFileTypes::Avif => ImageFormat::Avif,
         _ => {
             return Err(CaesiumError {
                 message: "Output format is unknown".into(),
