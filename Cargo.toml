@@ -39,7 +39,7 @@ webp = { version = "0.3.1", optional = true }
 infer = "0.19"
 image = { version = "0.25", default-features = false }
 img-parts = "0.4.0"
-bytes = "1.7"
+bytes = "1.11"
 lodepng = { version = "3.10", optional = true }
 imagequant = { version = "4.3", optional = true, default-features = false }
 tiff = { version = "0.9", optional = true }
