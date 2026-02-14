@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.20.1"
+version = "0.20.2"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
