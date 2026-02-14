@@ -10,6 +10,10 @@ use image::ImageFormat;
 use imagequant::RGBA;
 use oxipng::Deflaters::Zopfli;
 
+use bytes::Bytes;
+use img_parts::png::Png as PartsPng;
+use img_parts::{ImageEXIF, ImageICC};
+
 pub fn compress(input_path: String, output_path: String, parameters: &CSParameters) -> Result<(), CaesiumError> {
     let mut in_file = fs::read(input_path).map_err(|e| CaesiumError {
         message: e.to_string(),
@@ -52,6 +56,12 @@ pub fn compress_in_memory(in_file: &[u8], parameters: &CSParameters) -> Result<V
 }
 
 fn lossy(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumError> {
+    let (iccp, exif) = if parameters.keep_metadata {
+        extract_metadata(in_file)
+    } else {
+        (None, None)
+    };
+
     let rgba_bitmap = lodepng::decode32(in_file).map_err(|e| CaesiumError {
         message: e.to_string(),
         code: 20204,
@@ -109,6 +119,12 @@ fn lossy(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumEr
             code: 20209,
         })?;
 
+    if parameters.keep_metadata && (iccp.is_some() || exif.is_some()) {
+        if let Some(rewritten) = save_metadata(&png_vec, iccp, exif) {
+            return Ok(rewritten);
+        }
+    }
+
     Ok(png_vec)
 }
 
@@ -137,4 +153,27 @@ fn lossless(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, Caesiu
     })?;
 
     Ok(optimized_png)
+}
+
+fn extract_metadata(image: &[u8]) -> (Option<Bytes>, Option<Bytes>) {
+    match PartsPng::from_bytes(Bytes::from(image.to_vec())) {
+        Ok(png) => (png.icc_profile(), png.exif()),
+        Err(_) => (None, None),
+    }
+}
+
+fn save_metadata(image_buffer: &[u8], iccp: Option<Bytes>, exif: Option<Bytes>) -> Option<Vec<u8>> {
+    let mut png = match PartsPng::from_bytes(Bytes::from(image_buffer.to_vec())) {
+        Ok(p) => p,
+        Err(_) => return None,
+    };
+
+    png.set_icc_profile(iccp);
+    png.set_exif(exif);
+
+    let mut output: Vec<u8> = Vec::new();
+    match png.encoder().write_to(&mut output) {
+        Ok(_) => Some(output),
+        Err(_) => None,
+    }
 }
