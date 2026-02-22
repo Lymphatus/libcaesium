@@ -44,12 +44,11 @@ pub fn compress_in_memory(in_file: &[u8], parameters: &CSParameters) -> Result<V
 
             if iccp.is_some() || exif.is_some() {
                 input = save_metadata(
-                    &input,
+                    input,
                     iccp,
                     exif,
                     parameters.jpeg.preserve_icc && !parameters.keep_metadata,
-                )
-                .unwrap_or(input);
+                )?;
             }
         }
 
@@ -250,18 +249,27 @@ unsafe fn save_markers(src_info: &mut jpeg_decompress_struct, parameters: &CSPar
 }
 
 fn extract_metadata(image: &[u8]) -> (Option<Bytes>, Option<Bytes>) {
-    match PartsJpeg::from_bytes(Bytes::from(image.to_vec())) {
-        Ok(d) => (d.icc_profile(), d.exif()),
-        Err(_) => (None, None),
-    }
+    let Ok(d) = PartsJpeg::from_bytes(Bytes::copy_from_slice(image)) else {
+        return (None, None);
+    };
+
+    let iccp = d.icc_profile().map(|b| Bytes::copy_from_slice(&b));
+    let exif = d.exif().map(|b| Bytes::copy_from_slice(&b));
+
+    (iccp, exif)
 }
 
 //TODO if image is resized, change "PixelXDimension" and "PixelYDimension"
-fn save_metadata(image_buffer: &[u8], iccp: Option<Bytes>, exif: Option<Bytes>, only_icc: bool) -> Option<Vec<u8>> {
-    let mut dyn_image = match PartsJpeg::from_bytes(img_parts::Bytes::from(image_buffer.to_vec())) {
-        Ok(d) => d,
-        Err(_) => return None,
-    };
+fn save_metadata(
+    image_buffer: Vec<u8>,
+    iccp: Option<Bytes>,
+    exif: Option<Bytes>,
+    only_icc: bool,
+) -> Result<Vec<u8>, CaesiumError> {
+    let mut dyn_image = PartsJpeg::from_bytes(Bytes::from(image_buffer)).map_err(|_| CaesiumError {
+        message: "Failed to parse JPEG for metadata saving".to_string(),
+        code: 20110,
+    })?;
 
     dyn_image.set_icc_profile(iccp);
     if !only_icc {
@@ -269,10 +277,15 @@ fn save_metadata(image_buffer: &[u8], iccp: Option<Bytes>, exif: Option<Bytes>, 
     }
 
     let mut image_with_metadata: Vec<u8> = vec![];
-    match dyn_image.encoder().write_to(&mut image_with_metadata) {
-        Ok(_) => Some(image_with_metadata),
-        Err(_) => None,
-    }
+    dyn_image
+        .encoder()
+        .write_to(&mut image_with_metadata)
+        .map_err(|_| CaesiumError {
+            message: "Failed to encode JPEG after writing metadata".to_string(),
+            code: 20111,
+        })?;
+
+    Ok(image_with_metadata)
 }
 
 unsafe fn write_metadata(src_info: &mut jpeg_decompress_struct, dst_info: &mut jpeg_compress_struct) {
