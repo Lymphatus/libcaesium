@@ -1,6 +1,6 @@
 [package]
 name = "libcaesium"
-version = "0.20.2"
+version = "0.20.3"
 authors = ["Matteo Paonessa <matteo.paonessa@gmail.com>"]
 edition = "2021"
 categories = ["multimedia::images"]
@@ -31,6 +31,7 @@ gif = ["dep:gifski", "dep:gif", "dep:gif-dispose", "image/gif"]
 tiff = ["dep:tiff", "image/tiff"]
 parallel = ["oxipng?/parallel", "imagequant?/threads", "dssim/threads"]
 
+
 [dependencies]
 mozjpeg-sys = { version = "=2.2.1", optional = true }
 oxipng = { version = "9.0", default-features = false, features = ["filetime", "zopfli"], optional = true }
@@ -47,6 +48,8 @@ kamadak-exif = "0.6"
 gifski = { version = "1.34", optional = true }
 gif = { version = "0.13", optional = true }
 gif-dispose = { version = "5.0", optional = true }
+
+imgref = "1.12.0"
 
 [target.wasm32-unknown-emscripten.dependencies]
 libwebp-sys = "=0.9.5"
