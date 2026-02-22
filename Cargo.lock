@@ -644,7 +644,7 @@ checksum = "6800badb6cb2082ffd7b6a67e6125bb39f18782f793520caee8cb8846be06112"
 
 [[package]]
 name = "libcaesium"
-version = "0.20.2"
+version = "0.20.3"
 dependencies = [
  "bytes",
  "dssim",
@@ -654,6 +654,7 @@ dependencies = [
  "image",
  "imagequant",
  "img-parts",
+ "imgref",
  "infer",
  "kamadak-exif",
  "libc",
