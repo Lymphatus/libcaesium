@@ -1,5 +1,8 @@
 use crate::cleanup::remove_compressed_test_file;
+use bytes::Bytes;
 use caesium::parameters::CSParameters;
+use img_parts::png::Png as PartsPng;
+use img_parts::{ImageEXIF, ImageICC};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -99,6 +102,59 @@ fn jpeg_resize_optimize_with_metadata() {
 //     ));
 //     remove_compressed_test_file(output)
 // }
+
+#[test]
+fn png_lossy_with_metadata() {
+    let output = "tests/samples/output/lossy_metadata.png";
+    initialize(output);
+    let mut pars = CSParameters::new();
+    pars.png.quality = 80;
+    pars.png.optimize = false;
+    pars.keep_metadata = true;
+    caesium::compress(String::from("tests/samples/metadata.png"), String::from(output), &pars).unwrap();
+    assert!(Path::new(output).exists());
+    assert!(png_metadata_is_equal(
+        Path::new("tests/samples/metadata.png"),
+        Path::new(output)
+    ));
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn png_lossless_with_metadata() {
+    let output = "tests/samples/output/lossless_metadata.png";
+    initialize(output);
+    let mut pars = CSParameters::new();
+    pars.png.optimize = true;
+    pars.keep_metadata = true;
+    caesium::compress(String::from("tests/samples/metadata.png"), String::from(output), &pars).unwrap();
+    assert!(Path::new(output).exists());
+    assert!(png_metadata_is_equal(
+        Path::new("tests/samples/metadata.png"),
+        Path::new(output)
+    ));
+    remove_compressed_test_file(output)
+}
+
+fn png_metadata_is_equal(input: &Path, output: &Path) -> bool {
+    let in_buf = fs::read(input).unwrap();
+    let out_buf = fs::read(output).unwrap();
+
+    let in_png = PartsPng::from_bytes(Bytes::from(in_buf)).unwrap();
+    let out_png = PartsPng::from_bytes(Bytes::from(out_buf)).unwrap();
+
+    let in_iccp = in_png.icc_profile();
+    let out_iccp = out_png.icc_profile();
+
+    let in_exif = in_png.exif();
+    let out_exif = out_png.exif();
+
+    if in_iccp.is_none() && in_exif.is_none() {
+        panic!("The test input image has no metadata to verify!");
+    }
+
+    in_iccp == out_iccp && in_exif == out_exif
+}
 
 fn extract_exif(path: &Path) -> HashMap<String, String> {
     let file = fs::File::open(path).unwrap();

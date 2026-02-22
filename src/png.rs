@@ -120,9 +120,7 @@ fn lossy(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, CaesiumEr
         })?;
 
     if parameters.keep_metadata && (iccp.is_some() || exif.is_some()) {
-        if let Some(rewritten) = save_metadata(&png_vec, iccp, exif) {
-            return Ok(rewritten);
-        }
+        return save_metadata(png_vec, iccp, exif);
     }
 
     Ok(png_vec)
@@ -156,24 +154,25 @@ fn lossless(in_file: &[u8], parameters: &CSParameters) -> Result<Vec<u8>, Caesiu
 }
 
 fn extract_metadata(image: &[u8]) -> (Option<Bytes>, Option<Bytes>) {
-    match PartsPng::from_bytes(Bytes::from(image.to_vec())) {
-        Ok(png) => (png.icc_profile(), png.exif()),
-        Err(_) => (None, None),
-    }
+    let Ok(png) = PartsPng::from_bytes(Bytes::from(image.to_vec())) else {
+        return (None, None);
+    };
+    let iccp = png.icc_profile().map(|b| Bytes::copy_from_slice(&b));
+    let exif = png.exif().map(|b| Bytes::copy_from_slice(&b));
+    (iccp, exif)
 }
 
-fn save_metadata(image_buffer: &[u8], iccp: Option<Bytes>, exif: Option<Bytes>) -> Option<Vec<u8>> {
-    let mut png = match PartsPng::from_bytes(Bytes::from(image_buffer.to_vec())) {
-        Ok(p) => p,
-        Err(_) => return None,
-    };
-
+fn save_metadata(image_buffer: Vec<u8>, iccp: Option<Bytes>, exif: Option<Bytes>) -> Result<Vec<u8>, CaesiumError> {
+    let mut png = PartsPng::from_bytes(Bytes::from(image_buffer)).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20210,
+    })?;
     png.set_icc_profile(iccp);
     png.set_exif(exif);
-
-    let mut output: Vec<u8> = Vec::new();
-    match png.encoder().write_to(&mut output) {
-        Ok(_) => Some(output),
-        Err(_) => None,
-    }
+    let mut output = Vec::new();
+    png.encoder().write_to(&mut output).map_err(|e| CaesiumError {
+        message: e.to_string(),
+        code: 20211,
+    })?;
+    Ok(output)
 }
