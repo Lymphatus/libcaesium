@@ -1,8 +1,8 @@
 # libcaesium
 
 [![Test](https://github.com/Lymphatus/libcaesium/actions/workflows/test.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/test.yml)
-[![Clippy](https://github.com/Lymphatus/caesium-clt/actions/workflows/clippy.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/clippy.yml)
-[![Code formatting](https://github.com/Lymphatus/caesium-clt/actions/workflows/fmt.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/fmt.yml)
+[![Clippy](https://github.com/Lymphatus/libcaesium/actions/workflows/clippy.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/clippy.yml)
+[![Code formatting](https://github.com/Lymphatus/libcaesium/actions/workflows/fmt.yml/badge.svg)](https://github.com/Lymphatus/libcaesium/actions/workflows/fmt.yml)
 
 Libcaesium is a simple library performing JPEG, PNG, WebP, TIFF and GIF (partial) compression/optimization written in
 Rust, with a C interface.
