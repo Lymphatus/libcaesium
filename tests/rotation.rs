@@ -124,6 +124,38 @@ fn jpeg_resize_keeps_rotation() {
 }
 
 #[test]
+fn jpeg_resize_width_without_rotation() {
+    let output = "tests/samples/output/rotation_resized_width.jpg";
+    initialize(output);
+    let mut pars = CSParameters::new();
+    pars.width = 80;
+    caesium::compress(String::from(JPEG), String::from(output), &pars).unwrap();
+
+    assert_eq!(orientation(output), 1);
+    let dimensions = image::image_dimensions(output).unwrap();
+    assert_eq!(dimensions, (80, 60), "a dropped orientation tag must not swap the axes");
+    remove_compressed_test_file(output)
+}
+
+#[test]
+fn jpeg_resize_height_without_rotation() {
+    let output = "tests/samples/output/rotation_resized_height.jpg";
+    initialize(output);
+    let mut pars = CSParameters::new();
+    pars.height = 80;
+    caesium::compress(String::from(JPEG), String::from(output), &pars).unwrap();
+
+    assert_eq!(orientation(output), 1);
+    let dimensions = image::image_dimensions(output).unwrap();
+    assert_eq!(
+        dimensions,
+        (107, 80),
+        "a dropped orientation tag must not swap the axes"
+    );
+    remove_compressed_test_file(output)
+}
+
+#[test]
 fn png_lossy_keeps_rotation() {
     let output = "tests/samples/output/rotation_lossy.png";
     initialize(output);

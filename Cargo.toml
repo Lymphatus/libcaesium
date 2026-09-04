@@ -21,7 +21,7 @@ name = "libcaesium"
 readme = "README.md"
 repository = "https://github.com/Lymphatus/libcaesium"
 rust-version = "1.90"
-version = "0.21.0"
+version = "0.21.1"
 
 [features]
 default = ["jpg", "png", "webp", "gif", "tiff", "parallel"]

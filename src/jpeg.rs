@@ -45,7 +45,13 @@ pub fn compress_in_memory(
     let rotation_exif = rotation_exif_to_preserve(in_file, parameters, source_orientation);
 
     let compressed = if parameters.width > 0 || parameters.height > 0 {
-        let mut input = resize(in_file, parameters.width, parameters.height, Jpeg)?;
+        let mut input = resize(
+            in_file,
+            parameters.width,
+            parameters.height,
+            Jpeg,
+            parameters.keep_metadata || parameters.keep_rotation,
+        )?;
         if parameters.keep_metadata || parameters.jpeg.preserve_icc {
             let (iccp, exif) = extract_metadata(in_file);
 

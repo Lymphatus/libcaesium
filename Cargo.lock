@@ -619,7 +619,7 @@ checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
 
 [[package]]
 name = "libcaesium"
-version = "0.21.0"
+version = "0.21.1"
 dependencies = [
  "bytes",
  "dssim",

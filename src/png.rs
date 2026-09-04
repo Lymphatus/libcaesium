@@ -21,7 +21,13 @@ pub fn compress(input_path: String, output_path: String, parameters: &CSParamete
     })?;
 
     if parameters.width > 0 || parameters.height > 0 {
-        in_file = resize(&in_file, parameters.width, parameters.height, ImageFormat::Png)?;
+        in_file = resize(
+            &in_file,
+            parameters.width,
+            parameters.height,
+            ImageFormat::Png,
+            parameters.keep_metadata || parameters.keep_rotation,
+        )?;
     }
 
     let optimized_png = compress_in_memory(&in_file, parameters, None)?;
@@ -47,7 +53,13 @@ pub fn compress_in_memory(
     let rotation_exif = rotation_exif_to_preserve(in_file, parameters, source_orientation);
 
     let compressed = if parameters.width > 0 || parameters.height > 0 {
-        let input = resize(in_file, parameters.width, parameters.height, ImageFormat::Png)?;
+        let input = resize(
+            in_file,
+            parameters.width,
+            parameters.height,
+            ImageFormat::Png,
+            parameters.keep_metadata || parameters.keep_rotation,
+        )?;
 
         if parameters.png.optimize {
             lossless(&input, parameters)?

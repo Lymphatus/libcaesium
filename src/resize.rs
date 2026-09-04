@@ -11,9 +11,10 @@ pub fn resize(
     width: u32,
     height: u32,
     format: image::ImageFormat,
+    rotation_survives: bool,
 ) -> Result<Vec<u8>, CaesiumError> {
     let (mut desired_width, mut desired_height) = (width, height);
-    if format == image::ImageFormat::Jpeg {
+    if format == image::ImageFormat::Jpeg && rotation_survives {
         let orientation = get_orientation(image_buffer);
         (desired_width, desired_height) = match orientation {
             5..=8 => (height, width),
