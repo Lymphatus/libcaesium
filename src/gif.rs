@@ -122,8 +122,24 @@ fn lossy(in_file: &Vec<u8>, parameters: &CSParameters) -> Result<Vec<u8>, Caesiu
             Ok(())
         });
 
-        writer
-            .write(&mut result, &mut progress::NoProgress {})
+        let writer_thread = t.spawn(|| writer.write(&mut result, &mut progress::NoProgress {}));
+
+        // gifski's internal threads schedule work on the global rayon pool. If we are a worker of that pool
+        // and block here, a caller that saturates the pool with GIFs deadlocks, so keep running pool jobs.
+        if rayon::current_thread_index().is_some() {
+            while !(writer_thread.is_finished() && frames_thread.is_finished()) {
+                if rayon::yield_now() != Some(rayon::Yield::Executed) {
+                    std::thread::sleep(std::time::Duration::from_millis(1));
+                }
+            }
+        }
+
+        writer_thread
+            .join()
+            .map_err(|_| CaesiumError {
+                message: "GIF writer thread panicked".to_string(),
+                code: 20411,
+            })?
             .map_err(|e| CaesiumError {
                 message: e.to_string(),
                 code: 20409,

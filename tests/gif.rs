@@ -117,3 +117,51 @@ fn downscale_to_size() {
     assert_eq!(image::image_dimensions(output).unwrap(), (150, 100));
     remove_compressed_test_file(output)
 }
+
+fn animated_gif(width: u16, height: u16, frames: u16) -> Vec<u8> {
+    let mut out = vec![];
+    {
+        let mut encoder = gif::Encoder::new(&mut out, width, height, &[]).unwrap();
+        encoder.set_repeat(gif::Repeat::Infinite).unwrap();
+        for f in 0..frames {
+            let mut pixels = Vec::with_capacity(width as usize * height as usize * 4);
+            for y in 0..height {
+                for x in 0..width {
+                    pixels.extend_from_slice(&[(x + f * 7) as u8, (y * 3) as u8, (x ^ y) as u8, 255]);
+                }
+            }
+            let mut frame = gif::Frame::from_rgba_speed(width, height, &mut pixels, 30);
+            frame.delay = 4;
+            encoder.write_frame(&frame).unwrap();
+        }
+    }
+    out
+}
+
+#[test]
+fn compress_inside_saturated_rayon_pool() {
+    use rayon::prelude::*;
+    use std::sync::mpsc;
+    use std::time::Duration;
+
+    let input = animated_gif(170, 170, 20);
+    let jobs = rayon::current_num_threads() * 4;
+    let (tx, rx) = mpsc::channel();
+
+    std::thread::spawn(move || {
+        let results: Vec<bool> = (0..jobs)
+            .into_par_iter()
+            .map(|_| {
+                let mut params = CSParameters::new();
+                params.gif.quality = 100;
+                caesium::compress_in_memory(input.clone(), &params).is_ok()
+            })
+            .collect();
+        let _ = tx.send(results);
+    });
+
+    let results = rx
+        .recv_timeout(Duration::from_secs(120))
+        .expect("GIF compression deadlocked inside the rayon global pool");
+    assert!(results.iter().all(|ok| *ok));
+}

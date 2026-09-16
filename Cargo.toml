@@ -21,11 +21,11 @@ name = "libcaesium"
 readme = "README.md"
 repository = "https://github.com/Lymphatus/libcaesium"
 rust-version = "1.90"
-version = "0.21.1"
+version = "0.21.2"
 
 [features]
 default = ["jpg", "png", "webp", "gif", "tiff", "parallel"]
-gif = ["dep:gifski", "dep:gif", "dep:gif-dispose", "image/gif"]
+gif = ["dep:gifski", "dep:gif", "dep:gif-dispose", "dep:rayon", "image/gif"]
 jpg = ["dep:mozjpeg-sys", "image/jpeg"]
 parallel = ["oxipng?/parallel", "imagequant?/threads", "dssim/threads"]
 png = ["dep:oxipng", "dep:lodepng", "dep:imagequant", "image/png"]
@@ -47,6 +47,7 @@ libc = "0.2"
 lodepng = {version = "3.10", optional = true}
 mozjpeg-sys = {version = "2.1", optional = true}
 oxipng = {version = "10.2", default-features = false, features = ["zopfli"], optional = true}
+rayon = {version = "1.12", optional = true}
 tiff = {version = "0.11", optional = true}
 webp = {version = "0.3.1", optional = true}
 
@@ -55,6 +56,7 @@ libwebp-sys = "=0.9.5"
 
 [dev-dependencies]
 dssim = {version = "3.3", default-features = false, features = ["no-macos-vimage"]}
+rayon = "1.12"
 
 [lib]
 bench = false
